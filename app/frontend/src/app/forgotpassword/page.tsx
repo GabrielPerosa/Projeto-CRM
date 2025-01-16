@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from "react";
-import "@/style/styles.css";
+//import "@/style/styles.css";
 import axios from "axios";
 
 export default function Profile() {

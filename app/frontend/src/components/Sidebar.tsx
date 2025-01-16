@@ -15,8 +15,8 @@ interface SidebarProps {
 export default function Sidebar({ username }: SidebarProps) {
   const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
-  const [menuVisible, setMenuVisible] = useState(false);
-  const [isClient, setIsClient] = useState(false);
+  //const [menuVisible, setMenuVisible] = useState(false);
+  //const [isClient, setIsClient] = useState(false);
   const [nomeUsuario, setNomeUsuario] = useState<string | null>(null);
 
   const items = [
@@ -59,7 +59,7 @@ export default function Sidebar({ username }: SidebarProps) {
   }, []);
 
   return (
-    <div className={`flex ${isMobile ? "w-16" : "w-64"} h-full bg-white`}>
+    <div className={`flex ${isMobile ? "w-16" : "w-64"} h-full bg-white shadow-lg`}>
       {/* Sidebar */}
       <div className="flex flex-col items-center p-3 space-y-4 w-full">
         {/* Profile Section */}
