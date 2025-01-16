@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from "react";
-import "@/style/styles.css";
+//import "@/style/styles.css";
 import { useRouter } from 'next/navigation';
 import axios from "axios";
 import { Dialog } from 'primereact/dialog';
