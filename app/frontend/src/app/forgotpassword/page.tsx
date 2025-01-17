@@ -57,15 +57,15 @@ export default function Profile() {
     }
 
     return (
-        <main className="flex justify-center items-center h-screen bg-slate-800">
-            <div className="w-full max-w-md p-6 sm:p-8 bg-slate-900 bg-opacity-75 rounded-lg shadow-lg">
+        <main className="flex justify-center items-center h-screen bg-slate-300">
+            <div className="w-full max-w-md p-6 sm:p-8 bg-blue-600 rounded-lg shadow-lg">
                 <h2 className="text-2xl font-extrabold mb-4 md:mb-2 text-white text-center">Recuperar Senha</h2>
-                <h1 className="text-center text-sm md:text-base text-gray-300 mt-5">Para recuperar sua senha, preencha o campo abaixo com seu e-mail cadastrado</h1>
+                <h1 className="text-center text-sm md:text-base text-gray-200 mt-5">Para recuperar sua senha, preencha o campo abaixo com seu e-mail cadastrado.</h1>
 
                 <form onSubmit={updateUserByEmail}>
                     {/* Campo Email */}
                     <div className="mb-4 mt-8">
-                        <label htmlFor="email" className="text-gray-400">Email</label>
+                        <label htmlFor="email" className="text-white">Email</label>
                         <input
                             type="text"
                             id="email"
@@ -73,7 +73,7 @@ export default function Profile() {
                             value={email}
                             onChange={(e) => setUserEmail(e.target.value)}
                             required
-                            className="w-full p-3 mt-2 bg-slate-800 text-white rounded-md"
+                            className="w-full p-3 mt-2 bg-blue-200 text-black rounded-md"
                             placeholder="Digite seu email"
                         />
                     </div>
@@ -86,7 +86,7 @@ export default function Profile() {
                     <div className="text-center mt-8">
                         <button
                             type="submit"
-                            className="w-full p-3 rounded-md bg-gradient-to-r from-blue-500 to-blue-300 text-white font-semibold"
+                            className="w-full p-3 rounded-md bg-gradient-to-r from-blue-300 to-blue-400 text-white font-semibold"
                         >
                             Enviar
                         </button>
