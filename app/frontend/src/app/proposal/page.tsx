@@ -1,24 +1,26 @@
-'use client';
+'use client'
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
 import '../globals.css';
-import AdvancedFilterDemo from '@/components/AdvancedFilterDemo';
+import BasicFilterDemo from '@/components/BasicFilterDemo';
 
 export default function Proposal() {
+  useEffect(() => {
+    console.log('Proposal Page Loaded');
+  }, []);
+
   return (
-    <div className="flex h-screen bg-gray-100 space-x-18">
+    <div className="flex h-screen bg-gray-100">
       <div className="w-64 bg-gray-100 shadow-md">
-        <Sidebar title="" username="" />
+        <Sidebar title="Meus serviços" username="Usuário" />
       </div>
 
-      {/* MAIN */}
+      {/* MAIN CONTENT */}
       <div className="flex-1 p-6">
-        
-      <h1 className="text-2xl font-semibold mb-6 text-gray-800">Propostas</h1>
-        
-        <div className="w-11/12">
-          <AdvancedFilterDemo />
+        <h1 className="text-2xl font-semibold mb-6 text-gray-800">Propostas</h1>
+        <div className="text-black">
+          <BasicFilterDemo />
         </div>
       </div>
     </div>
