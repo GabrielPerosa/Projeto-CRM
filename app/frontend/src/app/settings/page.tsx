@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Sidebar from '@/components/Sidebar';
-import '../globals.css';
+//import '../globals.css';
 
 export default function Settings() {
   const [formData, setFormData] = useState({
