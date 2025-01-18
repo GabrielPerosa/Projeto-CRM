@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
 import '../globals.css';
-import BasicFilterDemo from '@/components/BasicFilterDemo';
+import ClientTable from '@/components/ClientTable';
 
 export default function Proposal() {
   useEffect(() => {
@@ -20,7 +20,7 @@ export default function Proposal() {
       <div className="flex-1 p-6">
         <h1 className="text-2xl font-semibold mb-6 text-gray-800">Propostas</h1>
         <div className="text-black">
-          <BasicFilterDemo />
+          <ClientTable />
         </div>
       </div>
     </div>
