@@ -1,168 +1,303 @@
-'use client';
+"use client";
 import React, { useState } from "react";
 import { InputMask } from "primereact/inputmask";
-import 'primeicons/primeicons.css';
-import { useRouter } from 'next/navigation';
+import { Dropdown } from "primereact/dropdown";
+import "primeicons/primeicons.css";
+import { useRouter } from "next/navigation";
 import axios from "axios";
-import { Dialog } from 'primereact/dialog';
+import { Dialog } from "primereact/dialog";
+import Image from "next/image";
 
 export default function StyledMaskDemo() {
-    const [nome, setNome] = useState('');
-    const [email, setEmail] = useState('');
-    const [telefone, setTelefone] = useState('');
-    const [senha, setSenha] = useState('');
-    const [senhaVisible, setPasswordVisible] = useState(false);
-    const [responseData, setResponseData] = useState(null);
-    const [showPopup, setShowPopup] = useState(false); // Controla a exibição do popup
-    const router = useRouter();
+  const [nome, setNome] = useState("");
+  const [sobrenome, setSobrenome] = useState("");
+  const [email, setEmail] = useState("");
+  const [telefone, setTelefone] = useState("");
+  const [senha, setSenha] = useState("");
+  const [endereco, setEndereco] = useState("");
+  const [senhaVisible, setPasswordVisible] = useState(false);
+  const [responseData, setResponseData] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
+  const [estado, setEstado] = useState("");
+  const [estadosAdicionados, setEstadosAdicionados] = useState<Estado[]>([]);
+  const [valor, setValor] = useState("");
+  const router = useRouter();
 
-    const formattedTelefone = telefone.replace(/\D/g, '');
+  const formattedTelefone = telefone.replace(/\D/g, "");
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+  const estadosBrasil = [
+    { label: "Acre", value: "AC" },
+    { label: "Alagoas", value: "AL" },
+    { label: "Amapá", value: "AP" },
+    { label: "Amazonas", value: "AM" },
+    { label: "Bahia", value: "BA" },
+    { label: "Ceará", value: "CE" },
+    { label: "Distrito Federal", value: "DF" },
+    { label: "Espírito Santo", value: "ES" },
+    { label: "Goiás", value: "GO" },
+    { label: "Maranhão", value: "MA" },
+    { label: "Mato Grosso", value: "MT" },
+    { label: "Mato Grosso do Sul", value: "MS" },
+    { label: "Minas Gerais", value: "MG" },
+    { label: "Pará", value: "PA" },
+    { label: "Paraíba", value: "PB" },
+    { label: "Paraná", value: "PR" },
+    { label: "Pernambuco", value: "PE" },
+    { label: "Piauí", value: "PI" },
+    { label: "Rio de Janeiro", value: "RJ" },
+    { label: "Rio Grande do Norte", value: "RN" },
+    { label: "Rio Grande do Sul", value: "RS" },
+    { label: "Rondônia", value: "RO" },
+    { label: "Roraima", value: "RR" },
+    { label: "Santa Catarina", value: "SC" },
+    { label: "São Paulo", value: "SP" },
+    { label: "Sergipe", value: "SE" },
+    { label: "Tocantins", value: "TO" },
+  ];
 
-        const usuarioDto = {
-            nome,
-            email,
-            telefone: formattedTelefone,
-            senha
-        };
-        try {
-            const response = await axios.post('http://localhost/api/usuario', usuarioDto);
-            console.log('Usuário criado:', response.data);
-            setShowPopup(true);
-        
-            // Aguardar os 3 segundos antes de redirecionar
-            await new Promise((resolve) => setTimeout(resolve, 2000));
-            
-            setShowPopup(false); //esconde o popup após a espera
-            setResponseData(response.data);
-            router.push('http://localhost:3000/login');
-        } catch (error) {
-            console.error('Erro:', error);
-        }
+  interface Estado {
+    estado: string;
+    valor: string;
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const usuarioDto = {
+      nome,
+      sobrenome,
+      endereco,
+      email,
+      telefone: formattedTelefone,
+      senha,
+      estadosAdicionados,
     };
+    try {
+      const response = await axios.post(
+        "http://localhost/api/usuario",
+        usuarioDto
+      );
+      setShowPopup(true);
 
-    return (
-        <main className="flex justify-center items-center min-h-screen bg-slate-300 p-4">
-            <div className="relative flex flex-col md:flex-row w-full max-w-4xl h-auto md:h-3/4 bg-slate-800 rounded-lg shadow-lg overflow-hidden">
+      await new Promise((resolve) => setTimeout(resolve, 2000));
 
-                {/* Seção do Formulário (lado esquerdo) */}
-                <div className="w-full md:w-1/2 p-6 sm:p-8 bg-blue-600  flex flex-col justify-center">
-                    <h2 className="text-2xl font-extrabold mb-4 md:mb-2 text-white text-center">Criar sua Conta</h2>
-                    <h1 className="text-center text-sm md:text-base text-gray-200">Preencha seus dados</h1>
-                    <form className="space-y-4" onSubmit={handleSubmit}>
+      setShowPopup(false);
+      setResponseData(response.data);
+      router.push("http://localhost:3000/login");
+    } catch (error) {
+      console.error("Erro:", error);
+    }
+  };
 
-                        {/* Campo Nome */}
-                        <div>
-                            <label htmlFor="nome" className="text-white block mb-1">Nome</label>
-                            <input
-                                type="text"
-                                id="nome"
-                                value={nome}
-                                onChange={(e) => setNome(e.target.value)}
-                                required
-                                className="w-full p-2  bg-blue-200 text-black rounded-md"
-                                placeholder="Digite seu nome"
-                            />
-                        </div>
+  const adicionarEstado = () => {
+    if (estado && valor) {
+      const novoEstado = { estado, valor };
+      setEstadosAdicionados([...estadosAdicionados, novoEstado]);
+      setEstado("");
+      setValor("");
+    }
+  };
 
-                        {/* Campo E-mail */}
-                        <div>
-                            <label htmlFor="email" className="text-white block mb-2">E-mail</label>
-                            <input
-                                type="email"
-                                id="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                required
-                                className="w-full p-2  bg-blue-200 text-black rounded-md"
-                                placeholder="Digite seu email"
-                            />
-                        </div>
+  return (
+    <main className="flex justify-center items-center min-h-screen bg-slate-300 p-4">
+      <div className="flex flex-col lg:flex-row w-full max-w-5xl bg-white rounded-lg shadow-lg overflow-hidden">
+        {/* Formulário */}
+        <div className="w-full lg:w-1/2 p-6 lg:p-10 bg-gradient-to-br from-blue-600 to-blue-500">
+          <h2 className="text-2xl font-bold text-white mb-4 text-center">
+            Crie sua Conta
+          </h2>
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="nome" className="text-white text-sm block mb-1">
+                  Nome
+                </label>
+                <input
+                  type="text"
+                  id="nome"
+                  value={nome}
+                  onChange={(e) => setNome(e.target.value)}
+                  required
+                  className="w-full p-2 rounded bg-blue-200 text-black text-sm"
+                  placeholder="Digite seu nome"
+                />
+              </div>
 
-                        {/* Campo Telefone */}
-                        <div>
-                            <label htmlFor="cargo" className="text-white block mb-2">Telefone</label>
-                            <InputMask
-                                id="phone"
-                                value={telefone}
-                                onChange={(e) => setTelefone(e.value as string)}
-                                mask="(99) 99999-9999"
-                                placeholder="(99) 99999-9999"
-                                className="w-full p-2  bg-blue-200 text-black rounded-md"
-                            />
-                        </div>
+              <div>
+                <label htmlFor="nome" className="text-white text-sm block mb-1">
+                  Sobrenome
+                </label>
+                <input
+                  type="text"
+                  id="sobrenome"
+                  value={nome}
+                  onChange={(e) => setSobrenome(e.target.value)}
+                  required
+                  className="w-full p-2 rounded bg-blue-200 text-black text-sm"
+                  placeholder="Digite seu sobrenome"
+                />
+              </div>
 
-                        {/* Campo Senha */}
-                        <div className="mb-4">
-                            <label htmlFor="password" className="text-white block mb-2">Senha</label>
-                            <div className="relative w-full">
-                                <input
-                                    type={senhaVisible ? "text" : "password"}
-                                    id="password"
-                                    value={senha}
-                                    onChange={(e) => setSenha(e.target.value)}
-                                    className="w-full p-2  bg-blue-200 text-black rounded-md pr-10"
-                                    placeholder="Digite sua senha"
-                                />
-                                <span
-                                    onClick={() => setPasswordVisible(!senhaVisible)}
-                                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white cursor-pointer"
-                                >
-                                    <i className={`pi ${senhaVisible ? 'pi-eye-slash' : 'pi-eye'}`} />
-                                </span>
-                            </div>
-                        </div>
+              <div>
+                <label htmlFor="nome" className="text-white text-sm block mb-1">
+                  Endereço
+                </label>
+                <input
+                  type="text"
+                  id="endereco"
+                  value={nome}
+                  onChange={(e) => setEndereco(e.target.value)}
+                  required
+                  className="w-full p-2 rounded bg-blue-200 text-black text-sm"
+                  placeholder="Digite seu endereço"
+                />
+              </div>
 
-                        {/* Botão de Cadastro */}
-                        <div className="text-center">
-                            <button type="submit" className="w-full mt-5 p-3 rounded-md bg-gradient-to-r from-blue-500 to-blue-300 text-white font-semibold">
-                                Cadastrar
-                            </button>
-                        </div>
-
-                        {/* Link "Já tenho uma conta" */}
-                        <div className="text-right mt-6">
-                            <a href="http://localhost:3000/login" className="text-white hover:underline">Já tenho uma conta</a>
-                        </div>
-
-                    </form>
-                </div>
-
-                {/* Imagem de Fundo (lado direito) */}
-                <div className="hidden md:block w-1/2 h-auto relative">
-                    <img
-                        src="images/register/painel.jpg"
-                        alt="Imagem de fundo"
-                        className="w-full h-full object-cover opacity-80"
-                    />
-                    <div className="absolute inset-0  via-transparent"></div>
-                </div>
-
+              <div>
+                <label
+                  htmlFor="email"
+                  className="text-white text-sm block mb-1"
+                >
+                  E-mail
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="w-full p-2 rounded bg-blue-200 text-black text-sm"
+                  placeholder="Digite seu email"
+                />
+              </div>
             </div>
-            <Dialog
-                header=""
-                visible={showPopup}
-                style={{
-                    width: '25vw',
-                    textAlign: 'center',
-                    position: 'absolute',
-                    top: '2%',
-                    left: '89%',
-                    transform: 'translateX(-50%)',
-                    backgroundColor: 'rgba(144, 238, 144, 0.8)',
-                    borderRadius: '8px',
-                }}
-                draggable={false}
-                closable={false}
-                onHide={() => setShowPopup(false)}
-            >
-                <div className="p-4 rounded-md flex items-center justify-center">
-                    <p className="text-sm text-white font-bold">Usuário cadastrado com sucesso!</p>
-                </div>
-            </Dialog>
-        </main>
 
-    );
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div>
+                <label
+                  htmlFor="telefone"
+                  className="text-white text-sm block mb-1"
+                >
+                  Telefone
+                </label>
+                <InputMask
+                  id="telefone"
+                  value={telefone}
+                  onChange={(e) => setTelefone(e.value as string)}
+                  mask="(99) 99999-9999"
+                  placeholder="(99) 99999-9999"
+                  className="w-full p-2 rounded bg-blue-200 text-black text-sm"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="estado"
+                  className="text-white text-sm block mb-1"
+                >
+                  Estado (valor médio cobrado)
+                </label>
+                <Dropdown
+                  id="estado"
+                  value={estado}
+                  onChange={(e) => setEstado(e.value)}
+                  options={estadosBrasil}
+                  placeholder="Selecione"
+                  className="w-full p-2 rounded bg-blue-200 text-black text-sm"
+                  panelClassName="custom-dropdown-panel"
+                />
+              </div>
+            </div>
+
+            {estado && (
+              <div>
+                <label
+                  htmlFor="valor"
+                  className="text-white text-sm block mb-1"
+                >
+                  Valor
+                </label>
+                <input
+                  type="text"
+                  id="valor"
+                  value={valor}
+                  onChange={(e) => setValor(e.target.value)}
+                  className="w-full p-2 rounded bg-blue-200 text-black text-sm"
+                  placeholder="Insira o valor"
+                />
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={adicionarEstado}
+              className="w-full p-2 rounded bg-blue-700 text-white text-sm font-semibold mt-2"
+            >
+              Adicionar Estado
+            </button>
+
+            {estadosAdicionados.length > 0 && (
+              <ul className="mt-2 bg-white rounded-lg p-2 shadow">
+                {estadosAdicionados.map((item, index) => (
+                  <li key={index} className="text-gray-700 text-sm">
+                    {item.estado} - R$ {item.valor}
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            <div>
+              <label htmlFor="senha" className="text-white text-sm block mb-1">
+                Senha
+              </label>
+              <div className="relative">
+                <input
+                  type={senhaVisible ? "text" : "password"}
+                  id="senha"
+                  value={senha}
+                  onChange={(e) => setSenha(e.target.value)}
+                  className="w-full p-2 rounded bg-blue-200 text-black text-sm"
+                  placeholder="Digite sua senha"
+                />
+                <span
+                  onClick={() => setPasswordVisible(!senhaVisible)}
+                  className="absolute top-1/2 right-2 transform -translate-y-1/2 text-white cursor-pointer"
+                >
+                  <i
+                    className={`pi ${senhaVisible ? "pi-eye-slash" : "pi-eye"}`}
+                  />
+                </span>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full p-2 rounded bg-blue-700 text-white text-sm font-semibold mt-4"
+            >
+              Cadastrar
+            </button>
+          </form>
+        </div>
+
+        {/* Imagem */}
+        <div className="hidden lg:block w-1/2">
+          <Image
+            src="/images/register/painel.jpg"
+            alt="Imagem de fundo"
+            width={1000}
+            height={1000}
+            objectFit="cover" // Para garantir que a imagem se comporte como `object-cover`
+          />
+        </div>
+      </div>
+
+      <Dialog
+        visible={showPopup}
+        onHide={() => setShowPopup(false)}
+        className="bg-green-400 p-4 text-center rounded-lg shadow-lg"
+      >
+        <p className="text-white font-bold">Usuário cadastrado com sucesso!</p>
+      </Dialog>
+    </main>
+  );
 }
