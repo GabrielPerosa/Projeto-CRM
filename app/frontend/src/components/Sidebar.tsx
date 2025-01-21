@@ -22,7 +22,7 @@ export default function Sidebar({ username }: SidebarProps) {
   const items = [
     { label: "Início", icon: "pi pi-home", command: () => router.push("/home") },
     { label: "Meus Serviços", icon: "pi pi-file-check", command: () => router.push("/myservices") },
-    //{ label: "Usuários", icon: "pi pi-user", command: () => router.push("/users") },
+    { label: "Propostas", icon: "pi pi-dollar", command: () => router.push("/proposal") },
     //{ label: "Dispositivos", icon: "pi pi-microchip", command: () => router.push("/devices") },
     //{ label: "Relatório", icon: "pi pi-clipboard", command: () => router.push("/reports") },
     {
