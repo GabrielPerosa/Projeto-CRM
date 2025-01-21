@@ -5,3 +5,7 @@
 @tailwind components;
 @tailwind utilities;
 
+
+.custom-dropdown-panel{
+  background-color: white;
+}
