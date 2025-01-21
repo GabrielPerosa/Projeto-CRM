@@ -1,0 +1,11 @@
+@import 'primereact/resources/themes/lara-light-indigo/theme.css'; /* ou outro tema de sua preferência */
+@import 'primereact/resources/primereact.min.css'; /* Estilos principais do PrimeReact */
+@import 'primeicons/primeicons.css'; /* Ícones do PrimeIcons */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+.custom-dropdown-panel{
+  background-color: white;
+}
