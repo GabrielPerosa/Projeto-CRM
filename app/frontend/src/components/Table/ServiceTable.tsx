@@ -9,14 +9,15 @@ type Service = {
   cityState: string;
   quantity: number;
   startDate: string;
+  deadline: string;
   cost: number;
   status: "Em andamento" | "Finalizado";
 };
 
 const initialData: Service[] = [
-  { id: 1, name: "João Silva", cityState: "São Paulo-SP", quantity: 10, startDate: "10/11/2020", cost: 1000, status: "Finalizado" },
-  { id: 2, name: "Maria Oliveira", cityState: "Rio de Janeiro-RJ", quantity: 20, startDate: "10/11/2020", cost: 1000, status: "Em andamento" },
-  { id: 3, name: "Carlos Souza", cityState: "Belo Horizonte-MG", quantity: 15, startDate: "10/11/2024", cost: 2500, status: "Finalizado" },
+  { id: 1, name: "João Silva", cityState: "São Paulo-SP", quantity: 10, startDate: "10/11/2020", deadline: "11/12/2020", cost: 1000, status: "Finalizado" },
+  { id: 2, name: "Maria Oliveira", cityState: "Rio de Janeiro-RJ", quantity: 20, startDate: "10/11/2020", deadline: "11/12/2020", cost: 1000, status: "Em andamento" },
+  { id: 3, name: "Carlos Souza", cityState: "Belo Horizonte-MG", quantity: 15, startDate: "10/11/2024", deadline: "11/12/2024", cost: 2500, status: "Finalizado" },
 ];
 
 export default function ServiceTable() {
@@ -47,6 +48,7 @@ export default function ServiceTable() {
             <th className="p-3 text-left">Cidade-Estado</th>
             <th className="p-3 text-left">Quantidade de Placas</th>
             <th className="p-3 text-left">Data de Início</th>
+            <th className="p-3 text-left">Previsão de Entrega</th>
             <th className="p-3 text-left">Recebível (R$)</th>
             <th className="p-3 text-left">Status</th>
           </tr>
@@ -58,6 +60,7 @@ export default function ServiceTable() {
               <td className="p-3">{service.cityState}</td>
               <td className="p-3">{service.quantity}</td>
               <td className="p-3">{service.startDate}</td>
+              <td className="p-3">{service.deadline}</td>
               <td className="p-3">
                 <NumericFormat 
                     value={service.cost} 
