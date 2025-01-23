@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { Dialog } from "primereact/dialog";
 import 'primeicons/primeicons.css';
+import Image from "next/image";
 
 
 export default function Profile() {
@@ -38,6 +39,7 @@ export default function Profile() {
       console.log("Usuário logado:", response.data);
       router.push("http://localhost:3000/home");
     } catch (error) {
+      console.error("Erro:", error);
       setShowPopup(true);
       setTimeout(() => setShowPopup(false), 2000);
     }
@@ -47,13 +49,14 @@ export default function Profile() {
     <main className="flex justify-center items-center min-h-screen bg-slate-300 p-4">
       <div className="relative flex flex-col md:flex-row w-full max-w-4xl h-auto md:h-3/4 bg-slate-800 rounded-lg shadow-lg overflow-hidden">
         {/* Imagem de Fundo (lado esquerdo) */}
-        <div className="hidden md:block w-full md:w-1/2 relative">
-          <img
-            src="images/login/painel.jpg"
+        <div className="hidden lg:block w-1/2">
+          <Image
+            src="/images/register/painel.jpg"
             alt="Imagem de fundo"
+            width={1000}
+            height={1000}
             className="w-full h-full object-cover opacity-80"
           />
-          <div className="absolute inset-0  via-transparent"></div>
         </div>
 
         {/* Seção do Formulário (lado direito) */}
@@ -107,7 +110,7 @@ export default function Profile() {
 
             <div className="text-right mt-4">
               <a
-                href="http://localhost:3000/forgotpassword"
+                href="http://localhost:3000/pages/forgotpassword"
                 className="text-white hover:underline"
               >
                 Esqueci minha senha
@@ -125,7 +128,7 @@ export default function Profile() {
 
             <div className="text-center mt-6">
               <a
-                href="http://localhost:3000/register"
+                href="http://localhost:3000/pages/register"
                 className="text-white hover:underline"
               >
                 Ainda não tenho uma conta

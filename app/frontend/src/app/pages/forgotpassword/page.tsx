@@ -94,7 +94,7 @@ export default function Profile() {
 
                     {/* Link login */}
                     <div className="text-center mt-6">
-                        <a href="/login" className="text-white hover:underline">Voltar</a>
+                        <a href="http://localhost:3000/" className="text-white hover:underline">Voltar</a>
                     </div>
                 </form>
             </div>

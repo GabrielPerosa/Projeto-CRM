@@ -3,7 +3,7 @@
 import React from 'react';
 import Sidebar from '@/components/Sidebar';
 import { Chart } from 'primereact/chart';
-import '../globals.css';
+//import '../globals.css';
 
 export default function Home() {
   const pieData = {
