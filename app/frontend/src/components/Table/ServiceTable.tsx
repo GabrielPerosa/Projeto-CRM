@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { ArrowPathIcon, CheckCircleIcon, ClockIcon, DocumentCheckIcon, QuestionMarkCircleIcon } from "@heroicons/react/24/solid";
 import  { NumericFormat }  from 'react-number-format';
+import { Button } from 'primereact/button';
+import { useRouter } from "next/navigation";
 
 type ServiceSupplier = {
   id: number;
@@ -38,6 +40,8 @@ const initialDataClient: ServiceClient[] = [
 ];
 
 export default function ServiceTable() {
+  const router = useRouter();
+  
   const hasKeyWord = (keyWord: string) => {
     if (typeof window === "undefined") return false; // Evita o erro no ambiente de servidor
     return window.location.pathname.includes(keyWord);
@@ -78,6 +82,7 @@ const isSupplier = hasKeyWord("supplier"); // Retorna true se "supplier" estiver
 
   return (
     <div className="p-4">
+      
       <h1 className="text-2xl font-bold mb-4">Buscar</h1>
       <input
         type="text"
@@ -213,6 +218,13 @@ const isSupplier = hasKeyWord("supplier"); // Retorna true se "supplier" estiver
           ))}
         </tbody>
       </table>
+      
+      {/* Novo serviço */}
+      {!isSupplier ? (
+      <div className="flex justify-end mt-3 mr-2">
+          <Button onClick={() => router.push("/pages/client/proposal")} className="bg-green-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500" label="Novo Serviço" />
+      </div>) : <></>
+      }
     </div>
-  );
+);
 }
