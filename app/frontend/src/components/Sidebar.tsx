@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-//import "../app/globals.css";
+import "../style/style.css";
 import "primeicons/primeicons.css";
 
 
@@ -18,7 +18,7 @@ export default function Sidebar({ username }: SidebarProps) {
   //const [menuVisible, setMenuVisible] = useState(false);
   //const [isClient, setIsClient] = useState(false);
   const [nomeUsuario, setNomeUsuario] = useState<string | null>(null);
-
+  
   const items = [
     { label: "Início", icon: "pi pi-home", command: () => router.push("/home") },
     { label: "Meus Serviços", icon: "pi pi-file-check", command: () => router.push("/myservices") },
