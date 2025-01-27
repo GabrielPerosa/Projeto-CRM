@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
-import '../globals.css';
+import '@/style/styles.css'
 import ClientTable from '@/components/ClientTable';
 
 export default function Proposal() {
