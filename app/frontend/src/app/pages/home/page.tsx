@@ -21,12 +21,12 @@ const SolarLandingPage = () => {
 
   // Dados do endereço do usuário
   const [address, setAddress] = useState({
-    street: "", // Rua
-    number: "", // Número
-    complement: "", // Complemento
-    city: "", // Cidade
-    state: "", // Estado
-    zip: "", // CEP
+    rua: "", // Rua
+    numero: "", // Número
+    complemento: "", // Complemento
+    cidade: "", // Cidade
+    estado: "", // Estado
+    cep: "", // CEP
   });
 
   // Arquivo de conta de energia enviado pelo usuário
@@ -77,9 +77,9 @@ const SolarLandingPage = () => {
           // Atualiza os campos de endereço com os dados da API
           setAddress((prev) => ({
             ...prev,
-            street: data.logradouro,
-            city: data.localidade,
-            state: data.uf,
+            rua: data.logradouro,
+            cidade: data.localidade,
+            estado: data.uf,
           }));
         } else {
           alert("CEP não encontrado.");
@@ -228,7 +228,7 @@ const SolarLandingPage = () => {
                 <Input
                   type="text"
                   name="zip"
-                  value={address.zip}
+                  value={address.cep}
                   onChange={(e) => handleAddressChange(e)}
                   onBlur={(e) => fetchAddressByZip(e.target.value)}
                   placeholder="CEP"
@@ -236,35 +236,35 @@ const SolarLandingPage = () => {
                 <Input
                   type="text"
                   name="street"
-                  value={address.street}
+                  value={address.rua}
                   placeholder="Rua"
                   disabled
                 />
                 <Input
                   type="text"
                   name="city"
-                  value={address.city}
+                  value={address.cidade}
                   placeholder="Cidade"
                   disabled
                 />
                 <Input
                   type="text"
                   name="state"
-                  value={address.state}
+                  value={address.estado}
                   placeholder="Estado"
                   disabled
                 />
                 <Input
                   type="text"
                   name="number"
-                  value={address.number}
+                  value={address.numero}
                   onChange={handleAddressChange}
                   placeholder="Número"
                 />
                 <Input
                   type="text"
                   name="complement"
-                  value={address.complement}
+                  value={address.complemento}
                   onChange={handleAddressChange}
                   placeholder="Complemento"
                 />
