@@ -1,15 +1,16 @@
+'use client';
 import React, { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import "@/style/styles.css";
 import "@/style/globals.css";
 
-interface ModalOrcamentoProps {
-  showModal: boolean;
-  setShowModal: (show: boolean) => void;
+interface BudgetProps {
+  showBudget: boolean;
+  setShowBudget: (show: boolean) => void;
 }
 
-const ModalOrcamento: React.FC<ModalOrcamentoProps> = ({ showModal, setShowModal }) => {
+const Budget: React.FC<BudgetProps> = ({ showBudget, setShowBudget }) => {
   const [option, setOption] = useState<"bill" | "area">("bill");
   const [energyBill, setEnergyBill] = useState<string>("");
   const [area, setArea] = useState<string>("");
@@ -43,7 +44,7 @@ const ModalOrcamento: React.FC<ModalOrcamentoProps> = ({ showModal, setShowModal
   };
 
   return (
-    showModal && (
+    showBudget && (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-white p-6 rounded-lg shadow-lg w-11/12 max-w-3xl">
           <h3 className="text-xl font-bold text-blue-700 mb-4 text-center">
@@ -118,11 +119,11 @@ const ModalOrcamento: React.FC<ModalOrcamentoProps> = ({ showModal, setShowModal
           )}
 
           {/* Fechar Modal */}
-          <Button onClick={() => setShowModal(false)} className="mt-4 w-full bg-gray-300 text-gray-700">Fechar</Button>
+          <Button onClick={() => setShowBudget(false)} className="mt-4 w-full bg-gray-300 text-gray-700">Fechar</Button>
         </div>
       </div>
     )
   );
 };
 
-export default ModalOrcamento;
+export default Budget;

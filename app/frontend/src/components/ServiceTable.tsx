@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { ArrowPathIcon, CheckCircleIcon, ClockIcon, DocumentCheckIcon, QuestionMarkCircleIcon } from "@heroicons/react/24/solid";
 import  { NumericFormat }  from 'react-number-format';
-import { Button } from 'primereact/button';
 import { useRouter } from "next/navigation";
 import Budget from "./Budget";
 
@@ -41,12 +40,11 @@ const initialDataClient: ServiceClient[] = [
   { id: 1, supplier: "Josmar", cityState: "São Paulo-SP", quantity: 10, startDate: "10/11/2020", duration: 10, deadline: " - ", budget: 1000, status: "Aguardando prestador"},
   { id: 2, supplier: "Perosa", cityState: "São Paulo-SP", quantity: 10, startDate: "10/11/2020", duration: 10, deadline: " - ", budget: 5000, status: "Em aprovação"}
 ];
-// Modal de orçamento
-const [showModal, setShowModal] = useState<boolean>(false);
-
 export default function ServiceTable() {
   const router = useRouter();
-  
+  // Modal de orçamento
+  const [showBudget, setShowBudget] = useState<boolean>(false);
+
   const hasKeyWord = (keyWord: string) => {
     if (typeof window === "undefined") return false; // Evita o erro no ambiente de servidor
     return window.location.pathname.includes(keyWord);
@@ -232,11 +230,11 @@ const isSupplier = hasKeyWord("supplier"); // Retorna true se "supplier" estiver
       {!isSupplier ? (
       <div className="flex justify-end mt-3 mr-2">
         <div>
-          <button onClick={() => setShowModal(true)} className="bg-blue-500 text-white p-2 rounded">
-            Abrir Modal
+          <button onClick={() => setShowBudget(true)} className="bg-blue-500 text-white p-2 rounded">
+            Novo serviço
           </button>
 
-          <Budget showModal={showModal} setShowModal={setShowModal} />
+          <Budget showBudget={showBudget} setShowBudget={setShowBudget} />
         </div>
       </div>) : <></>
       }
