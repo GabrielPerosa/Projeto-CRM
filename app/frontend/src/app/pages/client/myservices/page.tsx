@@ -3,7 +3,7 @@
 import React from 'react';
 import Sidebar from '@/components/Sidebar';
 //import '../globals.css';
-import ServiceTable from '@/components/Table/ServiceTable';
+import ServiceTable from '@/components/ServiceTable';
 
 export default function Myservices() {
   return (

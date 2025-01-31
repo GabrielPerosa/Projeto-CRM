@@ -8,9 +8,11 @@ import "@/style/styles.css";
 import "@/style/globals.css";
 
 const SolarLandingPage = () => {
+  
   // Controle para mostrar ou ocultar o modal
   const [showModal, setShowModal] = useState(false);
   // Tipo de orçamento selecionado: "bill" (conta) ou "area" (área)
+  
   const [option, setOption] = useState("bill");
   // Valor da conta de energia fornecido pelo usuário
   const [energyBill, setEnergyBill] = useState("");
