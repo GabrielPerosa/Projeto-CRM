@@ -8,8 +8,6 @@ export default function Settings() {
   const [formData, setFormData] = useState({
     nome: "",
     sobrenome: "",
-    telefone: "",
-    endereco: "",
     email: "",
     senha: "",
     confirmarSenha: "",
@@ -84,25 +82,6 @@ export default function Settings() {
               </div>
             </div>
 
-            {/* Endereço */}
-            <div>
-              <label
-                htmlFor="endereco"
-                className="block text-gray-700 font-medium mb-2"
-              >
-                Endereço
-              </label>
-              <input
-                type="addres"
-                id="endereco"
-                name="endereco"
-                value={formData.endereco}
-                onChange={handleChange}
-                placeholder="Rua, Número, Bairro, Cidade"
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
             {/* E-mail */}
             <div>
               <label htmlFor="email" className="block text-gray-700 font-medium mb-2">
@@ -117,25 +96,6 @@ export default function Settings() {
                 required
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Digite seu email"
-              />
-            </div>
-
-            {/* Telefone */}
-            <div>
-              <label
-                htmlFor="telefone"
-                className="block text-gray-700 font-medium mb-2"
-              >
-                Telefone
-              </label>
-              <input
-                type="tel"
-                id="telefone"
-                name="telefone"
-                value={formData.telefone}
-                onChange={handleChange}
-                placeholder="(99) 99999-9999"
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
