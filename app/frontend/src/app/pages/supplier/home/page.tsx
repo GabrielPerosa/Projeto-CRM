@@ -1,99 +1,68 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import { Chart } from 'primereact/chart';
-//import '../globals.css';
+import '@/style/globals.css';
 
 export default function Home() {
-  const pieData = {
-    labels: ['Categoria A', 'Categoria B', 'Categoria C'],
-    datasets: [
-      {
-        data: [300, 50, 100],
-        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-        hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-      },
-    ],
+  // Estado para o ano selecionado
+  const [selectedYear, setSelectedYear] = useState(2024);
+
+  // Dados do gráfico, separados por ano
+  const yearlyData = {
+    2024: [15000, 5000, 8000, 10000, 4000, 12000, 2000, 14000, 7000, 9000, 15000, 6000], // Dados para 2024
+    2025: [45, 50, 60, 70, 55, 80, 90, 100, 110, 120, 130, 140], // Dados para 2025 (exemplo)
   };
 
+  // Função para lidar com a mudança do ano
+  const handleYearChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedYear(Number(event.target.value));
+  };
+
+  // Definir os dados do gráfico com base no ano selecionado
   const barData = {
-    labels: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio'],
+    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Agost', 'Set', 'Out', 'Nov', 'Dez'],
     datasets: [
-      {
-        label: 'Vendas',
-        backgroundColor: '#42A5F5',
-        borderColor: '#1E88E5',
-        data: [65, 59, 80, 81, 56],
-      },
       {
         label: 'Lucro',
-        backgroundColor: '#9CCC65',
-        borderColor: '#7CB342',
-        data: [28, 48, 40, 19, 86],
-      },
-    ],
-  };
-
-  const lineData = {
-    labels: ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4'],
-    datasets: [
-      {
-        label: 'Temperatura',
-        data: [22, 24, 19, 23],
-        fill: false,
-        borderColor: '#4BC0C0',
-        tension: 0.4,
-      },
-    ],
-  };
-
-  const polarData = {
-    labels: ['Setor 1', 'Setor 2', 'Setor 3', 'Setor 4'],
-    datasets: [
-      {
-        data: [11, 16, 7, 14],
-        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#FF9F40'],
+        backgroundColor: 'blue', // Azul mais suave
+        data: yearlyData[selectedYear], // Usar os dados do ano selecionado
       },
     ],
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-100">
+    <div className="flex h-screen overflow-hidden bg-gray-50">
       {/* Sidebar fixa */}
-      <div className="w-64 bg-gray-100 shadow-md">
+      <div className="w-64 bg-white shadow-md">
         <Sidebar title="Irrigação Smart" username="Usuário" />
       </div>
 
       {/* Conteúdo principal */}
-      <div className="flex-1 overflow-y-auto p-6">
-        <h1 className="text-2xl font-semibold mb-6 text-gray-800">Dashboard</h1>
+      <div className="flex-1 overflow-y-auto p-6 flex justify-center items-center">
 
-        {/* Container dos gráficos */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Gráfico de Pizza */}
-          <div className="bg-white rounded-lg shadow p-4 h-96">
-            <h2 className="text-lg font-medium mb-4 text-black">Gráfico A</h2>
-            <Chart type="pie" data={pieData} style={{ height: '320px' }} />
+        {/* Container do gráfico */}
+        <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-4xl h-[500px] relative border border-gray-200">
+
+          {/* Filtro de Ano dentro do gráfico */}
+          <div className="absolute top-4 right-4 bg-white border border-gray-300 rounded-lg shadow-md px-4 py-2">
+            <label htmlFor="year" className="text-sm font-medium text-gray-700 mr-2">
+              Ano
+            </label>
+            <select
+              id="year"
+              value={selectedYear}
+              onChange={handleYearChange}
+              className="p-1 bg-white text-gray-700 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-300"
+            >
+              <option value={2024}>2024</option>
+              <option value={2025}>2025</option>
+            </select>
           </div>
 
-          {/* Gráfico de Barras */}
-          <div className="bg-white rounded-lg shadow p-4 h-96">
-            <h2 className="text-lg font-medium mb-4 text-black">Gráfico B</h2>
-            <Chart type="bar" data={barData} style={{ height: '320px' }} />
-          </div>
-
-          {/* Gráfico de Linhas */}
-          <div className="bg-white rounded-lg shadow p-4 h-96">
-            <h2 className="text-lg font-medium mb-4 text-black">Gráfico C</h2>
-            <Chart type="line" data={lineData} style={{ height: '320px' }} />
-          </div>
-
-          {/* Gráfico Polar */}
-          <div className="bg-white rounded-lg shadow p-4 h-96">
-            <h2 className="text-lg font-medium mb-4 text-black">Gráfico D</h2>
-            <Chart type="polarArea" data={polarData} style={{ height: '320px' }} />
-          </div>
+          <h2 className="text-xl font-semibold mb-6 text-gray-800">Faturamento</h2>
+          <Chart type="bar" data={barData} style={{ height: '100%' }} />
         </div>
       </div>
     </div>

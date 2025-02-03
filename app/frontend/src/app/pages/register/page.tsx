@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Dropdown } from "primereact/dropdown";
 import "primeicons/primeicons.css";
 import { useRouter } from "next/navigation";
@@ -20,6 +20,7 @@ export default function StyledMaskDemo() {
   const [estado, setEstado] = useState("");
   const [estadosAdicionados, setEstadosAdicionados] = useState<Estado[]>([]);
   const [valor, setValor] = useState("");
+  const [mensagemAviso, setMensagemAviso] = useState<string | null>(null);
   const router = useRouter();
   const formattedTelefone = telefone.replace(/\D/g, "");
 
@@ -102,19 +103,36 @@ export default function StyledMaskDemo() {
   };
 
   const adicionarEstado = () => {
-    if (estado && valor) {
+      if (!estado || !valor.trim()) {
+        setMensagemAviso("Por favor, selecione um estado e informe um valor válido.");
+        return;
+      }
+  
+      // Verifica se o estado já foi adicionado
+      if (estadosAdicionados.some((item) => item.estado === estado)) {
+        setMensagemAviso("Este estado já foi adicionado!");
+        return;
+      }
+  
       const novoEstado = { estado, valor };
       setEstadosAdicionados([...estadosAdicionados, novoEstado]);
       setEstado("");
       setValor("");
-    }
-  };
-
-  const removerEstado = (estadoToRemove: string) => {
-    setEstadosAdicionados(
-      estadosAdicionados.filter((item) => item.estado !== estadoToRemove)
-    );
-  };
+    };
+  
+    // Limpa a mensagem de aviso automaticamente após 3 segundos
+    useEffect(() => {
+      if (mensagemAviso) {
+        const timer = setTimeout(() => setMensagemAviso(null), 3000);
+        return () => clearTimeout(timer);
+      }
+    }, [mensagemAviso]); // Apenas a variável de estado
+  
+    const removerEstado = (estadoToRemove: string) => {
+      setEstadosAdicionados(
+        estadosAdicionados.filter((item) => item.estado !== estadoToRemove)
+      );
+    };
 
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -409,6 +427,13 @@ export default function StyledMaskDemo() {
             >
               Adicionar Estado
             </button>
+          )}
+
+          {/* Exibir mensagem de aviso */}
+          {mensagemAviso && (
+            <p className="text-white text-sm text-center my-2 font-bold">
+              {mensagemAviso}
+            </p>
           )}
 
           {isFornecedor && estadosAdicionados.length > 0 && (
