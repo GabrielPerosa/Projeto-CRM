@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "@/components/Sidebar";
 import { Dropdown } from "primereact/dropdown";
 import { FaTimes } from "react-icons/fa";
@@ -10,6 +10,13 @@ export default function Settings() {
   const [estado, setEstado] = useState("");
   const [estadosAdicionados, setEstadosAdicionados] = useState<Estado[]>([]);
   const [valor, setValor] = useState("");
+  const [mensagemAviso, setMensagemAviso] = useState<string | null>(null);
+
+
+  interface Estado {
+    estado: string;
+    valor: string;
+  }
 
   const [formData, setFormData] = useState({
     nome: "",
@@ -99,20 +106,31 @@ export default function Settings() {
   };
 
   const adicionarEstado = () => {
-    if (estado && valor) {
-      const novoEstado = { estado, valor };
-      setEstadosAdicionados([...estadosAdicionados, novoEstado]);
-      setEstado("");
-      setValor("");
+    if (!estado || !valor.trim()) {
+      setMensagemAviso("Por favor, selecione um estado e informe um valor válido.");
+      return;
     }
+
+    // Verifica se o estado já foi adicionado
+    if (estadosAdicionados.some((item) => item.estado === estado)) {
+      setMensagemAviso("Este estado já foi adicionado!");
+      return;
+    }
+
+    const novoEstado = { estado, valor };
+    setEstadosAdicionados([...estadosAdicionados, novoEstado]);
+    setEstado("");
+    setValor("");
   };
 
-  // Verifica se o estado já foi adicionado
-  if (estadosAdicionados.some((item) => item.estado === estado)) {
-    alert("Este estado já foi adicionado.");
-    return;
-  }
-  
+  // Limpa a mensagem de aviso automaticamente após 3 segundos
+  useEffect(() => {
+    if (mensagemAviso) {
+      const timer = setTimeout(() => setMensagemAviso(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [mensagemAviso]); // Apenas a variável de estado
+
   const removerEstado = (estadoToRemove: string) => {
     setEstadosAdicionados(
       estadosAdicionados.filter((item) => item.estado !== estadoToRemove)
@@ -127,7 +145,7 @@ export default function Settings() {
       </div>
 
       {/* Conteúdo principal */}
-      <div className="flex-1 flex flex-col items-center justify-center overflow-auto p-4">
+      <div className="flex-1 flex flex-col items-center justify-center overflow-auto p-4 custom-scrollbar">
         <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl max-h-[90vh] overflow-y-auto">
           <h2 className="text-xl font-semibold mb-4 text-gray-800">
             Editar Perfil
@@ -306,7 +324,7 @@ export default function Settings() {
               <div>
                 <label
                   htmlFor="estado"
-                  className="text-white text-sm block mb-1"
+                  className="block text-gray-700 font-medium mb-1"
                 >
                   Estado (Valor médio cobrado)
                 </label>
@@ -316,7 +334,7 @@ export default function Settings() {
                   onChange={(e) => setEstado(e.value)}
                   options={estadosBrasil}
                   placeholder="Selecione"
-                  className="w-full rounded bg-blue-200 text-black text-sm h-10"
+                  className="w-full border rounded-lg"
                   panelClassName="custom-dropdown-panel"
                 />
               </div>
@@ -325,7 +343,7 @@ export default function Settings() {
               <div>
                 <label
                   htmlFor="valor"
-                  className="text-white text-sm block mb-1"
+                  className="block text-gray-700 font-medium mb-1"
                 >
                   Valor
                 </label>
@@ -334,13 +352,13 @@ export default function Settings() {
                   id="valor"
                   value={valor}
                   onChange={(e) => setValor(e.target.value)}
-                  className="w-full p-2 rounded bg-blue-200 text-black text-sm h-10"
+                  className="w-full px-2 py-3 border rounded-lg"
                   placeholder="Insira o valor"
                 />
               </div>
             </div>
 
-              {/* Botão de Adicionar o Estado */}
+            {/* Botão de Adicionar o Estado */}
             <button
               type="button"
               onClick={adicionarEstado}
@@ -348,6 +366,13 @@ export default function Settings() {
             >
               Adicionar Estado
             </button>
+            
+            {/* Exibir mensagem de aviso */}
+            {mensagemAviso && (
+              <p className="text-black text-sm text-center my-2 font-bold">
+                {mensagemAviso}
+              </p>
+            )}
 
             {/* Removendo o estado */}
             <div className="mt-2 bg-white rounded-lg p-2 shadow max-h-20 overflow-y-auto border border-gray-300">
