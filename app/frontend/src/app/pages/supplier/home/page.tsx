@@ -3,66 +3,81 @@
 import React, { useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import { Chart } from 'primereact/chart';
-import '@/style/globals.css';
+import { MultiSelect } from 'primereact/multiselect';
 
 export default function Home() {
-  // Estado para o ano selecionado
-  const [selectedYear, setSelectedYear] = useState(2024);
+  const [anoSelecionado, setAnoSelecionado] = useState<number>(2024);
+  const [mesesSelecionados, setMesesSelecionados] = useState<string[]>([]);
+ 
 
-  // Dados do gráfico, separados por ano
-  const yearlyData = {
-    2024: [15000, 5000, 8000, 10000, 4000, 12000, 2000, 14000, 7000, 9000, 15000, 6000], // Dados para 2024
-    2025: [45, 50, 60, 70, 55, 80, 90, 100, 110, 120, 130, 140], // Dados para 2025 (exemplo)
+  const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+
+  const dados: Record<number, number[]> = {
+    2023: [20, 30, 50, 10, 80, 15, 55, 40, 30, 60, 20, 25],
+    2024: [28, 48, 40, 19, 86, 28, 48, 40, 19, 86, 20, 22],
+    2025: [25, 35, 45, 30, 70, 20, 60, 50, 35, 75, 25, 30],
   };
 
-  // Função para lidar com a mudança do ano
-  const handleYearChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedYear(Number(event.target.value));
+  const lucro: Record<number, number[]> = {
+    2023: [15, 25, 35, 12, 65, 10, 45, 38, 28, 50, 18, 20],
+    2024: [22, 38, 30, 14, 75, 18, 42, 34, 24, 78, 15, 19],
+    2025: [18, 28, 38, 20, 60, 12, 50, 40, 32, 68, 22, 25],
   };
 
-  // Definir os dados do gráfico com base no ano selecionado
-  const barData = {
-    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Agost', 'Set', 'Out', 'Nov', 'Dez'],
-    datasets: [
-      {
-        label: 'Lucro',
-        backgroundColor: 'blue', // Azul mais suave
-        data: yearlyData[selectedYear], // Usar os dados do ano selecionado
-      },
-    ],
-  };
+  const dadosFiltrados =
+    mesesSelecionados.length > 0
+      ? mesesSelecionados.map((mes) => dados[anoSelecionado][meses.indexOf(mes)] || 0)
+      : dados[anoSelecionado];
+
+  const lucroFiltrados =
+    mesesSelecionados.length > 0
+      ? mesesSelecionados.map((mes) => lucro[anoSelecionado][meses.indexOf(mes)] || 0)
+      : lucro[anoSelecionado];
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-50">
+    <div className="flex h-screen overflow-hidden bg-gray-100">
       {/* Sidebar fixa */}
-      <div className="w-64 bg-white shadow-md">
+      <div className="w-64 bg-gray-100 shadow-md">
         <Sidebar title="Irrigação Smart" username="Usuário" />
       </div>
 
       {/* Conteúdo principal */}
-      <div className="flex-1 overflow-y-auto p-6 flex justify-center items-center">
+      <div className="flex-1 overflow-y-auto p-6 mt-20">
+        {/* Filtros */}
+        <div className="bg-white p-4 mb-6 rounded-lg shadow flex flex-wrap gap-4">
+          {/* Filtro de Ano */}
+          <select
+            value={anoSelecionado}
+            onChange={(e) => setAnoSelecionado(Number(e.target.value))}
+            className="p-2 border rounded"
+          >
+            <option value="2024">2024</option>
+            <option value="2025">2025</option>
+          </select>
 
-        {/* Container do gráfico */}
-        <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-4xl h-[500px] relative border border-gray-200">
+          {/* Filtro de Meses */}
+          <MultiSelect
+            value={mesesSelecionados}
+            options={meses.map((mes) => ({ label: mes, value: mes }))}
+            onChange={(e) => setMesesSelecionados(e.value)}
+            placeholder="Selecione os meses"
+            className="w-72"
+          />
+        </div>
 
-          {/* Filtro de Ano dentro do gráfico */}
-          <div className="absolute top-4 right-4 bg-white border border-gray-300 rounded-lg shadow-md px-4 py-2">
-            <label htmlFor="year" className="text-sm font-medium text-gray-700 mr-2">
-              Ano
-            </label>
-            <select
-              id="year"
-              value={selectedYear}
-              onChange={handleYearChange}
-              className="p-1 bg-white text-gray-700 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-300"
-            >
-              <option value={2024}>2024</option>
-              <option value={2025}>2025</option>
-            </select>
+        {/* Container dos gráficos */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Gráfico de Serviços Realizados */}
+          <div className="bg-white rounded-lg shadow p-4 h-96">
+            <h2 className="text-lg font-medium mb-4 text-black">Serviços Realizados</h2>
+            <Chart type="bar" data={{ labels: meses, datasets: [{ label: 'Serviços', data: dadosFiltrados, backgroundColor: '#36A2EB' }] }} style={{ height: '320px' }} />
           </div>
 
-          <h2 className="text-xl font-semibold mb-6 text-gray-800">Faturamento</h2>
-          <Chart type="bar" data={barData} style={{ height: '100%' }} />
+          {/* Gráfico de Lucro */}
+          <div className="bg-white rounded-lg shadow p-4 h-96">
+            <h2 className="text-lg font-medium mb-4 text-black">Faturamento</h2>
+            <Chart type="bar" data={{ labels: meses, datasets: [{ label: 'Lucro', data: lucroFiltrados, backgroundColor: '#9CCC65' }] }} style={{ height: '320px' }} />
+          </div>
         </div>
       </div>
     </div>
