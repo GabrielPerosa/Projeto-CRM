@@ -48,7 +48,7 @@ export default function Profile() {
       // Atualiza o contexto com os dados do usuário
       
       const email = userDto.email;
-      const role = 'cliente';
+      const role = 'prestador';
       const route = convertRoleToRoute(String(role));
 
 

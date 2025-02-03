@@ -6,9 +6,10 @@ import { useRouter } from "next/navigation";
 import "../style/styles.css";
 import "primeicons/primeicons.css";
 import { useUserContext, UserData } from "@/components/context/UserContext";
+import { menu } from "framer-motion/client";
 
 
-interface SidebarProps {
+  interface SidebarProps {
   username?: string;
   title: string;
 }
@@ -17,22 +18,28 @@ export default function Sidebar({ username }: SidebarProps) {
   const { user } = useUserContext();
   const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
-  const [nomeUsuario, setNomeUsuario] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string | null>(null);
 
-  const menuItems = [
-    { label: "Início", icon: "pi pi-home", path: `/pages/${user}/home` },
-    { label: "Meus Serviços", icon: "pi pi-briefcase", path: `/pages/${user}/myservices` },
-    { label: "Propostas", icon: "pi pi-file", path: "/proposal" },
-    { label: "Configurações", icon: "pi pi-cog", path: `/pages/${user}/settings` },
-  ];
-
+  const menuItems = 
+  
+  user.role === "admin" || user.role === "prestador" 
+  ? [ 
+      { label: "Início", icon: "pi pi-home", path: `/pages/${user.route}/home` },
+      { label: "Meus Serviços", icon: "pi pi-briefcase", path: `/pages/${user.route}/myservices` },
+      { label: "Propostas", icon: "pi pi-file", path: `/pages/${user.route}/proposal` },
+      { label: "Configurações", icon: "pi pi-cog", path: `/pages/${user.route}/settings` },
+    ]
+  : [
+      { label: "Início", icon: "pi pi-home", path: `/pages/${user.route}/home` },
+      { label: "Configurações", icon: "pi pi-cog", path: `/pages/${user.route}/settings` },
+    ];
   const handleLogout = () => {
     localStorage.removeItem("nomeUsuario");
     router.push("/pages/login");
   };
 
   useEffect(() => {
-    setNomeUsuario(localStorage.getItem("nomeUsuario"));
+    setUserName(localStorage.getItem("nomeUsuario"));
 
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize();
@@ -59,7 +66,7 @@ export default function Sidebar({ username }: SidebarProps) {
             </div>
             {!isMobile && (
               <span className="text-white text-sm font-semibold">
-                Bem-vindo, {nomeUsuario || "Usuário"}
+                Bem-vindo, {userName || "Usuário"}
               </span>
             )}
           </div>
