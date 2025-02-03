@@ -5,6 +5,8 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import "../style/styles.css";
 import "primeicons/primeicons.css";
+import { useUserContext, UserData } from "@/components/context/UserContext";
+
 
 interface SidebarProps {
   username?: string;
@@ -12,15 +14,16 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ username }: SidebarProps) {
+  const { user } = useUserContext();
   const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
   const [nomeUsuario, setNomeUsuario] = useState<string | null>(null);
 
   const menuItems = [
-    { label: "Início", icon: "pi pi-home", path: "/home" },
-    { label: "Meus Serviços", icon: "pi pi-briefcase", path: "/myservices" },
+    { label: "Início", icon: "pi pi-home", path: `/pages/${user}/home` },
+    { label: "Meus Serviços", icon: "pi pi-briefcase", path: `/pages/${user}/myservices` },
     { label: "Propostas", icon: "pi pi-file", path: "/proposal" },
-    { label: "Configurações", icon: "pi pi-cog", path: "/settings" },
+    { label: "Configurações", icon: "pi pi-cog", path: `/pages/${user}/settings` },
   ];
 
   const handleLogout = () => {

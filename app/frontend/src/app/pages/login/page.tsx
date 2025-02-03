@@ -1,43 +1,63 @@
 "use client";
 import React, { useState } from "react";
-
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { Dialog } from "primereact/dialog";
-import 'primeicons/primeicons.css';
+import "primeicons/primeicons.css";
 import Image from "next/image";
+import { useUserContext, UserData } from "@/components/context/UserContext";
+
+function convertRoleToRoute (role: string) {
+  switch (role) {
+    case 'admin':
+      return 'admin';
+    case 'cliente':
+      return 'client';
+    case 'prestador':
+      return 'supplier';
+    default:
+      return '';
+  }
+}
 
 
 export default function Profile() {
   const [email, setUserEmail] = useState("");
-  const [senha, setSenha] = useState("");
-  const [senhaVisible, setPasswordVisible] = useState(false);
-  const [showPopup, setShowPopup] = useState(false); // Controla a exibição do popup
+  const [password, setPassword] = useState("");
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
   const router = useRouter();
+  
+  const { setUser } = useUserContext();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const usuarioDto = {
-      email,
-      senha,
-    };
+    const userDto = { email, password };
 
     try {
-      const response = await axios.post(
-        "http://localhost/api/Usuario/login",
-        usuarioDto
-      );
+      // const response = await axios.post(
+      //   "http://localhost/api/Usuario/login",
+      //   userDto
+      // );
 
-      const { nomeUsuario } = response.data; // Extraindo o nome do usuário
+      // // Supondo que a resposta contenha os campos userName e role
+      // const { userName, role } = response.data;
+      // console.log("Usuário logado:", response.data);
 
-      console.log(nomeUsuario);
+      // Atualiza o contexto com os dados do usuário
+      
+      const email = userDto.email;
+      const role = 'cliente';
+      const route = convertRoleToRoute(String(role));
 
-      // Armazene o nome em localStorage ou em um estado global/contexto
-      localStorage.setItem("nomeUsuario", nomeUsuario);
 
-      console.log("Usuário logado:", response.data);
-      router.push("http://localhost:3000/home");
+      const userData: UserData = { email, role, route };
+      setUser(userData);
+
+      // Redireciona para a home
+      router.push(`http://localhost:3000/pages/${route}/home`);
+    
     } catch (error) {
       console.error("Erro:", error);
       setShowPopup(true);
@@ -46,6 +66,7 @@ export default function Profile() {
   };
 
   return (
+    
     <main className="flex justify-center items-center min-h-screen bg-slate-300 p-4">
       <div className="relative flex flex-col md:flex-row w-full max-w-4xl h-auto md:h-3/4 bg-slate-800 rounded-lg shadow-lg overflow-hidden">
         {/* Imagem de Fundo (lado esquerdo) */}
@@ -60,7 +81,7 @@ export default function Profile() {
         </div>
 
         {/* Seção do Formulário (lado direito) */}
-        <div className="w-full md:w-1/2 p-6 sm:p-8 bg-blue-600  flex flex-col justify-center">
+        <div className="w-full md:w-1/2 p-6 sm:p-8 bg-blue-600 flex flex-col justify-center">
           <h2 className="text-2xl md:text-3xl font-extrabold mb-4 md:mb-6 text-white text-center">
             Bem-Vindo!
           </h2>
@@ -89,21 +110,19 @@ export default function Profile() {
               </label>
               <div className="relative w-full">
                 <input
-                  type={senhaVisible ? "text" : "password"}
+                  type={passwordVisible ? "text" : "password"}
                   id="password"
-                  value={senha}
-                  onChange={(e) => setSenha(e.target.value)}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="w-full p-3 bg-blue-200 text-black rounded-md pr-10"
                   placeholder="Digite sua senha"
                 />
                 {/* Ícone para exibir ou ocultar a senha */}
                 <span
-                  onClick={() => setPasswordVisible(!senhaVisible)}
+                  onClick={() => setPasswordVisible(!passwordVisible)}
                   className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white cursor-pointer"
                 >
-                  <i
-                    className={`pi ${senhaVisible ? "pi-eye-slash" : "pi-eye"}`}
-                  />
+                  <i className={`pi ${passwordVisible ? "pi-eye-slash" : "pi-eye"}`} />
                 </span>
               </div>
             </div>
