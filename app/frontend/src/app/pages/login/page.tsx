@@ -1,25 +1,13 @@
-"use client";
-import React, { useState } from "react";
+'use client';
+
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { Dialog } from "primereact/dialog";
 import "primeicons/primeicons.css";
 import Image from "next/image";
-import { useUserContext, UserData } from "@/components/context/UserContext";
-
-function convertRoleToRoute (role: string) {
-  switch (role) {
-    case 'admin':
-      return 'admin';
-    case 'cliente':
-      return 'client';
-    case 'prestador':
-      return 'supplier';
-    default:
-      return '';
-  }
-}
-
+import { signIn, useSession } from "next-auth/react";
+import { convertRoleToRoute } from "@/utils/ConvertRoleToRoute";
 
 export default function Profile() {
   const [email, setUserEmail] = useState("");
@@ -27,46 +15,43 @@ export default function Profile() {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const router = useRouter();
-  
-  const { setUser } = useUserContext();
+
+  // Obtém a sessão atual e o status (loading, authenticated, etc.)
+  const { data: session, status } = useSession();
+
+  useEffect(() => {
+    if (status === "authenticated" && session?.user?.role) {
+      const route = convertRoleToRoute(session.user.role);
+      // Redireciona para a rota baseada no role do usuário
+      router.push(`/pages/${route}/home`);
+    }
+  }, [status, session, router]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const userDto = { email, password };
+    // Chama o signIn do NextAuth passando email e senha
+    const result = await signIn("credentials", {
+      redirect: false, // Impede o redirecionamento automático
+      email,
+      password,
+    });
 
-    try {
-      // const response = await axios.post(
-      //   "http://localhost/api/Usuario/login",
-      //   userDto
-      // );
-
-      // // Supondo que a resposta contenha os campos userName e role
-      // const { userName, role } = response.data;
-      // console.log("Usuário logado:", response.data);
-
-      // Atualiza o contexto com os dados do usuário
-      
-      const email = userDto.email;
-      const role = 'prestador';
-      const route = convertRoleToRoute(String(role));
-
-
-      const userData: UserData = { email, role, route };
-      setUser(userData);
-
-      // Redireciona para a home
-      router.push(`http://localhost:3000/pages/${route}/home`);
-    
-    } catch (error) {
-      console.error("Erro:", error);
+    if (result?.error) {
+      console.error("Erro de autenticação:", result.error);
       setShowPopup(true);
       setTimeout(() => setShowPopup(false), 2000);
     }
+    // Se não houver erro, o hook useSession atualizará a sessão automaticamente,
+    // fazendo com que o useEffect realize o redirecionamento.
   };
 
+  // Enquanto a sessão está carregando, exibe um loading
+  if (status === "loading") {
+    return <p>Carregando...</p>;
+  }
+
   return (
-    
     <main className="flex justify-center items-center min-h-screen bg-slate-300 p-4">
       <div className="relative flex flex-col md:flex-row w-full max-w-4xl h-auto md:h-3/4 bg-slate-800 rounded-lg shadow-lg overflow-hidden">
         {/* Imagem de Fundo (lado esquerdo) */}

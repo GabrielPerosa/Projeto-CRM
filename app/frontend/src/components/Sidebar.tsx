@@ -5,9 +5,9 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import "../style/styles.css";
 import "primeicons/primeicons.css";
-import { useUserContext, UserData } from "@/components/context/UserContext";
 import { menu } from "framer-motion/client";
-
+import { signOut, useSession } from "next-auth/react";
+import { convertRoleToRoute } from "@/utils/ConvertRoleToRoute";
 
   interface SidebarProps {
   username?: string;
@@ -15,27 +15,36 @@ import { menu } from "framer-motion/client";
 }
 
 export default function Sidebar({ username }: SidebarProps) {
-  const { user } = useUserContext();
   const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
 
-  const menuItems = 
-  
-  user.role === "admin" || user.role === "prestador" 
-  ? [ 
-      { label: "Início", icon: "pi pi-home", path: `/pages/${user.route}/home` },
-      { label: "Meus Serviços", icon: "pi pi-briefcase", path: `/pages/${user.route}/myservices` },
-      { label: "Propostas", icon: "pi pi-file", path: `/pages/${user.route}/proposal` },
-      { label: "Configurações", icon: "pi pi-cog", path: `/pages/${user.route}/settings` },
-    ]
-  : [
-      { label: "Início", icon: "pi pi-home", path: `/pages/${user.route}/home` },
-      { label: "Configurações", icon: "pi pi-cog", path: `/pages/${user.route}/settings` },
-    ];
+  const { data: session, status } = useSession();
+  let menuItems: any[] = [];
+
+  if (status === "authenticated" && session?.user?.role) {
+    const route = convertRoleToRoute(session.user.role);
+
+    menuItems = 
+    route === "admin" || route === "supplier"
+    ? [ 
+        { label: "Início", icon: "pi pi-home", path: `/pages/${route}/home` },
+        { label: "Meus Serviços", icon: "pi pi-briefcase", path: `/pages/${route}/myservices` },
+        { label: "Propostas", icon: "pi pi-file", path: `/pages/${route}/proposal` },
+        { label: "Configurações", icon: "pi pi-cog", path: `/pages/${route}/settings` },
+      ]
+    : [
+        { label: "Início", icon: "pi pi-home", path: `/pages/${route}/home` },
+        { label: "Configurações", icon: "pi pi-cog", path: `/pages/${route}/settings` },
+      ];
+    
+    } else
+      router.push("../login");
+
+
   const handleLogout = () => {
-    localStorage.removeItem("nomeUsuario");
     router.push("/pages/login");
+    signOut();
   };
 
   useEffect(() => {
