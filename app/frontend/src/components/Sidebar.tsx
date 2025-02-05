@@ -7,11 +7,22 @@ import "../style/styles.css";
 import "primeicons/primeicons.css";
 import { menu } from "framer-motion/client";
 import { signOut, useSession } from "next-auth/react";
-import { convertRoleToRoute } from "@/utils/ConvertRoleToRoute";
 
   interface SidebarProps {
   username?: string;
   title: string;
+}
+function convertRoleToRoute (role: string) {
+  switch (role) {
+    case 'admin':
+      return 'admin';
+    case 'cliente':
+      return 'client';
+    case 'prestador':
+      return 'supplier';
+    default:
+      return '';
+  }
 }
 
 export default function Sidebar({ username }: SidebarProps) {

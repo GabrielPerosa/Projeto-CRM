@@ -16,7 +16,7 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials || !credentials.email || !credentials.password) {
-          return null;
+          throw new Error("Credenciais inválidas");
         }
 
         // Simulação de busca no banco (substituir por sua lógica real)
@@ -28,7 +28,7 @@ export const authOptions: NextAuthOptions = {
         };
 
         // Utilize o compare para validar a senha
-        if (!user || !(await compare(credentials.password, user.password))) {
+        if (!(await compare(credentials.password, user.password))) {
           throw new Error("Credenciais inválidas");
         }
 
