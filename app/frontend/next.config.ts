@@ -1,7 +1,4 @@
 const nextConfig = {
-  experimental: {
-    appDir: true, // Apenas se usando versões anteriores à 13.4
-  },
   async rewrites() {
     return [
       {

@@ -1,11 +1,17 @@
-'use client';
-
+import { getServerSession } from 'next-auth';
 import React from 'react';
 import Sidebar from '@/components/Sidebar';
 import { Chart } from 'primereact/chart';
+import { redirect } from 'next/navigation';
 //import '../globals.css';
 
-export default function Home() {
+export default async function Home() {
+  const session = await getServerSession();
+
+  if (!session || session.user.role !== "admin") {
+    redirect('/pages/login');
+    console.log("Acesso negado");
+  }
   const pieData = {
     labels: ['Categoria A', 'Categoria B', 'Categoria C'],
     datasets: [

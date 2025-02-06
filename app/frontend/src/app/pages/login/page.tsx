@@ -11,8 +11,8 @@ import Image from "next/image";
 
 export default function Profile() {
   const [email, setUserEmail] = useState("");
-  const [senha, setSenha] = useState("");
-  const [senhaVisible, setPasswordVisible] = useState(false);
+  const [password, setPassword] = useState("");
+  const [passwordVisible, setPasswordVisible] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const router = useRouter();
@@ -20,10 +20,13 @@ export default function Profile() {
 async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
   e.preventDefault();
   
+  const emailValue = e.currentTarget.email.value
+  const passwordValue = e.currentTarget.password.value
+  
   const result = await signIn("credentials", {
-    email: e.currentTarget.email.value,
-    password: e.currentTarget.password.value,
-    redirect: false,
+    email: emailValue,
+    password: passwordValue,
+    callbackUrl: "/pages/admin/home",
   });
 
   if (result?.error) {
@@ -79,21 +82,21 @@ async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
               </label>
               <div className="relative w-full">
                 <input
-                  type={senhaVisible ? "text" : "password"}
+                  type={passwordVisible ? "text" : "password"}
                   id="password"
-                  value={senha}
-                  name="password" // ← Corrigido aqui
-                  onChange={(e) => setSenha(e.target.value)}
+                  value={password}
+                  name="password"
+                  onChange={(e) => setPassword(e.target.value)}
                   className="w-full p-3 bg-blue-200 text-black rounded-md pr-10"
                   placeholder="Digite sua senha"
                 />
                 {/* Ícone para exibir ou ocultar a senha */}
                 <span
-                  onClick={() => setPasswordVisible(!senhaVisible)}
+                  onClick={() => setPasswordVisible(!passwordVisible)}
                   className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white cursor-pointer"
                 >
                   <i
-                    className={`pi ${senhaVisible ? "pi-eye-slash" : "pi-eye"}`}
+                    className={`pi ${passwordVisible ? "pi-eye-slash" : "pi-eye"}`}
                   />
                 </span>
               </div>
