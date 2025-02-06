@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { signIn } from "next-auth/react";
 
 import { useRouter } from "next/navigation";
 import axios from "axios";
@@ -12,38 +13,27 @@ export default function Profile() {
   const [email, setUserEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [senhaVisible, setPasswordVisible] = useState(false);
-  const [showPopup, setShowPopup] = useState(false); // Controla a exibição do popup
+  const [showPopup, setShowPopup] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  e.preventDefault();
+  
+  const result = await signIn("credentials", {
+    email: e.currentTarget.email.value,
+    password: e.currentTarget.password.value,
+    redirect: false,
+  });
 
-    const usuarioDto = {
-      email,
-      senha,
-    };
-
-    try {
-      const response = await axios.post(
-        "http://localhost/api/Usuario/login",
-        usuarioDto
-      );
-
-      const { nomeUsuario } = response.data; // Extraindo o nome do usuário
-
-      console.log(nomeUsuario);
-
-      // Armazene o nome em localStorage ou em um estado global/contexto
-      localStorage.setItem("nomeUsuario", nomeUsuario);
-
-      console.log("Usuário logado:", response.data);
-      router.push("http://localhost:3000/home");
-    } catch (error) {
-      console.error("Erro:", error);
-      setShowPopup(true);
-      setTimeout(() => setShowPopup(false), 2000);
-    }
-  };
+  if (result?.error) {
+    setErrorMessage("Credenciais inválidas. Por favor, tente novamente.");
+    setShowPopup(true);
+    setTimeout(() => setShowPopup(false), 3000);
+  } else {
+    router.push("/pages/admin/home");
+  }
+}
 
   return (
     <main className="flex justify-center items-center min-h-screen bg-slate-300 p-4">
@@ -92,6 +82,7 @@ export default function Profile() {
                   type={senhaVisible ? "text" : "password"}
                   id="password"
                   value={senha}
+                  name="password" // ← Corrigido aqui
                   onChange={(e) => setSenha(e.target.value)}
                   className="w-full p-3 bg-blue-200 text-black rounded-md pr-10"
                   placeholder="Digite sua senha"
