@@ -3,15 +3,17 @@ import React from 'react';
 import Sidebar from '@/components/Sidebar';
 import { Chart } from 'primereact/chart';
 import { redirect } from 'next/navigation';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 //import '../globals.css';
 
 export default async function Home() {
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
 
-  if (!session || session.user.role !== "admin") {
+  if (!session) {
     redirect('/pages/login');
     console.log("Acesso negado");
   }
+  
   const pieData = {
     labels: ['Categoria A', 'Categoria B', 'Categoria C'],
     datasets: [

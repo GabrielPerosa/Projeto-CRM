@@ -1,8 +1,8 @@
 "use client";
 import React, { useState } from "react";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import axios from "axios";
 import { Dialog } from "primereact/dialog";
 import 'primeicons/primeicons.css';
@@ -10,12 +10,17 @@ import Image from "next/image";
 
 
 export default function Profile() {
+
   const [email, setUserEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const router = useRouter();
+  const session = useSession();
+  
+  if(session.status === 'authenticated')
+    redirect(`/pages/${session.data.user.role}/home`);
 
 async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
   e.preventDefault();
