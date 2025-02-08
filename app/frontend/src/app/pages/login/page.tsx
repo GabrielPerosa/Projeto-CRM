@@ -7,6 +7,7 @@ import axios from "axios";
 import { Dialog } from "primereact/dialog";
 import 'primeicons/primeicons.css';
 import Image from "next/image";
+import { Loading } from "@/components/Loading";
 
 
 export default function Profile() {
@@ -19,8 +20,16 @@ export default function Profile() {
   const router = useRouter();
   const session = useSession();
   
-  if(session.status === 'authenticated')
+  
+  if (session.status === "loading") {
+    return (
+      <Loading/>
+    )
+  }
+
+  if (session.status === "authenticated") {
     redirect(`/pages/${session.data.user.role}/home`);
+  }
 
 async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
   e.preventDefault();
@@ -31,15 +40,18 @@ async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
   const result = await signIn("credentials", {
     email: emailValue,
     password: passwordValue,
-    callbackUrl: "/pages/admin/home",
+    redirect: false
   });
 
   if (result?.error) {
     setErrorMessage("Credenciais inválidas. Por favor, tente novamente.");
     setShowPopup(true);
     setTimeout(() => setShowPopup(false), 3000);
-  } else {
-    router.push("/pages/admin/home");
+  }
+  
+  
+  if(result?.ok && session.status === 'authenticated'){
+    redirect(`/pages/${session.data.user.role}/home`);
   }
 }
 
@@ -162,3 +174,4 @@ async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     </main>
   );
 }
+
