@@ -1,25 +1,19 @@
-'use client';
+'use client'
+import Sidebar from "@/components/Sidebar";
+import Filter from '@/components/Filter';
 
-import React from 'react';
-import Sidebar from '@/components/Sidebar';
-//import '../globals.css';
-import ServiceTable from '@/components/ServiceTable';
-
-export default function Services() {
+export default function ClientesPage() {
   return (
-    <div className="flex h-screen bg-gray-100 space-x-18">
-      <div className="w-64 bg-gray-100 shadow-md">
-        <Sidebar title="Serviços" username="Usuário" />
+    <div className="flex min-h-screen bg-gray-100">
+      {/* Sidebar ocupa 1/4 da largura da tela */}
+      <div className="w-64 bg-white shadow-md">
+        <Sidebar title="Configurações" username="Usuário" />
       </div>
 
-      {/* MAIN */}
+      {/* Conteúdo principal ocupa o restante do espaço */}
       <div className="flex-1 p-6">
-        
-      <h1 className="text-2xl font-semibold mb-6 text-gray-800">Serviços</h1>
-        
-        <div className="w-full">
-          <ServiceTable />
-        </div>
+        <h1 className="text-2xl font-bold mb-4">Lista de Clientes</h1>
+        <Filter />
       </div>
     </div>
   );
