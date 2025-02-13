@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import "../style/styles.css";
 import "primeicons/primeicons.css";
+import { signOut } from "next-auth/react";
 
 interface SidebarProps {
   username?: string;
@@ -24,13 +25,10 @@ export default function Sidebar({ username }: SidebarProps) {
   ];
 
   const handleLogout = () => {
-    localStorage.removeItem("nomeUsuario");
-    router.push("/pages/login");
+    signOut();
   };
 
   useEffect(() => {
-    setNomeUsuario(localStorage.getItem("nomeUsuario"));
-
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize();
     window.addEventListener("resize", handleResize);
