@@ -29,8 +29,6 @@ export default function Sidebar({ username }: SidebarProps) {
   };
 
   useEffect(() => {
-    setNomeUsuario(localStorage.getItem("nomeUsuario"));
-
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize();
     window.addEventListener("resize", handleResize);

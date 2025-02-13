@@ -8,11 +8,6 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
-
-  if (!session) {
-    redirect('/pages/login');
-    console.log("Acesso negado");
-  }
   
   const pieData = {
     labels: ['Categoria A', 'Categoria B', 'Categoria C'],

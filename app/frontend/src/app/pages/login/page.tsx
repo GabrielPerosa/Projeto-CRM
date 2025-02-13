@@ -27,10 +27,6 @@ export default function Profile() {
     )
   }
 
-  if (session.status === "authenticated") {
-    redirect(`/pages/${session.data.user.role}/home`);
-  }
-
 async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
   e.preventDefault();
   
@@ -48,7 +44,6 @@ async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     setShowPopup(true);
     setTimeout(() => setShowPopup(false), 3000);
   }
-  
   
   if(result?.ok && session.status === 'authenticated'){
     redirect(`/pages/${session.data.user.role}/home`);
@@ -174,4 +169,3 @@ async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     </main>
   );
 }
-
