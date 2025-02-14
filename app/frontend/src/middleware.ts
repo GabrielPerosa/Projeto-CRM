@@ -13,8 +13,6 @@ export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const token = await getToken({ req: request });
 
-  console.log('Middleware is running');
-  
   if(protectedRoutes.some((route) => path.startsWith(route.path)) && !token) {
     return NextResponse.redirect(new URL('/pages/login', request.nextUrl));
   } 
