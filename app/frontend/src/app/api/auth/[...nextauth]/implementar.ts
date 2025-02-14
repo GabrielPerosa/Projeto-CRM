@@ -153,3 +153,9 @@ export const config = {
   matcher: ["/((?!api|static|.*\\..*|_next).*)"], // Rotas para o middleware
 };
 */
+
+
+/*
+NEXTAUTH_SECRET=68kC6WGhppjC4RvqXrPxAY0zxJ1DDiwwVef4snU7PXc=
+NEXTAUTH_URL=http://localhost:3000
+*/
