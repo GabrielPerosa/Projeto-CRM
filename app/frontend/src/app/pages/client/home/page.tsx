@@ -5,7 +5,7 @@ import Sidebar from '@/components/Sidebar';
 //import '../globals.css';
 import ServiceTable from '@/components/ServiceTable';
 
-export default function Myservices() {
+export default function Home() {
   return (
     <div className="flex h-screen bg-gray-100 space-x-18">
       <div className="w-64 bg-gray-100 shadow-md">

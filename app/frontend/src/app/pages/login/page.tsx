@@ -1,49 +1,54 @@
 "use client";
 import React, { useState } from "react";
+import { signIn, useSession } from "next-auth/react";
 
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import axios from "axios";
 import { Dialog } from "primereact/dialog";
 import 'primeicons/primeicons.css';
 import Image from "next/image";
+import { Loading } from "@/components/Loading";
 
 
 export default function Profile() {
+
   const [email, setUserEmail] = useState("");
-  const [senha, setSenha] = useState("");
-  const [senhaVisible, setPasswordVisible] = useState(false);
-  const [showPopup, setShowPopup] = useState(false); // Controla a exibição do popup
+  const [password, setPassword] = useState("");
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const router = useRouter();
+  const session = useSession();
+  
+  
+  if (session.status === "loading") {
+    return (
+      <Loading/>
+    )
+  }
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  e.preventDefault();
+  
+  const emailValue = e.currentTarget.email.value
+  const passwordValue = e.currentTarget.password.value
+  
+  const result = await signIn("credentials", {
+    email: emailValue,
+    password: passwordValue,
+    redirect: false
+  });
 
-    const usuarioDto = {
-      email,
-      senha,
-    };
-
-    try {
-      const response = await axios.post(
-        "http://localhost/api/Usuario/login",
-        usuarioDto
-      );
-
-      const { nomeUsuario } = response.data; // Extraindo o nome do usuário
-
-      console.log(nomeUsuario);
-
-      // Armazene o nome em localStorage ou em um estado global/contexto
-      localStorage.setItem("nomeUsuario", nomeUsuario);
-
-      console.log("Usuário logado:", response.data);
-      router.push("http://localhost:3000/home");
-    } catch (error) {
-      console.error("Erro:", error);
-      setShowPopup(true);
-      setTimeout(() => setShowPopup(false), 2000);
-    }
-  };
+  if (result?.error) {
+    setErrorMessage("Credenciais inválidas. Por favor, tente novamente.");
+    setShowPopup(true);
+    setTimeout(() => setShowPopup(false), 3000);
+  }
+  
+  if(result?.ok && session.status === 'authenticated'){
+    redirect(`/pages/${session.data.user.role}/home`);
+  }
+}
 
   return (
     <main className="flex justify-center items-center min-h-screen bg-slate-300 p-4">
@@ -89,20 +94,21 @@ export default function Profile() {
               </label>
               <div className="relative w-full">
                 <input
-                  type={senhaVisible ? "text" : "password"}
+                  type={passwordVisible ? "text" : "password"}
                   id="password"
-                  value={senha}
-                  onChange={(e) => setSenha(e.target.value)}
+                  value={password}
+                  name="password"
+                  onChange={(e) => setPassword(e.target.value)}
                   className="w-full p-3 bg-blue-200 text-black rounded-md pr-10"
                   placeholder="Digite sua senha"
                 />
                 {/* Ícone para exibir ou ocultar a senha */}
                 <span
-                  onClick={() => setPasswordVisible(!senhaVisible)}
+                  onClick={() => setPasswordVisible(!passwordVisible)}
                   className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white cursor-pointer"
                 >
                   <i
-                    className={`pi ${senhaVisible ? "pi-eye-slash" : "pi-eye"}`}
+                    className={`pi ${passwordVisible ? "pi-eye-slash" : "pi-eye"}`}
                   />
                 </span>
               </div>
