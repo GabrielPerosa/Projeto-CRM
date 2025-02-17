@@ -33,21 +33,27 @@ async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
   const emailValue = e.currentTarget.email.value
   const passwordValue = e.currentTarget.password.value
   
-  const result = await signIn("credentials", {
-    email: emailValue,
-    password: passwordValue,
-    redirect: false
-  });
-
-  if (result?.error) {
-    setErrorMessage("Credenciais inválidas. Por favor, tente novamente.");
-    setShowPopup(true);
-    setTimeout(() => setShowPopup(false), 3000);
-  }
+  try{
+    const result = await signIn("credentials", {
+      email: emailValue,
+      password: passwordValue,
+      redirect: false
+    });
   
-  if(result?.ok && session.status === 'authenticated'){
-    redirect(`/pages/${session.data.user.role}/home`);
+    if (result?.error) {
+      setErrorMessage("Credenciais inválidas. Por favor, tente novamente.");
+      setShowPopup(true);
+      setTimeout(() => setShowPopup(false), 3000);
+    }
+
+    if(result?.ok && session.status === 'authenticated'){
+      console.log("Ok, login")
+      redirect(`/pages/${session.data.user.role}/home`);
+    }
+  }catch (err) {
+    setErrorMessage("Erro ao fazer login")
   }
+
 }
 
   return (

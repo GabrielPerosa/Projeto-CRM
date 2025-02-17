@@ -1,6 +1,8 @@
 import NextAuth, { AuthOptions, Session, SessionStrategy, User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
+import bcrypt from "bcrypt";
+import validator from "validator";
 
 const authOptions: AuthOptions = {
   secret: process.env.NEXTAUTH_SECRET!,
@@ -18,12 +20,40 @@ const authOptions: AuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials || !credentials.email || !credentials.password) {
-          console.log("Invalid credentials");
+
+        const email = credentials?.email;
+        const password = credentials?.password;
+
+        if (!credentials || !email || !password) {
+          console.log("credenciais invalidas");
           return null;
         }
 
-        if (credentials.email === "admin.com" && credentials.password === "123") {
+        if (!validator.isEmail(email)) {
+          throw new Error("Email inválido");
+        }
+
+        // Validar senha
+
+        try {
+          const user = await prisma.user.findUnique({ where: { email } });
+
+          if (!user || !(await bcrypt.compare(password, user.password))) {
+            throw new Error("Credenciais inválidas");
+          }
+
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+          };
+        } catch (error) {
+          console.error("Erro na autenticação:", error);
+          throw new Error("Ocorreu um erro durante a autenticação"); // Mensagem genérica para o usuário
+        }
+        
+        if (email === "admin.com" && password === "123") {
           console.log("Valid credentials");
           return {
             id: "1",
@@ -31,7 +61,7 @@ const authOptions: AuthOptions = {
             name: "Admin",
             role: "admin",
           };
-        } else if (credentials.email === "client.com" && credentials.password === "123") {
+        } else if (email === "client.com" && password === "123") {
           return {
             id: "2",
             email: "client.com",
@@ -50,19 +80,22 @@ const authOptions: AuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }: { token: JWT; user: User }) {
+    async jwt({ token, user }) {
       if (user) {
-        token.role = user.role;
-        token.email = user.email;
+        token.id = user.id;
       }
       return token;
     },
-    async session({ session, token }: { session: Session; token: JWT }) {
-      if (token?.role && token?.email) {
-        session.user.email = token.email as string;
-        session.user.role = token.role as string;
+    async session({ session, token }) {
+      if (token?.id) {
+        const user = await prisma.user.findUnique({ where: { id: token.id } });
+        session.user = {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+        };
       }
-
       return session;
     },
   },
