@@ -1,8 +1,7 @@
 import NextAuth, { AuthOptions, Session, SessionStrategy, User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
-import bcrypt from "bcrypt";
-import validator from "validator";
+
 
 const authOptions: AuthOptions = {
   secret: process.env.NEXTAUTH_SECRET!,
@@ -20,75 +19,78 @@ const authOptions: AuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-
         const email = credentials?.email;
         const password = credentials?.password;
 
-        if (!credentials || !email || !password) {
-          throw new Error("credenciais invalidas");
+        if (!email || !password) {
+          throw new Error("Credenciais inválidas");
         }
-
-        if (!validator.isEmail(email)) {
-          throw new Error("Email inválido");
-        }
-
-        // Validar senha
-
-        try { 
-          // Buscar no banco
-          const user = {
+        // Simular validação de usuário
+        try {
+          // SIMULAÇÃO DO AXIOS POST P OBTER JWT
+          // const user_token = await axios.post(`${process.env.BACKEND_URL}/api/login`, {
+          //   email,
+          //   password
+          // });
+          const user_token = {
             id: "1",
             email: "admin@example.com",
             name: "John Doe",
-            password: "$2y$10$tnK2G0BYGMcmYdbwJ7eMq.OFleSkve.EPkF/9Rr966zQ7gmJmWsV6",
             role: "admin",
-            };
+          };
 
-          if (!user) {
-            throw new Error("Sem usuário");
-          }
-          if (!bcrypt.compare(password, user.password)) {
-            throw new Error("Senha incorreta");
+          if (!user_token) {
+            throw new Error("Não foi possível autenticar o usuário.");
           }
 
           return {
-            id: user.id,
-            email: user.email,
-            name: user.name,
-            role: user.role,
+            id: user_token.id,  
+            email: user_token.email,
+            name: user_token.name,
+            role: user_token.role,
           };
         } catch (error) {
           console.error("Erro na autenticação:", error);
-          throw new Error("Ocorreu um erro durante a autenticação"); // Mensagem genérica para o usuário
+          throw new Error("Erro na autenticação");
         }
       },
     }),
   ],
   callbacks: {
     async jwt({ token, user }) {
+      // Persiste o token na sessão JWT
       if (user) {
+        token.role = user.role;
+        token.email = user.email;
         token.id = user.id;
-      }
+      }      
       return token;
     },
+
     async session({ session, token }) {
-      if (token?.id) {
-        const user = {
-          id: "1",
-          email: "admin@example.com",
-          name: "John Doe",
-          password: "$2y$10$tnK2G0BYGMcmYdbwJ7eMq.OFleSkve.EPkF/9Rr966zQ7gmJmWsV6",
-          role: "admin",
-          };
-          
-          session.user = {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
+      // Passa os dados do token para a sessão do usuário
+      if (token) {
+        session.user = {
+          id: token.id as string,
+          email: token.email!,
+          name: token.name!,
+          role: token.role as string,
         };
+        session.token = token;
       }
       return session;
+    },    
+  },
+  cookies: {
+    sessionToken: {
+      name: `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 60 * 60 * 24, // 1 dia
+      },
     },
   },
 };
