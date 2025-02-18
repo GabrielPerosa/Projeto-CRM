@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, JSX } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { InputText } from "primereact/inputtext";
@@ -9,6 +9,7 @@ import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import { addLocale, locale } from "primereact/api";
 import { FilterMatchMode } from "primereact/api";
+import { FaHourglass, FaClock, FaSpinner, FaCheck, FaUser, FaMapMarkerAlt, FaMoneyBillAlt } from "react-icons/fa"; // Importando ícones do react-icons
 import "../style/globals.css";
 
 // 📌 Configuração para português
@@ -21,14 +22,15 @@ locale("pt");
 
 // 📌 Definição dos tipos
 interface Cliente {
-  dataEntrega: string;
-  dataInicio: string;
+  dataEntrega: string | null;
+  dataInicio: string | null;
   id: number;
   cliente: string;
   fornecedor: string;
   estado: string;
   data: string;
   status: string;
+  valor: string;
 }
 
 interface Fornecedor {
@@ -63,44 +65,48 @@ const fornecedoresMock: Fornecedor[] = [
 // 📌 Lista de clientes
 const clientesMock: Cliente[] = [
   {
-      id: 1,
-      cliente: "Carlos Silva",
-      fornecedor: "",
-      estado: "SP",
-      data: "",
-      status: "Aprovação de Crédito",
-      dataInicio: "",
-      dataEntrega: ""
+    id: 1,
+    cliente: "Carlos Silva",
+    fornecedor: "",
+    estado: "SP",
+    data: "",
+    valor: "R$ 5.000",
+    status: "Aprovação de Crédito",
+    dataInicio: null,
+    dataEntrega: null,
   },
   {
-      id: 2,
-      cliente: "Ana Souza",
-      fornecedor: "",
-      estado: "MG",
-      data: "",
-      status: "Aguardando Orçamento",
-      dataInicio: "",
-      dataEntrega: ""
+    id: 2,
+    cliente: "Ana Souza",
+    fornecedor: "",
+    estado: "MG",
+    data: "",
+    valor: "R$ 10.000",
+    status: "Aguardando Orçamento",
+    dataInicio: null,
+    dataEntrega: null,
   },
   {
-      id: 3,
-      cliente: "João Pereira",
-      fornecedor: "",
-      estado: "BA",
-      data: "",
-      status: "Em Andamento",
-      dataInicio: "",
-      dataEntrega: ""
+    id: 3,
+    cliente: "João Pereira",
+    fornecedor: "",
+    estado: "BA",
+    data: "",
+    valor: "R$ 7.000",
+    status: "Em Andamento",
+    dataInicio: null,
+    dataEntrega: null,
   },
   {
-      id: 4,
-      cliente: "Maria Oliveira",
-      fornecedor: "",
-      estado: "AL",
-      data: "",
-      status: "Concluído",
-      dataInicio: "",
-      dataEntrega: ""
+    id: 4,
+    cliente: "Maria Oliveira",
+    fornecedor: "",
+    estado: "AL",
+    data: "",
+    valor: "R$ 15.000",
+    status: "Concluído",
+    dataInicio: null,
+    dataEntrega: null,
   },
 ];
 
@@ -116,6 +122,8 @@ export default function TabelaClientes() {
     estado: { value: null, matchMode: FilterMatchMode.CONTAINS },
     status: { value: null, matchMode: FilterMatchMode.EQUALS },
     data: { value: null, matchMode: FilterMatchMode.DATE_IS },
+    dataInicio: { value: null, matchMode: FilterMatchMode.DATE_IS }, // Adicionado
+    dataEntrega: { value: null, matchMode: FilterMatchMode.DATE_IS }, // Adicionado
   });
 
   useEffect(() => {
@@ -153,6 +161,7 @@ export default function TabelaClientes() {
       fornecedor: { value: null, matchMode: FilterMatchMode.CONTAINS },
       estado: { value: null, matchMode: FilterMatchMode.CONTAINS },
       status: { value: null, matchMode: FilterMatchMode.EQUALS },
+      data: { value: null, matchMode: FilterMatchMode.DATE_IS },
       dataInicio: { value: null, matchMode: FilterMatchMode.DATE_IS },
       dataEntrega: { value: null, matchMode: FilterMatchMode.DATE_IS },
     });
@@ -169,11 +178,11 @@ export default function TabelaClientes() {
   );
 
   // 📌 Ícones e cores para os status
-  const statusMap: { [key: string]: { icon: string; color: string } } = {
-    "Aprovação de Crédito": { icon: "pi pi-hourglass", color: "orange" },
-    "Aguardando Orçamento": { icon: "pi pi-clock", color: "blue" },
-    "Em Andamento": { icon: "pi pi-spin pi-spinner", color: "green" },
-    Concluído: { icon: "pi pi-check", color: "purple" },
+  const statusMap: { [key: string]: { icon: JSX.Element; color: string } } = {
+    "Aprovação de Crédito": { icon: <FaHourglass />, color: "orange" },
+    "Aguardando Orçamento": { icon: <FaClock />, color: "blue" },
+    "Em Andamento": { icon: <FaSpinner />, color: "green" },
+    "Concluído": { icon: <FaCheck />, color: "purple" },
   };
 
   // 📌 Opções do dropdown de status
@@ -185,16 +194,15 @@ export default function TabelaClientes() {
   // 📌 Template do status (Dropdown dentro da célula)
   const statusTemplate = (rowData: Cliente) => {
     const statusInfo = statusMap[rowData.status] || {
-      icon: "pi pi-info-circle",
+      icon: <FaHourglass />,
       color: "gray",
     };
 
     return (
       <div className="flex align-items-center">
-        <i
-          className={`pi ${statusInfo.icon}`}
-          style={{ color: statusInfo.color, marginRight: "8px" }}
-        ></i>
+        <span style={{ color: statusInfo.color, marginRight: "8px" }}>
+          {statusInfo.icon}
+        </span>
         <Dropdown
           value={rowData.status}
           options={statusOptions}
@@ -222,12 +230,16 @@ export default function TabelaClientes() {
           showFilterMatchModes={false} // 📌 Remove os modos de filtro ("Starts with", "Contains", etc.)
           showClearButton={true} // 📌 Exibe o botão "Remover"
           filterElement={(options) => (
-            <InputText
-              value={options.value || ""}
-              onChange={(e) => options.filterCallback(e.target.value)}
-              placeholder="Digite o cliente"
-              className="w-full"
-            />
+            <div style={{ position: "relative" }}>
+              <FaUser style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "#6c757d" }} />
+              <InputText
+                value={options.value || ""}
+                onChange={(e) => options.filterCallback(e.target.value)}
+                placeholder="Digite o cliente"
+                className="w-full"
+                style={{ paddingLeft: "2.5rem" }} // Ajuste o padding para acomodar o ícone
+              />
+            </div>
           )}
         />
 
@@ -250,55 +262,78 @@ export default function TabelaClientes() {
           showFilterMatchModes={false} // 📌 Remove os modos de filtro
           showClearButton={true} // 📌 Exibe o botão "Remover"
           filterElement={(options) => (
-            <InputText
-              value={options.value || ""}
-              onChange={(e) => options.filterCallback(e.target.value)}
-              placeholder="Digite o estado"
-              className="w-full"
+            <div style={{ position: "relative" }}>
+              <FaMapMarkerAlt style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "#6c757d" }} />
+              <InputText
+                value={options.value || ""}
+                onChange={(e) => options.filterCallback(e.target.value)}
+                placeholder="Digite o estado"
+                className="w-full"
+                style={{ paddingLeft: "2.5rem" }} // Ajuste o padding para acomodar o ícone
+              />
+            </div>
+          )}
+        />
+
+        <Column
+          field="dataInicio"
+          header="Data de Início"
+          body={(rowData: Cliente) => (
+            <Calendar
+              value={rowData.dataInicio ? new Date(rowData.dataInicio) : null}
+              onChange={(e) => {
+                const novosClientes = clientes.map((cliente) =>
+                  cliente.id === rowData.id
+                    ? { ...cliente, dataInicio: e.value ? e.value.toISOString() : null } // Converte para string
+                    : cliente
+                );
+                setClientes(novosClientes);
+              }}
+              dateFormat="dd/mm/yy"
+              placeholder="Selecionar data"
             />
           )}
         />
 
-<Column
-  field="dataInicio"
-  header="Data de Início"
-  body={(rowData: Cliente) => (
-    <Calendar
-      value={rowData.dataInicio ? new Date(rowData.dataInicio) : null}
-      onChange={(e) => {
-        const novosClientes = clientes.map((cliente) =>
-          cliente.id === rowData.id
-            ? { ...cliente, dataInicio: e.value }
-            : cliente
-        );
-        setClientes(novosClientes);
-      }}
-      dateFormat="dd/mm/yy"
-      placeholder="Selecionar data"
-    />
-  )}
-/>
+        <Column
+          field="dataEntrega"
+          header="Data de Entrega"
+          body={(rowData: Cliente) => (
+            <Calendar
+              value={rowData.dataEntrega ? new Date(rowData.dataEntrega) : null}
+              onChange={(e) => {
+                const novosClientes = clientes.map((cliente) =>
+                  cliente.id === rowData.id
+                    ? { ...cliente, dataEntrega: e.value ? e.value.toISOString() : null } // Converte para string
+                    : cliente
+                );
+                setClientes(novosClientes);
+              }}
+              dateFormat="dd/mm/yy"
+              placeholder="Selecionar data"
+            />
+          )}
+        />
 
-<Column
-  field="dataEntrega"
-  header="Data de Entrega"
-  body={(rowData: Cliente) => (
-    <Calendar
-      value={rowData.dataEntrega ? new Date(rowData.dataEntrega) : null}
-      onChange={(e) => {
-        const novosClientes = clientes.map((cliente) =>
-          cliente.id === rowData.id
-            ? { ...cliente, dataEntrega: e.value }
-            : cliente
-        );
-        setClientes(novosClientes);
-      }}
-      dateFormat="dd/mm/yy"
-      placeholder="Selecionar data"
-    />
-  )}
-/>
-
+        <Column
+          field="valor"
+          header="Valor (R$)"
+          filter
+          showFilterMatchModes={false} // 📌 Remove os modos de filtro
+          showClearButton={true} // 📌 Exibe o botão "Remover"
+          filterElement={(options) => (
+            <div style={{ position: "relative" }}>
+              <FaMoneyBillAlt style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "#6c757d" }} />
+              <InputText
+                value={options.value || ""}
+                onChange={(e) => options.filterCallback(e.target.value)}
+                placeholder="Digite o valor"
+                className="w-full"
+                style={{ paddingLeft: "2.5rem" }} // Ajuste o padding para acomodar o ícone
+              />
+            </div>
+          )}
+        />
 
         <Column field="status" header="Status" body={statusTemplate} />
       </DataTable>
