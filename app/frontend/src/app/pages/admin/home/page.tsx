@@ -1,14 +1,15 @@
-import { getServerSession } from 'next-auth';
-import React from 'react';
+'use client'
+//import { getServerSession } from 'next-auth';
+import React, { useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import { Chart } from 'primereact/chart';
-import { redirect } from 'next/navigation';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+//import { redirect } from 'next/navigation';
+//import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { FaChartColumn } from "react-icons/fa6"; // Importa o ícone de gráfico de barras
 import { MultiSelect } from "primereact/multiselect"; // Importa o componente MultiSelect para seleções múltiplas
 
 export default async function Home() {
-  const session = await getServerSession(authOptions);
+  // const session = await getServerSession(authOptions);
   // Estado para armazenar os filtros e o gráfico selecionado
   const [graficoSelecionado, setGraficoSelecionado] = useState(null);
   const [ano, setAno] = useState(null);

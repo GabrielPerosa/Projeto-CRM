@@ -7,6 +7,8 @@ import "../style/styles.css";
 import "primeicons/primeicons.css";
 import { signOut } from "next-auth/react";
 
+
+
 interface SidebarProps {
   username?: string;
   title: string;
@@ -80,7 +82,7 @@ export default function Sidebar({ username }: SidebarProps) {
           className="flex items-center w-full p-3 space-x-3 bg-blue-300/80 hover:bg-blue-500 text-white rounded-md transition-all duration-200"
         >
           <i className="pi pi-sign-out text-lg"></i>
-          {!isMobile && <span className="text-md font-medium">Logout</span>}
+          {!isMobile && <span className="text-md font-medium">Sair</span>}
         </button>
       </div>
     </div>
