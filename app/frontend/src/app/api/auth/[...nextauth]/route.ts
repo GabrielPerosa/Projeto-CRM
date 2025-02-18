@@ -25,8 +25,7 @@ const authOptions: AuthOptions = {
         const password = credentials?.password;
 
         if (!credentials || !email || !password) {
-          console.log("credenciais invalidas");
-          return null;
+          throw new Error("credenciais invalidas");
         }
 
         if (!validator.isEmail(email)) {
@@ -35,11 +34,21 @@ const authOptions: AuthOptions = {
 
         // Validar senha
 
-        try {
-          const user = await prisma.user.findUnique({ where: { email } });
+        try { 
+          // Buscar no banco
+          const user = {
+            id: "1",
+            email: "admin@example.com",
+            name: "John Doe",
+            password: "$2y$10$tnK2G0BYGMcmYdbwJ7eMq.OFleSkve.EPkF/9Rr966zQ7gmJmWsV6",
+            role: "admin",
+            };
 
-          if (!user || !(await bcrypt.compare(password, user.password))) {
-            throw new Error("Credenciais inválidas");
+          if (!user) {
+            throw new Error("Sem usuário");
+          }
+          if (!bcrypt.compare(password, user.password)) {
+            throw new Error("Senha incorreta");
           }
 
           return {
@@ -51,30 +60,6 @@ const authOptions: AuthOptions = {
         } catch (error) {
           console.error("Erro na autenticação:", error);
           throw new Error("Ocorreu um erro durante a autenticação"); // Mensagem genérica para o usuário
-        }
-        
-        if (email === "admin.com" && password === "123") {
-          console.log("Valid credentials");
-          return {
-            id: "1",
-            email: "admin.com",
-            name: "Admin",
-            role: "admin",
-          };
-        } else if (email === "client.com" && password === "123") {
-          return {
-            id: "2",
-            email: "client.com",
-            name: "Cliente",
-            role: "client",
-          };
-        } else {
-          return {
-            id: "3",
-            email: "supplier.com",
-            name: "Prestador",
-            role: "supplier",
-          };
         }
       },
     }),
@@ -88,8 +73,15 @@ const authOptions: AuthOptions = {
     },
     async session({ session, token }) {
       if (token?.id) {
-        const user = await prisma.user.findUnique({ where: { id: token.id } });
-        session.user = {
+        const user = {
+          id: "1",
+          email: "admin@example.com",
+          name: "John Doe",
+          password: "$2y$10$tnK2G0BYGMcmYdbwJ7eMq.OFleSkve.EPkF/9Rr966zQ7gmJmWsV6",
+          role: "admin",
+          };
+          
+          session.user = {
           id: user.id,
           email: user.email,
           name: user.name,
