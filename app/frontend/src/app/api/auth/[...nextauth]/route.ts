@@ -1,3 +1,4 @@
+import axios from "axios";
 import NextAuth, { AuthOptions, Session, SessionStrategy, User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -25,29 +26,19 @@ const authOptions: AuthOptions = {
         if (!email || !password) {
           throw new Error("Credenciais inválidas");
         }
-        // Simular validação de usuário
         try {
-          // SIMULAÇÃO DO AXIOS POST P OBTER JWT
-          // const user_token = await axios.post(`${process.env.BACKEND_URL}/api/login`, {
-          //   email,
-          //   password
-          // });
-          const user_token = {
-            id: "1",
-            email: "admin@example.com",
-            name: "John Doe",
-            role: "admin",
-          };
-
+          const user_token: any = await axios.post(`${process.env.BACKEND_URL}/login`, {
+            "Email": email,
+            "Password": password
+          });
           if (!user_token) {
             throw new Error("Não foi possível autenticar o usuário.");
           }
-
           return {
-            id: user_token.id,  
-            email: user_token.email,
-            name: user_token.name,
-            role: user_token.role,
+            id: '10',  
+            email: user_token.data.email,
+            name: user_token.data.name,
+            role: user_token.data.role,
           };
         } catch (error) {
           console.error("Erro na autenticação:", error);

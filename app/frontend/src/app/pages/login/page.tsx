@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { signIn, useSession } from "next-auth/react";
+import { getSession, signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { Dialog } from "primereact/dialog";
@@ -34,12 +34,15 @@ export default function Profile() {
         password,
         redirect: false,
       });
-  
-      if (result?.ok) {
-        router.push(`/pages/${session.data?.user.role}/home`);
-      } else {
+
+      if (result?.error) {
         setErrorMessage(result?.error || "Erro desconhecido");
+        result.error && setShowPopup(true);
       }
+      if(result?.ok){
+        const sessionData = await getSession();
+        router.push(`${sessionData?.token?.role}/home`);
+    }
     } catch (err) {
       setErrorMessage("Erro na conexão com o servidor");
     }
@@ -50,6 +53,7 @@ export default function Profile() {
       <Loading/>
     )
   }
+
   else {
     return (
       <main className="flex justify-center items-center min-h-screen bg-slate-300 p-4">
