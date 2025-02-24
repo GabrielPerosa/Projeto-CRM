@@ -2,7 +2,7 @@
 import React from 'react';
 import { Dropdown } from 'primereact/dropdown';
 
-interface DropdownStateProps { // Renamed interface to DropdownStateProps
+interface DropdownStateProps {
     id: string;
     value: string;
     onChange: (e: { value: string }) => void;
