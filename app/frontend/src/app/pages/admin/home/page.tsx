@@ -1,4 +1,5 @@
-i//import { getServerSession } from 'next-auth';
+'use client'
+//import { getServerSession } from 'next-auth';
 import React, { useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import { Chart } from 'primereact/chart';
