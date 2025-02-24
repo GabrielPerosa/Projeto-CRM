@@ -27,7 +27,7 @@ export default function Register() {
     const [stateValue, setStateValue] = useState("");
     const [warningMessage, setWarningMessage] = useState<string | null>(null);
     const router = useRouter();
-    const formattedPhone = phone.replace(/\D/g, "");
+    const formattedPhone = phone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
 
     const [isClient, setIsClient] = useState(false);
     const [isProvider, setIsProvider] = useState(false);
@@ -199,7 +199,7 @@ export default function Register() {
                             label="Telefone"
                             id="telefone"
                             name="telefone"
-                            value={phone} // 
+                            value={formattedPhone} // 
                             onChange={(e) => setPhone(e.target.value)}
                             required
                             placeholder="(99) 99999-9999"

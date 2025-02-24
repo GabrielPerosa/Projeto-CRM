@@ -75,10 +75,10 @@ const ProviderState: React.FC<ProviderStateProps> = ({
                                 key={index}
                                 className="text-gray-700 text-sm flex items-center justify-between p-2"
                             >
-                                {item.estado} - R$ {item.valor}
+                                {item.state} - R$ {item.value}
                                 <button
                                     type="button"
-                                    onClick={() => removeState(item.estado)} 
+                                    onClick={() => removeState(item.state)} 
                                     className="text-black p-1"
                                 >
                                     <FaTimes />
