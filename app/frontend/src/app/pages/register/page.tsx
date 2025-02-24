@@ -5,13 +5,13 @@ import axios from "axios";
 
 // Importando os componentes
 import InputText from "@/components/form/InputText";
-import InputEmail from "@/components/form/InputEmhttps://github.com/GabrielPerosa/Projeto-CRM/pull/27/conflict?name=app%252Ffrontend%252Fsrc%252Fapp%252Fpages%252Fregister%252Fpage.tsx&ancestor_oid=da11251437d2b0b8ba193334b813c3663a42f9a9&base_oid=f8c73c6c46c189bbaf43c9626c5f16ad90537486&head_oid=12340681fabd57dc0cde6e3cc8ffaa9c8a36569fail";
 import InputPhone from "@/components/form/InputPhone";
 import InputPassword from "@/components/form/InputPassword";
 import CheckboxUser from "@/components/form/CheckboxUser";
 import PopupDialog from "@/components/form/PopupDialog";
 import ProviderState from "@/components/form/ProviderState";
 import AddressForm from "@/components/form/AddressForm";
+import InputEmail from "@/components/form/InputEmail";
 
 export default function Register() {
     const [name, setName] = useState("");
@@ -282,10 +282,7 @@ export default function Register() {
                             id="telefone"
                             name="telefone"
                             value={formattedPhone} // 
-                            onChange={(e) => setPhone(e.target.value)}
-
                             onChange={handlePhoneChange}
-
                             required
                             placeholder="(99) 99999-9999"
                         />
