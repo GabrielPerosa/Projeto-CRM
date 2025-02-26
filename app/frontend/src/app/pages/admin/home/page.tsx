@@ -8,24 +8,24 @@ import { Chart } from 'primereact/chart';
 import { FaChartColumn } from "react-icons/fa6"; // Importa o ícone de gráfico de barras
 import { MultiSelect } from "primereact/multiselect"; // Importa o componente MultiSelect para seleções múltiplas
 
-export default async function Home() {
+export default function Home() {
   // const session = await getServerSession(authOptions);
   // Estado para armazenar os filtros e o gráfico selecionado
-  const [graficoSelecionado, setGraficoSelecionado] = useState(null);
-  const [ano, setAno] = useState(null);
-  const [meses, setMeses] = useState([]);
-  const [estados, setEstados] = useState([]);
+  const [selectedChart, setSelectedChart] = useState<string| null>(null);
+  const [year, setYear] = useState(undefined);
+  const [months, setMonths] = useState([]);
+  const [states, setStates] = useState([]);
 
   // Dados disponíveis para os filtros
-  const anos = [2022, 2023, 2024];
-  const mesesDisponiveis = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",];
-  const estadosDisponiveis = ["SP", "RJ", "MG", "BA", "PR", "RS", "SC", "PE", "CE", "GO"];
+  const years = [2022, 2023, 2024];
+  const availableMouths = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",];
+  const availableStates = ["SP", "RJ", "MG", "BA", "PR", "RS", "SC", "PE", "CE", "GO"];
 
   // Opções de configurações do gráfico
-  const opcoesGrafico = { responsive: true, maintainAspectRatio: false,};
+  const chartOptions = { responsive: true, maintainAspectRatio: false,};
 
   // Dados mockados para os gráficos
-  const dadosMockados = {
+  const mockData = {
     A: {
       // Gráfico de pizza
       labels: ["A", "B", "C"],
@@ -38,12 +38,12 @@ export default async function Home() {
     },
     B: {
       // Gráfico de barras
-      labels: mesesDisponiveis,
+      labels: availableMouths,
       datasets: [
         {
           label: "Pedidos",
           backgroundColor: "#42A5F5",
-          data: meses.map(() => Math.floor(Math.random() * 7000)), // Gera valores aleatórios para as vendas
+          data: months.map(() => Math.floor(Math.random() * 7000)), // Gera valores aleatórios para as vendas
         },
       ],
     },
@@ -71,13 +71,14 @@ export default async function Home() {
   };
 
   // Tipos e títulos dos gráficos
-  const graficos = {
-    A: { tipo: "pie", titulo: "Faturamento" },
-    B: { tipo: "bar", titulo: "Pedidos" },
-    C: { tipo: "line", titulo: "Tempo de Conclusão" },
-    D: { tipo: "doughnut", titulo: "Prestador" },
-  };
-
+  const charts = {
+    A: { type: "pie", title: "Faturamento" },
+    B: { type: "bar", title: "Pedidos" },
+    C: { type: "line", title: "Tempo de Conclusão" },
+    D: { type: "doughnut", title: "Prestador" },
+  }
+  const chartsToShow = ['C', 'D'];
+  
   return (
     <div className="flex h-screen bg-gray-100 overflow-hidden">
       {/* Componente Sidebar que exibe o menu lateral */}
@@ -87,62 +88,64 @@ export default async function Home() {
         {/* Filtros de seleção (meses, estados e ano) */}
         <div className="flex flex-wrap gap-4 mb-6 justify-center">
           <MultiSelect
-            value={meses}
-            options={mesesDisponiveis}
-            onChange={(e) => setMeses(e.value)} // Atualiza o estado de meses
+            value={months}
+            options={availableMouths}
+            onChange={(e) => setMonths(e.value)} // Atualiza o estado de meses
             placeholder="Selecione os meses"
             display="chip"
           />
           <MultiSelect
-            value={estados}
-            options={estadosDisponiveis}
-            onChange={(e) => setEstados(e.value)} // Atualiza o estado de estados
+            value={states}
+            options={availableStates}
+            onChange={(e) => setStates(e.value)} // Atualiza o estado de estados
             placeholder="Selecione os estados"
             display="chip"
           />
           <MultiSelect
-            value={ano}
-            options={anos}
-            onChange={(e) => setAno(e.value)} // Atualiza o estado do ano
+            value={year}
+            options={years}
+            onChange={(e) => setYear(e.value)} // Atualiza o estado do year
             placeholder="Ano"
           />
         </div>
 
         {/* Exibe os botões para selecionar os gráficos */}
         <div className="flex flex-wrap gap-6 justify-center">
-          {Object.keys(graficos).map((chave) => (
+          {chartsToShow.map(key => {
+            return(
             <div
-              key={chave}
+              key={key}
               className="p-6 bg-white rounded-lg shadow-lg w-72 text-center cursor-pointer hover:shadow-xl"
-              onClick={() => setGraficoSelecionado(chave)} // Ao clicar, seleciona o gráfico
+              onClick={() => setSelectedChart(key)}
             >
               <FaChartColumn className="text-4xl mb-2 text-blue-500" />
               <div className="text-lg font-semibold">
-                {graficos[chave].titulo}
+                {charts[key as keyof typeof charts].title}
               </div>
-            </div>
-          ))}
+            </div> 
+            )
+          })}
         </div>
 
         {/* Exibe o gráfico selecionado */}
-        {graficoSelecionado && (
+        {selectedChart && (
           <div className="mt-8 flex flex-col items-center">
             <div className="bg-white rounded-lg shadow-lg p-6 flex flex-col items-center justify-center w-full max-w-4xl">
               <h2 className="text-xl font-semibold mb-4">
-                {graficos[graficoSelecionado].titulo}
+                {charts[selectedChart as keyof typeof charts].title}
               </h2>
-              {/* Exibe o gráfico de acordo com o tipo e dados selecionados */}
+              {/* Exibe o gráfico de acordo com o type e dados selecionados */}
               <Chart
-                type={graficos[graficoSelecionado].tipo}
-                data={dadosMockados[graficoSelecionado]}
-                options={opcoesGrafico}
+                type={charts[selectedChart as keyof typeof charts].type}
+                data={mockData[selectedChart as keyof typeof charts]}
+                options={chartOptions}
                 style={{ width: "100%", height: "300px" }}
               />
             </div>
             {/* Botão para voltar e desmarcar o gráfico selecionado */}
             <button
               className="bg-blue-500 text-white py-2 px-20 rounded hover:bg-blue-600 mt-4"
-              onClick={() => setGraficoSelecionado(null)} // Desmarca o gráfico
+              onClick={() => setSelectedChart(null)} // Desmarca o gráfico
             >
               Voltar
             </button>
@@ -151,19 +154,19 @@ export default async function Home() {
 
         <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-white rounded-lg shadow-lg p-6 flex flex-col items-center">
-            <h2 className="text-xl font-semibold mb-4">{graficos.A.titulo}</h2>
+            <h2 className="text-xl font-semibold mb-4">{charts.A.title}</h2>
             <Chart
-              type={graficos.A.tipo}
-              data={dadosMockados.A}
-              options={opcoesGrafico}
+              type={charts.A.type}
+              data={mockData.A}
+              options={chartOptions}
             />
           </div>
           <div className="bg-white rounded-lg shadow-lg p-6 flex flex-col items-center">
-            <h2 className="text-xl font-semibold mb-4">{graficos.B.titulo}</h2>
+            <h2 className="text-xl font-semibold mb-4">{charts.B.title}</h2>
             <Chart
-              type={graficos.B.tipo}
-              data={dadosMockados.B}
-              options={opcoesGrafico}
+              type={charts.B.type}
+              data={mockData.B}
+              options={chartOptions}
               style={{ width: "100%", maxWidth: "550px", height: "300px" }}
             />
           </div>
