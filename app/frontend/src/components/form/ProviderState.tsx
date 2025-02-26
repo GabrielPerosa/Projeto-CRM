@@ -28,11 +28,56 @@ const ProviderState: React.FC<ProviderStateProps> = ({
     addState,
     removeState,
 }) => {
+    const MAX_VALUE = 10000000; // 100.000,00 em centavos (10000000 centavos = R$ 100.000,00)
+
     const handleValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const inputValue = e.target.value;
-        // Remove qualquer caractere não numérico usando regex
+
+        // Remove todos os caracteres não numéricos
         const numericValue = inputValue.replace(/[^0-9]/g, '');
-        setValue(numericValue); // Atualiza o estado com o valor numérico
+
+        // Limita o valor máximo
+        const limitedValue = Math.min(parseFloat(numericValue), MAX_VALUE);
+
+        // Atualiza o estado com o valor numérico (em centavos)
+        setValue(limitedValue.toString());
+    };
+
+    const formatCurrency = (value: string) => {
+        const numberValue = parseFloat(value) / 100; // Converte para reais
+        if (isNaN(numberValue)) {
+            return ''; // Retorna uma string vazia se o valor for inválido
+        }
+        return new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL',
+        }).format(numberValue);
+    };
+
+    const validateAndAddState = () => {
+        if (!state || !value) {
+            setWarningMessage('Por favor, selecione um estado e insira um valor.');
+            return;
+        }
+
+        if (statesAdded.some(item => item.state === state)) {
+            setWarningMessage('Este estado já foi adicionado.');
+            return;
+        }
+
+        const numericValue = parseFloat(value); // Converte para centavos
+        if (numericValue <= 0) {
+            setWarningMessage('O valor deve ser maior que zero.');
+            return;
+        }
+
+        if (numericValue > MAX_VALUE) {
+            setWarningMessage(`O valor não pode ser maior que ${formatCurrency(MAX_VALUE.toString())}.`);
+            return;
+        }
+
+        setWarningMessage(null);
+        addState();
     };
 
     return (
@@ -45,17 +90,17 @@ const ProviderState: React.FC<ProviderStateProps> = ({
                 />
                 <InputText
                     type='text'   
-                    label="Valor"   
+                    label="Valor (valor em média cobrado)"   
                     id="valor-estado"
                     name="valor-estado"
-                    value={value}
+                    value={formatCurrency(value)} // Exibe o valor formatado
                     onChange={handleValueChange}
                     placeholder="Digite o valor"/>
             </div>
 
             <button
                 type="button"
-                onClick={addState} 
+                onClick={validateAndAddState} 
                 className="w-full p-2 rounded bg-blue-700 hover:bg-blue-800 text-white text-sm font-semibold mt-2"
             >
                 Adicionar Estado
@@ -75,7 +120,7 @@ const ProviderState: React.FC<ProviderStateProps> = ({
                                 key={index}
                                 className="text-gray-700 text-sm flex items-center justify-between p-2"
                             >
-                                {item.state} - R$ {item.value}
+                                {item.state} - {formatCurrency(item.value)}
                                 <button
                                     type="button"
                                     onClick={() => removeState(item.state)} 

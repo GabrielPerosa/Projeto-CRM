@@ -49,7 +49,7 @@ const DropdownState: React.FC<DropdownStateProps> = ({
     return (
         <div>
             <label htmlFor={id} className="text-white text-sm block mb-1">
-                Estados
+                Estados (todos os estados que você atende)
             </label>
             <Dropdown
                 id={id}
@@ -57,7 +57,7 @@ const DropdownState: React.FC<DropdownStateProps> = ({
                 onChange={(e) => onChange({value: e.value})}
                 options={brazilStatesOptions}
                 placeholder={placeholder}
-                className="w-full rounded bg-blue-200 text-black text-sm h-10"
+                className="w-full rounded bg-blue-200 text-black text-sm h-9"
                 panelClassName="custom-dropdown-panel"
             />
         </div>

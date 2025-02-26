@@ -43,7 +43,7 @@ const AddressForm: React.FC<AddressFormProps> = ({
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <InputText
-          label="Número"
+          label="Número / Complemento"
           id="numero"
           name="numero"
           value={address.numero}
