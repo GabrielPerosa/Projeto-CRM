@@ -101,33 +101,9 @@ export default function Register() {
         e.preventDefault();
 
         // Validações antes de enviar o formulário
-        if (!/^[A-Za-z\s]+$/.test(name)) {
-            alert("Por favor, insira um nome válido (somente letras).");
-            return;
-        }
-
-        if (!/^[A-Za-z\s]+$/.test(lastName)) {
-            alert("Por favor, insira um sobrenome válido (somente letras).");
-            return;
-        }
-
-        if (!/^\d{11}$/.test(formattedPhone)) {
-            alert("Por favor, insira um telefone válido (11 dígitos, com DDD).");
-            return;
-        }
 
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             alert("Por favor, insira um e-mail válido.");
-            return;
-        }
-
-        if (!/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/.test(password)) {
-            alert("A senha deve conter pelo menos uma letra e um número, com no mínimo 8 caracteres.");
-            return;
-        }
-
-        if (!/^\d{8}$/.test(address.cep)) {
-            alert("Por favor, insira um CEP válido (8 dígitos).");
             return;
         }
 
