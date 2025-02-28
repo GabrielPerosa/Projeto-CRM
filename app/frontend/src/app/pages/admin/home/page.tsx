@@ -7,6 +7,8 @@ import { Chart } from 'primereact/chart';
 //import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { FaChartColumn } from "react-icons/fa6"; // Importa o ícone de gráfico de barras
 import { MultiSelect } from "primereact/multiselect"; // Importa o componente MultiSelect para seleções múltiplas
+import { getSession } from 'next-auth/react';
+import { Loading } from '@/components/Loading';
 
 export default function Home() {
   // const session = await getServerSession(authOptions);
@@ -15,6 +17,21 @@ export default function Home() {
   const [year, setYear] = useState(undefined);
   const [months, setMonths] = useState([]);
   const [states, setStates] = useState([]);
+  const [session, setSession] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Busca a sessão do usuário
+  const fetchSession = async () => {
+    try {
+      const sessionData = await getSession();
+      if(sessionData){
+        setSession(sessionData);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error("Erro ao buscar sessão:", error);
+    }
+  };
 
   // Dados disponíveis para os filtros
   const years = [2022, 2023, 2024];
@@ -79,6 +96,12 @@ export default function Home() {
   }
   const chartsToShow = ['C', 'D'];
   
+  if(loading) {
+    fetchSession()
+    return (
+      <Loading />
+    )
+  }
   return (
     <div className="flex h-screen bg-gray-100 overflow-hidden">
       {/* Componente Sidebar que exibe o menu lateral */}
