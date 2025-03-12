@@ -5,9 +5,8 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import "../style/styles.css";
 import "primeicons/primeicons.css";
-import { signOut } from "next-auth/react";
-
-
+import { getSession, signOut } from "next-auth/react";
+import { Loading } from "./Loading";
 
 interface SidebarProps {
   username?: string;
@@ -17,15 +16,44 @@ interface SidebarProps {
 export default function Sidebar({ username }: SidebarProps) {
   const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
-  const [nomeUsuario, setNomeUsuario] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true)
+  const [session, setSession] = useState<any>(null);
 
-  const menuItems = [
-    { label: "Início", icon: "pi pi-home", path: "/home" },
-    { label: "Meus Serviços", icon: "pi pi-briefcase", path: "/myservices" },
-    { label: "Propostas", icon: "pi pi-file", path: "/proposal" },
-    { label: "Configurações", icon: "pi pi-cog", path: "/settings" },
-  ];
+  // Busca a sessão do usuário
+  const fetchSession = async () => {
+    try {
+      const sessionData = await getSession();
+      if(sessionData){
+        setSession(sessionData);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error("Erro ao buscar sessão:", error);
+    }
+  };
 
+  let menuItems: any[] = [];
+
+if(!loading){
+  session?.token?.role === "admin" && (menuItems = [
+    { label: "Início", icon: "pi pi-home", path:`/pages/${session?.token?.role}/home`},
+    { label: "Serviços", icon: "pi pi-briefcase", path: `/pages/${session?.token?.role}/services` },
+    { label: "Configurações", icon: "pi pi-cog", path: `/pages/${session?.token?.role}/settings` },            
+  ])
+
+  session?.token?.role === "supplier" && (menuItems = [
+    { label: "Início", icon: "pi pi-home", path: `/pages/${session?.token?.role}/home`},
+    { label: "Meus Serviços", icon: "pi pi-briefcase", path: `/pages/${session?.token?.role}/services` },
+    { label: "Propostas", icon: "pi pi-file", path: `/pages/${session?.token?.role}/proposal` },
+    { label: "Configurações", icon: "pi pi-cog", path: `/pages/${session?.token?.role}/settings` },            
+  ])
+
+  session?.token?.role === "client" && (menuItems = [
+    { label: "Início", icon: "pi pi-home", path:`/pages/${session?.token?.role}/home`},
+    { label: "Configurações", icon: "pi pi-cog", path: `/pages/${session?.token?.role}/settings` },            
+  ])
+}
   const handleLogout = () => {
     signOut();
   };
@@ -36,6 +64,10 @@ export default function Sidebar({ username }: SidebarProps) {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+  
+  if (loading) {
+    fetchSession();
+  }
 
   return (
     <div className={`flex ${isMobile ? "w-20" : "w-64"} h-full bg-gradient-to-b from-blue-900 to-blue-600 shadow-xl transition-all duration-300`}>
@@ -56,7 +88,7 @@ export default function Sidebar({ username }: SidebarProps) {
             </div>
             {!isMobile && (
               <span className="text-white text-sm font-semibold">
-                Bem-vindo, {nomeUsuario || "Usuário"}
+                Bem-vindo, {userName || "Usuário"}
               </span>
             )}
           </div>

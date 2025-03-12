@@ -17,6 +17,7 @@ export default function Profile() {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
   const session = useSession();
 
