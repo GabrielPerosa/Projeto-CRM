@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import Sidebar from "@/components/Sidebar";
-//import '../globals.css';
 
 export default function Settings() {
   const [formData, setFormData] = useState({
@@ -13,14 +12,49 @@ export default function Settings() {
     confirmarSenha: "",
   });
 
+  const [emailError, setEmailError] = useState<string | null>(null); // Estado para mensagem de erro do e-mail
+
+  // Função para validar o e-mail
+  const validateEmail = (email: string) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  // Função para lidar com mudanças nos campos do formulário
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+
+    // Validação para nome e sobrenome (não pode conter números)
+    if (name === "nome" || name === "sobrenome") {
+      if (/\d/.test(value)) {
+        alert("Nome e sobrenome não podem conter números.");
+        return;
+      }
+    }
+
+    // Validação para e-mail
+    if (name === "email") {
+      if (value && !validateEmail(value)) {
+        setEmailError("Por favor, insira um e-mail válido.");
+      } else {
+        setEmailError(null);
+      }
+    }
+
     setFormData({ ...formData, [name]: value });
   };
 
+  // Função de envio do formulário
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Lógica para salvar as configurações
+
+    // Validação final do e-mail
+    if (!validateEmail(formData.email)) {
+      setEmailError("Por favor, insira um e-mail válido.");
+      return;
+    }
+
+    // Se tudo estiver válido, prossegue com o envio
     alert("Configurações salvas com sucesso!");
   };
 
@@ -32,11 +66,7 @@ export default function Settings() {
       </div>
 
       {/* Conteúdo principal */}
-      <div className="flex-1 p-4">
-        <h1 className="text-2xl font-semibold mb-6 text-gray-800">
-          Configurações
-        </h1>
-
+      <div className="flex-1 p-4 mt-20">
         <div className="bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto">
           <h2 className="text-xl font-semibold mb-4 text-gray-800">
             Editar Perfil
@@ -93,10 +123,12 @@ export default function Settings() {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
+                onBlur={handleChange} // Valida o e-mail ao sair do campo
                 required
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Digite seu email"
               />
+              {emailError && <p className="text-red-500 text-sm mt-1">{emailError}</p>}
             </div>
 
             {/* Senha e Confirmar Senha */}
