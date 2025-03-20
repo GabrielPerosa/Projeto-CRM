@@ -22,19 +22,71 @@ export default function Settings() {
     cep: "",
   });
 
+  const [emailError, setEmailError] = useState<string | null>(null); // Estado para mensagem de erro do e-mail
+
+  // Função para validar o e-mail
+  const validateEmail = (email: string) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  // Função para lidar com mudanças nos campos do formulário
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+
+    // Validação para nome e sobrenome (não pode conter números)
+    if (name === "nome" || name === "sobrenome") {
+      if (/\d/.test(value)) {
+        alert("Nome e sobrenome não podem conter números.");
+        return;
+      }
+    }
+
+    // Formatação para telefone (formato (99) 99999-9999)
+    if (name === "telefone") {
+      const numericValue = value.replace(/\D/g, ""); // Remove tudo que não é número
+      let formattedValue = numericValue;
+
+      if (numericValue.length > 2) {
+        formattedValue = `(${numericValue.slice(0, 2)}) ${numericValue.slice(2)}`;
+      }
+      if (numericValue.length > 7) {
+        formattedValue = `(${numericValue.slice(0, 2)}) ${numericValue.slice(2, 7)}-${numericValue.slice(7, 11)}`;
+      }
+
+      setFormData({ ...formData, [name]: formattedValue });
+      return;
+    }
+
+    // Validação para e-mail
+    if (name === "email") {
+      if (value && !validateEmail(value)) {
+        setEmailError("Por favor, insira um e-mail válido.");
+      } else {
+        setEmailError(null);
+      }
+    }
+
     setFormData({ ...formData, [name]: value });
   };
 
+  // Função para lidar com mudanças nos campos de endereço
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+
+    // Validação para CEP (não pode aceitar letras)
+    if (name === "cep" && !/^\d*$/.test(value)) {
+      alert("CEP deve conter apenas números.");
+      return;
+    }
+
     setAddress((prev) => ({
       ...prev,
       [name]: value,
     }));
   };
 
+  // Função para buscar endereço pelo CEP
   const fetchAddressByZip = async (zip: string) => {
     if (zip.length === 8) {
       try {
@@ -56,8 +108,17 @@ export default function Settings() {
     }
   };
 
+  // Função de envio do formulário
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validação final do e-mail
+    if (!validateEmail(formData.email)) {
+      setEmailError("Por favor, insira um e-mail válido.");
+      return;
+    }
+
+    // Se tudo estiver válido, prossegue com o envio
     alert("Configurações salvas com sucesso!");
   };
 
@@ -193,10 +254,12 @@ export default function Settings() {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
+                onBlur={handleChange} // Valida o e-mail ao sair do campo
                 required
                 className="w-full px-3 py-2 border rounded-lg"
                 placeholder="Digite seu email"
               />
+              {emailError && <p className="text-red-500 text-sm mt-1">{emailError}</p>}
             </div>
             <div>
               <label htmlFor="telefone" className="block text-gray-700 font-medium mb-1">
