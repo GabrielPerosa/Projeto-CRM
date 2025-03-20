@@ -6,12 +6,11 @@ import { Dropdown } from "primereact/dropdown";
 import { FaTimes } from "react-icons/fa";
 
 export default function Settings() {
-
   const [estado, setEstado] = useState("");
   const [estadosAdicionados, setEstadosAdicionados] = useState<Estado[]>([]);
   const [valor, setValor] = useState("");
   const [mensagemAviso, setMensagemAviso] = useState<string | null>(null);
-
+  const [emailError, setEmailError] = useState<string | null>(null);
 
   interface Estado {
     estado: string;
@@ -66,17 +65,101 @@ export default function Settings() {
     { label: "Tocantins", value: "TO" },
   ];
 
+  // Validação para nome e sobrenome (não pode conter números)
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+
+    if (name === "nome" || name === "sobrenome") {
+      if (/\d/.test(value)) {
+        alert("Nome e sobrenome não podem conter números.");
+        return;
+      }
+    }
+
     setFormData({ ...formData, [name]: value });
   };
 
+  // Validação para CEP (não pode aceitar letras)
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+
+    if (name === "cep" && !/^\d*$/.test(value)) {
+      return;
+    }
+
     setAddress((prev) => ({
       ...prev,
       [name]: value,
     }));
+  };
+
+  // Formatação para telefone (formato (99) 99999-9999)
+  const handleTelefoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    const numericValue = value.replace(/\D/g, ""); // Remove tudo que não é número
+    let formattedValue = numericValue;
+
+    if (numericValue.length > 2) {
+      formattedValue = `(${numericValue.slice(0, 2)}) ${numericValue.slice(2)}`;
+    }
+    if (numericValue.length > 7) {
+      formattedValue = `(${numericValue.slice(0, 2)}) ${numericValue.slice(
+        2,
+        7
+      )}-${numericValue.slice(7, 11)}`;
+    }
+
+    setFormData({ ...formData, telefone: formattedValue });
+  };
+
+  // Formatação para valor (formato R$ 10.000,00 e limite de R$100.000,00)
+  const handleValorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, ""); // Remove tudo que não é número
+    const numericValue = parseFloat(value) / 100; // Converte para valor decimal
+
+    if (numericValue > 100000) {
+      return;
+    }
+
+    const formattedValue = new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(numericValue);
+
+    setValor(formattedValue);
+  };
+
+  // Função para validar o e-mail
+  const validateEmail = (email: string) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  // Função para lidar com a mudança no campo de e-mail
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setFormData({ ...formData, email: value });
+
+    // Validação do e-mail
+    if (value && !validateEmail(value)) {
+      setEmailError("Por favor, insira um e-mail válido.");
+    } else {
+      setEmailError(null);
+    }
+  };
+
+  // Função de envio do formulário
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Validação final do e-mail
+    if (!validateEmail(formData.email)) {
+      setEmailError("Por favor, insira um e-mail válido.");
+      return;
+    }
+
+    // Se tudo estiver válido, prossegue com o envio
+    alert("Configurações salvas com sucesso!");
   };
 
   const fetchAddressByZip = async (zip: string) => {
@@ -100,14 +183,11 @@ export default function Settings() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    alert("Configurações salvas com sucesso!");
-  };
-
   const adicionarEstado = () => {
     if (!estado || !valor.trim()) {
-      setMensagemAviso("Por favor, selecione um estado e informe um valor válido.");
+      setMensagemAviso(
+        "Por favor, selecione um estado e informe um valor válido."
+      );
       return;
     }
 
@@ -129,7 +209,7 @@ export default function Settings() {
       const timer = setTimeout(() => setMensagemAviso(null), 3000);
       return () => clearTimeout(timer);
     }
-  }, [mensagemAviso]); // Apenas a variável de estado
+  }, [mensagemAviso]);
 
   const removerEstado = (estadoToRemove: string) => {
     setEstadosAdicionados(
@@ -235,7 +315,7 @@ export default function Settings() {
                   htmlFor="numero"
                   className="block text-gray-700 font-medium mb-1"
                 >
-                  Número
+                  Número/Complemento
                 </label>
                 <input
                   type="text"
@@ -294,11 +374,15 @@ export default function Settings() {
                 id="email"
                 name="email"
                 value={formData.email}
-                onChange={handleChange}
+                onChange={handleEmailChange}
+                onBlur={handleEmailChange}
                 required
                 className="w-full px-3 py-2 border rounded-lg"
                 placeholder="Digite seu email"
               />
+              {emailError && (
+                <p className="text-red-500 text-sm mt-1">{emailError}</p>
+              )}
             </div>
             <div>
               <label
@@ -312,14 +396,13 @@ export default function Settings() {
                 id="telefone"
                 name="telefone"
                 value={formData.telefone}
-                onChange={handleChange}
+                onChange={handleTelefoneChange}
                 placeholder="(99) 99999-9999"
                 className="w-full px-3 py-2 border rounded-lg"
               />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-
               {/* Adicionar Estado */}
               <div>
                 <label
@@ -351,7 +434,7 @@ export default function Settings() {
                   type="text"
                   id="valor"
                   value={valor}
-                  onChange={(e) => setValor(e.target.value)}
+                  onChange={handleValorChange}
                   className="w-full px-2 py-3 border rounded-lg"
                   placeholder="Insira o valor"
                 />
@@ -366,7 +449,7 @@ export default function Settings() {
             >
               Adicionar Estado
             </button>
-            
+
             {/* Exibir mensagem de aviso */}
             {mensagemAviso && (
               <p className="text-black text-sm text-center my-2 font-bold">
@@ -382,7 +465,7 @@ export default function Settings() {
                     key={index}
                     className="text-gray-700 text-sm flex items-center justify-between p-2"
                   >
-                    {item.estado} - R$ {item.valor}
+                    {item.estado} {item.valor}
                     <button
                       type="button"
                       onClick={() => removerEstado(item.estado)}
