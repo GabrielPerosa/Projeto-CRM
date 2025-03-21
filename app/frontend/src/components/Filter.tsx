@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, JSX } from "react";
+import React, { useState, useEffect } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { InputText } from "primereact/inputtext";
@@ -9,8 +9,8 @@ import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import { addLocale, locale } from "primereact/api";
 import { FilterMatchMode } from "primereact/api";
-import { FaHourglass, FaClock, FaSpinner, FaCheck, FaUser, FaMapMarkerAlt, FaMoneyBillAlt } from "react-icons/fa"; // Importando ícones do react-icons
 import "../style/globals.css";
+import { FaUser, FaMapMarkerAlt } from "react-icons/fa";
 
 // 📌 Configuração para português
 addLocale("pt", {
@@ -40,7 +40,7 @@ interface Fornecedor {
   valor: string;
 }
 
-// 📌 Lista de fornecedores
+// 📌 Lista de fornecedores (dados mockados)
 const fornecedoresMock: Fornecedor[] = [
   {
     nome: "Fornecedor A",
@@ -62,7 +62,7 @@ const fornecedoresMock: Fornecedor[] = [
   },
 ];
 
-// 📌 Lista de clientes
+// 📌 Lista de clientes (dados mockados)
 const clientesMock: Cliente[] = [
   {
     id: 1,
@@ -111,49 +111,56 @@ const clientesMock: Cliente[] = [
 ];
 
 export default function TabelaClientes() {
-  const [clientes, setClientes] = useState<Cliente[]>([]);
-  const [showDialog, setShowDialog] = useState<boolean>(false);
-  const [selectedRow, setSelectedRow] = useState<Cliente | null>(null);
+  // 📌 Estados da aplicação
+  const [clientes, setClientes] = useState<Cliente[]>([]); // Armazena a lista de clientes
+  const [showDialog, setShowDialog] = useState<boolean>(false); // Controla a visibilidade do popup de fornecedores
+  const [selectedRow, setSelectedRow] = useState<Cliente | null>(null); // Armazena a linha selecionada na tabela
 
+  // 📌 Filtros da tabela
   const [filtros, setFiltros] = useState({
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    cliente: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    fornecedor: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    estado: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    status: { value: null, matchMode: FilterMatchMode.EQUALS },
-    data: { value: null, matchMode: FilterMatchMode.DATE_IS },
-    dataInicio: { value: null, matchMode: FilterMatchMode.DATE_IS }, // Adicionado
-    dataEntrega: { value: null, matchMode: FilterMatchMode.DATE_IS }, // Adicionado
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS }, // Filtro global
+    cliente: { value: null, matchMode: FilterMatchMode.CONTAINS }, // Filtro por cliente
+    fornecedor: { value: null, matchMode: FilterMatchMode.CONTAINS }, // Filtro por fornecedor
+    estado: { value: null, matchMode: FilterMatchMode.CONTAINS }, // Filtro por estado
+    status: { value: null, matchMode: FilterMatchMode.EQUALS }, // Filtro por status
+    data: { value: null, matchMode: FilterMatchMode.DATE_IS }, // Filtro por data
+    dataInicio: { value: null, matchMode: FilterMatchMode.DATE_IS }, // Filtro por data de início
+    dataEntrega: { value: null, matchMode: FilterMatchMode.DATE_IS }, // Filtro por data de entrega
   });
 
+  // 📌 Efeito para carregar os dados mockados ao iniciar
   useEffect(() => {
     setClientes(clientesMock);
   }, []);
 
+  // 📌 Função para selecionar um fornecedor e atualizar a lista de clientes
   const selecionarFornecedor = (fornecedor: Fornecedor) => {
     if (!selectedRow) return;
 
     const novosClientes = clientes.map((cliente) =>
       cliente.id === selectedRow.id
-        ? { ...cliente, fornecedor: fornecedor.nome }
+        ? { ...cliente, fornecedor: fornecedor.nome } // Atualiza o fornecedor do cliente selecionado
         : cliente
     );
-    setClientes(novosClientes);
-    setShowDialog(false);
+    setClientes(novosClientes); // Atualiza o estado dos clientes
+    setShowDialog(false); // Fecha o popup
   };
 
+  // 📌 Função para abrir o popup de seleção de fornecedor
   const abrirPopupFornecedor = (rowData: Cliente) => {
-    setSelectedRow(rowData);
-    setShowDialog(true);
+    setSelectedRow(rowData); // Define a linha selecionada
+    setShowDialog(true); // Abre o popup
   };
 
+  // 📌 Função para atualizar o status de um cliente
   const atualizarStatus = (novaOpcao: string, rowData: Cliente) => {
     const novosClientes = clientes.map((cliente) =>
-      cliente.id === rowData.id ? { ...cliente, status: novaOpcao } : cliente
+      cliente.id === rowData.id ? { ...cliente, status: novaOpcao } : cliente // Atualiza o status do cliente selecionado
     );
-    setClientes(novosClientes);
+    setClientes(novosClientes); // Atualiza o estado dos clientes
   };
 
+  // 📌 Função para limpar todos os filtros da tabela
   const limparFiltros = () => {
     setFiltros({
       global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -167,6 +174,7 @@ export default function TabelaClientes() {
     });
   };
 
+  // 📌 Função para renderizar o cabeçalho da tabela com botão de limpar filtros
   const renderizarCabecalho = () => (
     <div className="flex justify-content-between">
       <Button
@@ -177,44 +185,30 @@ export default function TabelaClientes() {
     </div>
   );
 
-  // 📌 Ícones e cores para os status
-  const statusMap: { [key: string]: { icon: JSX.Element; color: string } } = {
-    "Aprovação de Crédito": { icon: <FaHourglass />, color: "orange" },
-    "Aguardando Orçamento": { icon: <FaClock />, color: "blue" },
-    "Em Andamento": { icon: <FaSpinner />, color: "green" },
-    "Concluído": { icon: <FaCheck />, color: "purple" },
-  };
+  // 📌 Lista de opções de status para o dropdown
+  const statusOptions = [
+    { label: "Aprovação de Crédito", value: "Aprovação de Crédito" },
+    { label: "Aguardando Orçamento", value: "Aguardando Orçamento" },
+    { label: "Em Andamento", value: "Em Andamento" },
+    { label: "Concluído", value: "Concluído" },
+  ];
 
-  // 📌 Opções do dropdown de status
-  const statusOptions = Object.keys(statusMap).map((status) => ({
-    label: status,
-    value: status,
-  }));
-
-  // 📌 Template do status (Dropdown dentro da célula)
+  // 📌 Template para a coluna de status com dropdown
   const statusTemplate = (rowData: Cliente) => {
-    const statusInfo = statusMap[rowData.status] || {
-      icon: <FaHourglass />,
-      color: "gray",
-    };
-
     return (
-      <div className="flex align-items-center">
-        <span style={{ color: statusInfo.color, marginRight: "8px" }}>
-          {statusInfo.icon}
-        </span>
-        <Dropdown
-          value={rowData.status}
-          options={statusOptions}
-          onChange={(e) => atualizarStatus(e.value, rowData)}
-          className="w-full"
-        />
-      </div>
+      <Dropdown
+        value={rowData.status}
+        options={statusOptions}
+        onChange={(e) => atualizarStatus(e.value, rowData)} // Atualiza o status ao selecionar uma opção
+        placeholder="Selecione o status"
+        className="w-full"
+      />
     );
   };
 
   return (
     <div>
+      {/* 📌 Tabela de clientes */}
       <DataTable
         value={clientes}
         paginator
@@ -223,12 +217,13 @@ export default function TabelaClientes() {
         header={renderizarCabecalho()}
         emptyMessage="Nenhum dado encontrado."
       >
+        {/* Coluna de Cliente */}
         <Column
           field="cliente"
           header="Cliente"
           filter
-          showFilterMatchModes={false} // 📌 Remove os modos de filtro ("Starts with", "Contains", etc.)
-          showClearButton={true} // 📌 Exibe o botão "Remover"
+          showFilterMatchModes={false}
+          showClearButton={true}
           filterElement={(options) => (
             <div style={{ position: "relative" }}>
               <FaUser style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "#6c757d" }} />
@@ -237,12 +232,13 @@ export default function TabelaClientes() {
                 onChange={(e) => options.filterCallback(e.target.value)}
                 placeholder="Digite o cliente"
                 className="w-full"
-                style={{ paddingLeft: "2.5rem" }} // Ajuste o padding para acomodar o ícone
+                style={{ paddingLeft: "2.5rem" }}
               />
             </div>
           )}
         />
 
+        {/* Coluna de Fornecedor */}
         <Column
           field="fornecedor"
           header="Fornecedor"
@@ -255,12 +251,13 @@ export default function TabelaClientes() {
           )}
         />
 
+        {/* Coluna de Estado */}
         <Column
           field="estado"
           header="Estado"
           filter
-          showFilterMatchModes={false} // 📌 Remove os modos de filtro
-          showClearButton={true} // 📌 Exibe o botão "Remover"
+          showFilterMatchModes={false}
+          showClearButton={true}
           filterElement={(options) => (
             <div style={{ position: "relative" }}>
               <FaMapMarkerAlt style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "#6c757d" }} />
@@ -269,12 +266,13 @@ export default function TabelaClientes() {
                 onChange={(e) => options.filterCallback(e.target.value)}
                 placeholder="Digite o estado"
                 className="w-full"
-                style={{ paddingLeft: "2.5rem" }} // Ajuste o padding para acomodar o ícone
+                style={{ paddingLeft: "2.5rem" }}
               />
             </div>
           )}
         />
 
+        {/* Coluna de Data de Início */}
         <Column
           field="dataInicio"
           header="Data de Início"
@@ -284,7 +282,7 @@ export default function TabelaClientes() {
               onChange={(e) => {
                 const novosClientes = clientes.map((cliente) =>
                   cliente.id === rowData.id
-                    ? { ...cliente, dataInicio: e.value ? e.value.toISOString() : null } // Converte para string
+                    ? { ...cliente, dataInicio: e.value ? e.value.toISOString() : null }
                     : cliente
                 );
                 setClientes(novosClientes);
@@ -295,6 +293,7 @@ export default function TabelaClientes() {
           )}
         />
 
+        {/* Coluna de Data de Entrega */}
         <Column
           field="dataEntrega"
           header="Data de Entrega"
@@ -304,7 +303,7 @@ export default function TabelaClientes() {
               onChange={(e) => {
                 const novosClientes = clientes.map((cliente) =>
                   cliente.id === rowData.id
-                    ? { ...cliente, dataEntrega: e.value ? e.value.toISOString() : null } // Converte para string
+                    ? { ...cliente, dataEntrega: e.value ? e.value.toISOString() : null }
                     : cliente
                 );
                 setClientes(novosClientes);
@@ -315,30 +314,24 @@ export default function TabelaClientes() {
           )}
         />
 
+        {/* Coluna de Valor */}
         <Column
           field="valor"
           header="Valor (R$)"
-          filter
-          showFilterMatchModes={false} // 📌 Remove os modos de filtro
-          showClearButton={true} // 📌 Exibe o botão "Remover"
-          filterElement={(options) => (
-            <div style={{ position: "relative" }}>
-              <FaMoneyBillAlt style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "#6c757d" }} />
-              <InputText
-                value={options.value || ""}
-                onChange={(e) => options.filterCallback(e.target.value)}
-                placeholder="Digite o valor"
-                className="w-full"
-                style={{ paddingLeft: "2.5rem" }} // Ajuste o padding para acomodar o ícone
-              />
-            </div>
+          body={(rowData: Cliente) => (
+            <div style={{ whiteSpace: "nowrap" }}>{rowData.valor}</div>
           )}
         />
 
-        <Column field="status" header="Status" body={statusTemplate} />
+        {/* Coluna de Status */}
+        <Column
+          field="status"
+          header="Status"
+          body={statusTemplate} // Usa o template personalizado
+        />
       </DataTable>
 
-      {/* POP-UP FORNECEDOR */}
+      {/* 📌 Popup de seleção de fornecedor */}
       <Dialog
         header="Selecionar Fornecedor"
         visible={showDialog}
