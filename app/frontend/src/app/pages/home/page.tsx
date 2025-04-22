@@ -5,20 +5,19 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import Counter from "@/components/Counter";
-
 import "@/style/styles.css";
 import "@/style/globals.css";
 
 const SolarLandingPage = () => {
   // Controle para mostrar ou ocultar o modal
   const [showModal, setShowModal] = useState(false);
-  // Tipo de orçamento selecionado: "bill" (conta) ou "area" (área)
+  // Tipo de orçamento selecionado: "bill" (conta) ou "kw"
 
   const [option, setOption] = useState("bill");
   // Valor da conta de energia fornecido pelo usuário
   const [energyBill, setEnergyBill] = useState("");
   // Área disponível para instalação fornecida pelo usuário
-  const [area, setArea] = useState("");
+  const [kw, setKw] = useState("");
   // Resultado do orçamento calculado
   const [quote, setQuote] = useState<string | null>(null);
 
@@ -45,9 +44,9 @@ const SolarLandingPage = () => {
     if (option === "bill") {
       // Cálculo baseado no valor da conta de energia
       total = parseFloat(energyBill) * stateRatePerBill;
-    } else if (option === "area") {
+    } else if (option === "kw") {
       // Cálculo baseado na área em metros quadrados
-      total = parseFloat(area) * stateRatePerSquareMeter;
+      total = parseFloat(kw) * stateRatePerSquareMeter;
     }
     setQuote(total.toFixed(2)); // Armazena o resultado formatado
   };
@@ -195,7 +194,7 @@ const SolarLandingPage = () => {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-12 max-w-4xl mx-auto">
             <Counter target={200} label="Sistemas Instalados pelo Brasil" />
             <Counter target={10} label="Anos de Experiência" />
-            <Counter target={95} label="Clientes Satisfeitos" />
+            <Counter target={100} label="Clientes Satisfeitos" />
           </div>
         </div>
       </section>
@@ -268,14 +267,14 @@ const SolarLandingPage = () => {
                   Reduzir Conta de Energia
                 </Button>
                 <Button
-                  onClick={() => setOption("area")}
+                  onClick={() => setOption("kw")}
                   className={`w-full ${
-                    option === "area"
+                    option === "kw"
                       ? "bg-blue-500 text-white"
                       : "bg-gray-200 text-gray-800"
                   }`}
                 >
-                  Calcular por m²
+                  Calcular por Quilowatt
                 </Button>
               </div>
             </div>
@@ -296,16 +295,16 @@ const SolarLandingPage = () => {
               </div>
             )}
 
-            {option === "area" && (
+            {option === "kw" && (
               <div className="mb-4">
                 <label className="block text-gray-600 mb-1">
-                  Área disponível para instalação (m²)
+                  Valor gasto de Kw (quilowatt)
                 </label>
                 <Input
                   type="number"
-                  value={area}
-                  onChange={(e) => setArea(e.target.value)}
-                  placeholder="Digite a área em m²"
+                  value={kw}
+                  onChange={(e) => setKw(e.target.value)}
+                  placeholder="Digite o valor"
                   step="0.01"
                 />
               </div>

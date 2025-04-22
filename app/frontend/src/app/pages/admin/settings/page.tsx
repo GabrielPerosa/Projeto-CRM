@@ -4,27 +4,40 @@ import React, { useState } from "react";
 import Sidebar from "@/components/Sidebar";
 
 export default function Settings() {
+  const [emailError, setEmailError] = useState<string | null>(null);
+
   const [formData, setFormData] = useState({
     nome: "",
     sobrenome: "",
     email: "",
     senha: "",
     confirmarSenha: "",
+    valorAssinatura: "",
   });
 
-  const [emailError, setEmailError] = useState<string | null>(null); // Estado para mensagem de erro do e-mail
-
-  // Função para validar o e-mail
+  // Validação de e-mail
   const validateEmail = (email: string) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
   };
 
-  // Função para lidar com mudanças nos campos do formulário
+  // Formata o número conforme o usuário digita
+  const formatCurrencyLive = (value: string) => {
+    const onlyDigits = value.replace(/\D/g, "");
+    const numericValue = parseFloat(onlyDigits) / 100;
+
+    if (isNaN(numericValue)) return "";
+
+    return numericValue.toLocaleString("pt-BR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  };
+
+  // Handle de mudança dos campos
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
-    // Validação para nome e sobrenome (não pode conter números)
     if (name === "nome" || name === "sobrenome") {
       if (/\d/.test(value)) {
         alert("Nome e sobrenome não podem conter números.");
@@ -32,7 +45,6 @@ export default function Settings() {
       }
     }
 
-    // Validação para e-mail
     if (name === "email") {
       if (value && !validateEmail(value)) {
         setEmailError("Por favor, insira um e-mail válido.");
@@ -41,20 +53,23 @@ export default function Settings() {
       }
     }
 
+    if (name === "valorAssinatura") {
+      const formatted = formatCurrencyLive(value);
+      setFormData({ ...formData, [name]: formatted });
+      return;
+    }
+
     setFormData({ ...formData, [name]: value });
   };
 
-  // Função de envio do formulário
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validação final do e-mail
     if (!validateEmail(formData.email)) {
       setEmailError("Por favor, insira um e-mail válido.");
       return;
     }
 
-    // Se tudo estiver válido, prossegue com o envio
     alert("Configurações salvas com sucesso!");
   };
 
@@ -114,7 +129,10 @@ export default function Settings() {
 
             {/* E-mail */}
             <div>
-              <label htmlFor="email" className="block text-gray-700 font-medium mb-2">
+              <label
+                htmlFor="email"
+                className="block text-gray-700 font-medium mb-2"
+              >
                 E-mail
               </label>
               <input
@@ -128,7 +146,9 @@ export default function Settings() {
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Digite seu email"
               />
-              {emailError && <p className="text-red-500 text-sm mt-1">{emailError}</p>}
+              {emailError && (
+                <p className="text-red-500 text-sm mt-1">{emailError}</p>
+              )}
             </div>
 
             {/* Senha e Confirmar Senha */}
@@ -168,6 +188,25 @@ export default function Settings() {
                   className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
+            </div>
+
+            {/* Novo Campo: Valor da Assinatura */}
+            <div>
+              <label
+                htmlFor="valorAssinatura"
+                className="block text-gray-700 font-medium mb-2"
+              >
+                Valor da Assinatura (R$)
+              </label>
+              <input
+                type="text"
+                id="valorAssinatura"
+                name="valorAssinatura"
+                value={formData.valorAssinatura}
+                onChange={handleChange}
+                placeholder="Ex: 29,90"
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
 
             {/* Botão Salvar */}
