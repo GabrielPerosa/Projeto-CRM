@@ -104,18 +104,18 @@ const isSupplier = hasKeyWord("supplier"); // Retorna true se "supplier" estiver
                 <th className="p-3 text-left">Cidade-Estado</th>
                 <th className="p-3 text-left">Placas</th>
                 <th className="p-3 text-left">Data de Início</th>
-                <th className="p-3 text-left">Duração - Horas</th>
+                <th className="p-3 text-left">Duração de Dias</th>
                 <th className="p-3 text-left">Data de entrega</th>
                 <th className="p-3 text-left">Recebível (R$)</th>
                 <th className="p-3 text-left">Status</th>
               </>
             ) : (
               <>
-                <th className="p-3 text-left">Fornecedor</th>
+                <th className="p-3 text-left">Prestador</th>
                 <th className="p-3 text-left">Cidade-Estado</th>
                 <th className="p-3 text-left">Placas</th>
                 <th className="p-3 text-left">Data de Início</th>
-                <th className="p-3 text-left">Duração - Horas</th>
+                <th className="p-3 text-left">Duração de Dias</th>
                 <th className="p-3 text-left">Data de entrega</th>
                 <th className="p-3 text-left">Orçamento (R$)</th>
                 <th className="p-3 text-left">Status</th>
@@ -234,7 +234,7 @@ const isSupplier = hasKeyWord("supplier"); // Retorna true se "supplier" estiver
             Novo serviço
           </button>
 
-          <Budget showBudget={showBudget} setShowBudget={setShowBudget} />
+          {showBudget && <Budget setShowModal={setShowBudget} />}
         </div>
       </div>) : <></>
       }
