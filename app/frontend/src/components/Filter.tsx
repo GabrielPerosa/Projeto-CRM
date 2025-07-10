@@ -26,36 +26,36 @@ interface Cliente {
   dataInicio: string | null;
   id: number;
   cliente: string;
-  fornecedor: string;
+  prestador: string;
   estado: string;
   data: string;
   status: string;
   valor: string;
 }
 
-interface Fornecedor {
+interface prestador {
   nome: string;
   duracao: number;
   dataDisponivel: string;
   valor: string;
 }
 
-// 📌 Lista de fornecedores (dados mockados)
-const fornecedoresMock: Fornecedor[] = [
+// 📌 Lista de prestadores (dados mockados)
+const prestadoresMock: prestador[] = [
   {
-    nome: "Fornecedor A",
+    nome: "prestador A",
     duracao: 30,
     dataDisponivel: "01/01/2024",
     valor: "R$ 5.000",
   },
   {
-    nome: "Fornecedor B",
+    nome: "prestador B",
     duracao: 45,
     dataDisponivel: "01/01/2024",
     valor: "R$ 7.500",
   },
   {
-    nome: "Fornecedor C",
+    nome: "prestador C",
     duracao: 60,
     dataDisponivel: "01/01/2024",
     valor: "R$ 10.000",
@@ -67,7 +67,7 @@ const clientesMock: Cliente[] = [
   {
     id: 1,
     cliente: "Carlos Silva",
-    fornecedor: "",
+    prestador: "",
     estado: "SP",
     data: "",
     valor: "R$ 5.000",
@@ -78,7 +78,7 @@ const clientesMock: Cliente[] = [
   {
     id: 2,
     cliente: "Ana Souza",
-    fornecedor: "",
+    prestador: "",
     estado: "MG",
     data: "",
     valor: "R$ 10.000",
@@ -89,7 +89,7 @@ const clientesMock: Cliente[] = [
   {
     id: 3,
     cliente: "João Pereira",
-    fornecedor: "",
+    prestador: "",
     estado: "BA",
     data: "",
     valor: "R$ 7.000",
@@ -100,7 +100,7 @@ const clientesMock: Cliente[] = [
   {
     id: 4,
     cliente: "Maria Oliveira",
-    fornecedor: "",
+    prestador: "",
     estado: "AL",
     data: "",
     valor: "R$ 15.000",
@@ -113,14 +113,14 @@ const clientesMock: Cliente[] = [
 export default function TabelaClientes() {
   // 📌 Estados da aplicação
   const [clientes, setClientes] = useState<Cliente[]>([]); // Armazena a lista de clientes
-  const [showDialog, setShowDialog] = useState<boolean>(false); // Controla a visibilidade do popup de fornecedores
+  const [showDialog, setShowDialog] = useState<boolean>(false); // Controla a visibilidade do popup de prestadores
   const [selectedRow, setSelectedRow] = useState<Cliente | null>(null); // Armazena a linha selecionada na tabela
 
   // 📌 Filtros da tabela
   const [filtros, setFiltros] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }, // Filtro global
     cliente: { value: null, matchMode: FilterMatchMode.CONTAINS }, // Filtro por cliente
-    fornecedor: { value: null, matchMode: FilterMatchMode.CONTAINS }, // Filtro por fornecedor
+    prestador: { value: null, matchMode: FilterMatchMode.CONTAINS }, // Filtro por prestador
     estado: { value: null, matchMode: FilterMatchMode.CONTAINS }, // Filtro por estado
     status: { value: null, matchMode: FilterMatchMode.EQUALS }, // Filtro por status
     data: { value: null, matchMode: FilterMatchMode.DATE_IS }, // Filtro por data
@@ -133,29 +133,30 @@ export default function TabelaClientes() {
     setClientes(clientesMock);
   }, []);
 
-  // 📌 Função para selecionar um fornecedor e atualizar a lista de clientes
-  const selecionarFornecedor = (fornecedor: Fornecedor) => {
+  // 📌 Função para selecionar um prestador e atualizar a lista de clientes
+  const selecionarprestador = (prestador: prestador) => {
     if (!selectedRow) return;
 
     const novosClientes = clientes.map((cliente) =>
       cliente.id === selectedRow.id
-        ? { ...cliente, fornecedor: fornecedor.nome } // Atualiza o fornecedor do cliente selecionado
+        ? { ...cliente, prestador: prestador.nome } // Atualiza o prestador do cliente selecionado
         : cliente
     );
     setClientes(novosClientes); // Atualiza o estado dos clientes
     setShowDialog(false); // Fecha o popup
   };
 
-  // 📌 Função para abrir o popup de seleção de fornecedor
-  const abrirPopupFornecedor = (rowData: Cliente) => {
+  // 📌 Função para abrir o popup de seleção de prestador
+  const abrirPopupprestador = (rowData: Cliente) => {
     setSelectedRow(rowData); // Define a linha selecionada
     setShowDialog(true); // Abre o popup
   };
 
   // 📌 Função para atualizar o status de um cliente
   const atualizarStatus = (novaOpcao: string, rowData: Cliente) => {
-    const novosClientes = clientes.map((cliente) =>
-      cliente.id === rowData.id ? { ...cliente, status: novaOpcao } : cliente // Atualiza o status do cliente selecionado
+    const novosClientes = clientes.map(
+      (cliente) =>
+        cliente.id === rowData.id ? { ...cliente, status: novaOpcao } : cliente // Atualiza o status do cliente selecionado
     );
     setClientes(novosClientes); // Atualiza o estado dos clientes
   };
@@ -165,7 +166,7 @@ export default function TabelaClientes() {
     setFiltros({
       global: { value: null, matchMode: FilterMatchMode.CONTAINS },
       cliente: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      fornecedor: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      prestador: { value: null, matchMode: FilterMatchMode.CONTAINS },
       estado: { value: null, matchMode: FilterMatchMode.CONTAINS },
       status: { value: null, matchMode: FilterMatchMode.EQUALS },
       data: { value: null, matchMode: FilterMatchMode.DATE_IS },
@@ -226,7 +227,15 @@ export default function TabelaClientes() {
           showClearButton={true}
           filterElement={(options) => (
             <div style={{ position: "relative" }}>
-              <FaUser style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "#6c757d" }} />
+              <FaUser
+                style={{
+                  position: "absolute",
+                  left: "0.75rem",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  color: "#6c757d",
+                }}
+              />
               <InputText
                 value={options.value || ""}
                 onChange={(e) => options.filterCallback(e.target.value)}
@@ -238,14 +247,14 @@ export default function TabelaClientes() {
           )}
         />
 
-        {/* Coluna de Fornecedor */}
+        {/* Coluna de prestador */}
         <Column
-          field="fornecedor"
-          header="Fornecedor"
+          field="prestador"
+          header="prestador"
           body={(rowData: Cliente) => (
             <Button
-              label={rowData.fornecedor || "Selecionar"}
-              onClick={() => abrirPopupFornecedor(rowData)}
+              label={rowData.prestador || "Selecionar"}
+              onClick={() => abrirPopupprestador(rowData)}
               className="p-button-outlined p-button-sm"
             />
           )}
@@ -260,7 +269,15 @@ export default function TabelaClientes() {
           showClearButton={true}
           filterElement={(options) => (
             <div style={{ position: "relative" }}>
-              <FaMapMarkerAlt style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "#6c757d" }} />
+              <FaMapMarkerAlt
+                style={{
+                  position: "absolute",
+                  left: "0.75rem",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  color: "#6c757d",
+                }}
+              />
               <InputText
                 value={options.value || ""}
                 onChange={(e) => options.filterCallback(e.target.value)}
@@ -282,7 +299,10 @@ export default function TabelaClientes() {
               onChange={(e) => {
                 const novosClientes = clientes.map((cliente) =>
                   cliente.id === rowData.id
-                    ? { ...cliente, dataInicio: e.value ? e.value.toISOString() : null }
+                    ? {
+                        ...cliente,
+                        dataInicio: e.value ? e.value.toISOString() : null,
+                      }
                     : cliente
                 );
                 setClientes(novosClientes);
@@ -303,7 +323,10 @@ export default function TabelaClientes() {
               onChange={(e) => {
                 const novosClientes = clientes.map((cliente) =>
                   cliente.id === rowData.id
-                    ? { ...cliente, dataEntrega: e.value ? e.value.toISOString() : null }
+                    ? {
+                        ...cliente,
+                        dataEntrega: e.value ? e.value.toISOString() : null,
+                      }
                     : cliente
                 );
                 setClientes(novosClientes);
@@ -331,24 +354,24 @@ export default function TabelaClientes() {
         />
       </DataTable>
 
-      {/* 📌 Popup de seleção de fornecedor */}
+      {/* 📌 Popup de seleção de prestador */}
       <Dialog
-        header="Selecionar Fornecedor"
+        header="Selecionar prestador"
         visible={showDialog}
         onHide={() => setShowDialog(false)}
         style={{ width: "50vw" }}
       >
-        <DataTable value={fornecedoresMock}>
+        <DataTable value={prestadoresMock}>
           <Column field="nome" header="Nome" />
           <Column field="duracao" header="Duração (dias)" />
           <Column field="dataDisponivel" header="Data Disponivel" />
           <Column field="valor" header="Valor Cobrado" />
           <Column
             header="Ação"
-            body={(rowData: Fornecedor) => (
+            body={(rowData: prestador) => (
               <Button
                 label="Selecionar"
-                onClick={() => selecionarFornecedor(rowData)}
+                onClick={() => selecionarprestador(rowData)}
                 className="p-button-sm"
               />
             )}

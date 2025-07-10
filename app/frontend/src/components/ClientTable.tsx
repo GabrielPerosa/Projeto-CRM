@@ -1,29 +1,91 @@
-'use client';
-import { useState } from "react";
-import { CheckCircleIcon, ExclamationCircleIcon } from "@heroicons/react/24/solid";
+"use client";
+import { useState, useEffect } from "react";
+import {
+  CheckCircleIcon,
+  ExclamationCircleIcon,
+} from "@heroicons/react/24/solid";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { NumericFormat } from "react-number-format";
 
 type Client = {
   id: number;
   name: string;
   cityState: string;
   quantity: number;
-  startDate: string;
+  startDate: Date | null;
+  deliveryDate: Date | null;
   value: number | null;
   status: "Pendente" | "Enviado";
 };
 
+type StoredClient = Omit<Client, "startDate" | "deliveryDate"> & {
+  startDate: string | null;
+  deliveryDate: string | null;
+};
+
 const initialData: Client[] = [
-  { id: 1, name: "João Silva", cityState: "São Paulo-SP", quantity: 10, startDate: "", value: null, status: "Pendente" },
-  { id: 2, name: "Maria Oliveira", cityState: "Rio de Janeiro-RJ", quantity: 20, startDate: "", value: null, status: "Pendente" },
-  { id: 3, name: "Carlos Souza", cityState: "Belo Horizonte-MG", quantity: 15, startDate: "", value: null, status: "Pendente" },
+  {
+    id: 1,
+    name: "João Silva",
+    cityState: "São Paulo-SP",
+    quantity: 10,
+    startDate: null,
+    deliveryDate: null,
+    value: null,
+    status: "Pendente",
+  },
+  {
+    id: 2,
+    name: "Maria Oliveira",
+    cityState: "Rio de Janeiro-RJ",
+    quantity: 20,
+    startDate: null,
+    deliveryDate: null,
+    value: null,
+    status: "Pendente",
+  },
+  {
+    id: 3,
+    name: "Carlos Souza",
+    cityState: "Belo Horizonte-MG",
+    quantity: 15,
+    startDate: null,
+    deliveryDate: null,
+    value: null,
+    status: "Pendente",
+  },
 ];
 
 export default function ClientTable() {
-  const [clients, setClients] = useState<Client[]>(initialData);
   const [search, setSearch] = useState("");
   const [showPopup, setShowPopup] = useState(false);
 
-  const handleUpdate = (id: number, key: keyof Client, value: string | number | null) => {
+ const [clients, setClients] = useState<Client[]>(() => {
+  if (typeof window !== "undefined") {
+    const stored = localStorage.getItem("clients_data");
+    if (stored) {
+      const parsed = (JSON.parse(stored) as StoredClient[]).map((c) => ({
+        ...c,
+        startDate: c.startDate ? new Date(c.startDate) : null,
+        deliveryDate: c.deliveryDate ? new Date(c.deliveryDate) : null,
+      }));
+      return parsed;
+    }
+  }
+  return initialData;
+});
+
+
+  useEffect(() => {
+    localStorage.setItem("clients_data", JSON.stringify(clients));
+  }, [clients]);
+
+  const handleUpdate = (
+    id: number,
+    key: keyof Client,
+    value: Client[keyof Client]
+  ) => {
     setClients((prev) =>
       prev.map((client) => {
         if (client.id === id) {
@@ -44,9 +106,8 @@ export default function ClientTable() {
       })
     );
 
-    // Exibir pop-up
     setShowPopup(true);
-    setTimeout(() => setShowPopup(false), 3000); // Ocultar após 3 segundos
+    setTimeout(() => setShowPopup(false), 3000);
   };
 
   const filteredClients = clients.filter(
@@ -59,6 +120,7 @@ export default function ClientTable() {
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Propostas</h1>
+
       <input
         type="text"
         placeholder="Pesquisar..."
@@ -66,18 +128,21 @@ export default function ClientTable() {
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />
+
       {showPopup && (
         <div className="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-md">
           Proposta enviada com sucesso!
         </div>
       )}
+
       <table className="min-w-full bg-white border border-gray-200 shadow-md rounded">
         <thead className="bg-gray-100">
           <tr>
-            <th className="p-3 text-left">Nome</th>
+            <th className="p-3 text-left">Cliente</th>
             <th className="p-3 text-left">Cidade-Estado</th>
-            <th className="p-3 text-left">Quantidade de Placas</th>
+            <th className="p-3 text-left">Placas</th>
             <th className="p-3 text-left">Data de Início</th>
+            <th className="p-3 text-left">Data de Entrega</th>
             <th className="p-3 text-left">Valor (R$)</th>
             <th className="p-3 text-left">Status</th>
             <th className="p-3 text-left">Ações</th>
@@ -89,26 +154,51 @@ export default function ClientTable() {
               <td className="p-3">{client.name}</td>
               <td className="p-3">{client.cityState}</td>
               <td className="p-3">{client.quantity}</td>
+
+              {/* Calendário para data de início */}
               <td className="p-3">
-                <input
-                  type="date"
+                <DatePicker
+                  selected={client.startDate}
+                  onChange={(date) =>
+                    handleUpdate(client.id, "startDate", date)
+                  }
+                  dateFormat="dd/MM/yyyy"
+                  placeholderText="Selecionar data"
                   className="border border-gray-300 rounded p-1 w-full"
-                  value={client.startDate}
-                  onChange={(e) =>
-                    handleUpdate(client.id, "startDate", e.target.value)
+                />
+              </td>
+
+              {/* Calendário para data de entrega */}
+              <td className="p-3">
+                <DatePicker
+                  selected={client.deliveryDate}
+                  onChange={(date) =>
+                    handleUpdate(client.id, "deliveryDate", date)
+                  }
+                  dateFormat="dd/MM/yyyy"
+                  placeholderText="Selecionar data"
+                  className="border border-gray-300 rounded p-1 w-full"
+                />
+              </td>
+
+              {/* Valor formatado como R$ */}
+              <td className="p-3">
+                <NumericFormat
+                  value={client.value ?? ""}
+                  thousandSeparator="."
+                  decimalSeparator=","
+                  prefix="R$ "
+                  decimalScale={2}
+                  fixedDecimalScale
+                  allowNegative={false}
+                  className="border border-gray-300 rounded p-1 w-full"
+                  onValueChange={(values) =>
+                    handleUpdate(client.id, "value", values.floatValue ?? null)
                   }
                 />
               </td>
-              <td className="p-3">
-                <input
-                  type="number"
-                  className="border border-gray-300 rounded p-1 w-full"
-                  value={client.value || ""}
-                  onChange={(e) =>
-                    handleUpdate(client.id, "value", parseFloat(e.target.value) || null)
-                  }
-                />
-              </td>
+
+              {/* Status */}
               <td className="p-3 flex items-center space-x-2">
                 {client.status === "Enviado" ? (
                   <>
@@ -118,19 +208,32 @@ export default function ClientTable() {
                 ) : (
                   <>
                     <ExclamationCircleIcon className="h-5 w-5 text-orange-500" />
-                    <span className="text-orange-500 font-medium">Pendente</span>
+                    <span className="text-orange-500 font-medium">
+                      Pendente
+                    </span>
                   </>
                 )}
               </td>
+
+              {/* Botão Enviar */}
               <td className="p-3">
                 <button
+                  type="button"
                   className={`px-4 py-2 rounded text-white ${
-                    client.startDate && client.value !== null
-                      ? "bg-blue-500 hover:bg-blue-600"
-                      : "bg-gray-300 cursor-not-allowed"
+                    client.status === "Enviado" ||
+                    !client.startDate ||
+                    !client.deliveryDate ||
+                    client.value === null
+                      ? "bg-gray-300 cursor-not-allowed"
+                      : "bg-blue-500 hover:bg-blue-600"
                   }`}
                   onClick={() => handleSendProposal(client.id)}
-                  disabled={!client.startDate || client.value === null}
+                  disabled={
+                    client.status === "Enviado" ||
+                    !client.startDate ||
+                    !client.deliveryDate ||
+                    client.value === null
+                  }
                 >
                   Enviar
                 </button>

@@ -76,7 +76,7 @@ export default function Home() {
           {/* Gráfico de Lucro */}
           <div className="bg-white rounded-lg shadow p-4 h-96">
             <h2 className="text-lg font-medium mb-4 text-black">Faturamento</h2>
-            <Chart type="bar" data={{ labels: meses, datasets: [{ label: 'Lucro', data: lucroFiltrados, backgroundColor: '#9CCC65' }] }} style={{ height: '320px' }} />
+            <Chart type="bar" data={{ labels: meses, datasets: [{ label: 'Faturamento', data: lucroFiltrados, backgroundColor: '#9CCC65' }] }} style={{ height: '320px' }} />
           </div>
         </div>
       </div>
