@@ -24,9 +24,9 @@ export default function StyledMaskDemo() {
   const router = useRouter();
   const formattedTelefone = telefone.replace(/\D/g, "");
 
-  // estado para armazenar se é Cliente ou Fornecedor
+  // estado para armazenar se é Cliente ou prestador
   const [isCliente, setIsCliente] = useState(false);
-  const [isFornecedor, setIsFornecedor] = useState(false);
+  const [isPrestador, setIsPrestador] = useState(false);
 
   const estadosBrasil = [
     { label: "Acre", value: "AC" },
@@ -82,7 +82,7 @@ export default function StyledMaskDemo() {
       telefone: formattedTelefone,
       senha,
       estadosAdicionados,
-      tipo: isCliente ? "Cliente" : isFornecedor ? "Fornecedor" : null,
+      tipo: isCliente ? "Cliente" : isPrestador ? "prestador" : null,
     };
 
     try {
@@ -103,36 +103,38 @@ export default function StyledMaskDemo() {
   };
 
   const adicionarEstado = () => {
-      if (!estado || !valor.trim()) {
-        setMensagemAviso("Por favor, selecione um estado e informe um valor válido.");
-        return;
-      }
-  
-      // Verifica se o estado já foi adicionado
-      if (estadosAdicionados.some((item) => item.estado === estado)) {
-        setMensagemAviso("Este estado já foi adicionado!");
-        return;
-      }
-  
-      const novoEstado = { estado, valor };
-      setEstadosAdicionados([...estadosAdicionados, novoEstado]);
-      setEstado("");
-      setValor("");
-    };
-  
-    // Limpa a mensagem de aviso automaticamente após 3 segundos
-    useEffect(() => {
-      if (mensagemAviso) {
-        const timer = setTimeout(() => setMensagemAviso(null), 3000);
-        return () => clearTimeout(timer);
-      }
-    }, [mensagemAviso]); // Apenas a variável de estado
-  
-    const removerEstado = (estadoToRemove: string) => {
-      setEstadosAdicionados(
-        estadosAdicionados.filter((item) => item.estado !== estadoToRemove)
+    if (!estado || !valor.trim()) {
+      setMensagemAviso(
+        "Por favor, selecione um estado e informe um valor válido."
       );
-    };
+      return;
+    }
+
+    // Verifica se o estado já foi adicionado
+    if (estadosAdicionados.some((item) => item.estado === estado)) {
+      setMensagemAviso("Este estado já foi adicionado!");
+      return;
+    }
+
+    const novoEstado = { estado, valor };
+    setEstadosAdicionados([...estadosAdicionados, novoEstado]);
+    setEstado("");
+    setValor("");
+  };
+
+  // Limpa a mensagem de aviso automaticamente após 3 segundos
+  useEffect(() => {
+    if (mensagemAviso) {
+      const timer = setTimeout(() => setMensagemAviso(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [mensagemAviso]); // Apenas a variável de estado
+
+  const removerEstado = (estadoToRemove: string) => {
+    setEstadosAdicionados(
+      estadosAdicionados.filter((item) => item.estado !== estadoToRemove)
+    );
+  };
 
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -171,7 +173,7 @@ export default function StyledMaskDemo() {
         </h2>
 
         <form className="space-y-3" onSubmit={handleSubmit}>
-          {/* Seção: Cliente ou Fornecedor */}
+          {/* Seção: Cliente ou prestador */}
           <div className="flex gap-6 items-center">
             <div className="flex items-center gap-2">
               <Checkbox
@@ -179,7 +181,7 @@ export default function StyledMaskDemo() {
                 checked={isCliente}
                 onChange={(e) => {
                   setIsCliente(e.checked as boolean);
-                  setIsFornecedor(false);
+                  setIsPrestador(false);
                 }}
               />
               <label htmlFor="cliente" className="text-white text-sm">
@@ -189,15 +191,15 @@ export default function StyledMaskDemo() {
 
             <div className="flex items-center gap-2">
               <Checkbox
-                inputId="fornecedor"
-                checked={isFornecedor}
+                inputId="prestador"
+                checked={isPrestador}
                 onChange={(e) => {
-                  setIsFornecedor(e.checked as boolean);
+                  setIsPrestador(e.checked as boolean);
                   setIsCliente(false);
                 }}
               />
-              <label htmlFor="fornecedor" className="text-white text-sm">
-                Fornecedor
+              <label htmlFor="prestador" className="text-white text-sm">
+                prestador
               </label>
             </div>
           </div>
@@ -378,8 +380,8 @@ export default function StyledMaskDemo() {
             </div>
           </div>
 
-          {/* Campos específicos para Fornecedor */}
-          {isFornecedor && (
+          {/* Campos específicos para prestador */}
+          {isPrestador && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div>
                 <label
@@ -419,7 +421,7 @@ export default function StyledMaskDemo() {
             </div>
           )}
 
-          {isFornecedor && (
+          {isPrestador && (
             <button
               type="button"
               onClick={adicionarEstado}
@@ -436,7 +438,7 @@ export default function StyledMaskDemo() {
             </p>
           )}
 
-          {isFornecedor && estadosAdicionados.length > 0 && (
+          {isPrestador && estadosAdicionados.length > 0 && (
             <div className="mt-2 bg-white rounded-lg p-2 shadow max-h-20 overflow-y-auto border border-gray-300">
               <ul className="divide-y divide-gray-300">
                 {estadosAdicionados.map((item, index) => (

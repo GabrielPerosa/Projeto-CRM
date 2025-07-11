@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
@@ -17,14 +17,14 @@ export default function Sidebar({ username }: SidebarProps) {
   const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true);
   const [session, setSession] = useState<any>(null);
 
   // Busca a sessão do usuário
   const fetchSession = async () => {
     try {
       const sessionData = await getSession();
-      if(sessionData){
+      if (sessionData) {
         setSession(sessionData);
         setLoading(false);
       }
@@ -35,25 +35,64 @@ export default function Sidebar({ username }: SidebarProps) {
 
   let menuItems: any[] = [];
 
-if(!loading){
-  session?.token?.role === "admin" && (menuItems = [
-    { label: "Início", icon: "pi pi-home", path:`/pages/${session?.token?.role}/home`},
-    { label: "Serviços", icon: "pi pi-briefcase", path: `/pages/${session?.token?.role}/services` },
-    { label: "Configurações", icon: "pi pi-cog", path: `/pages/${session?.token?.role}/settings` },            
-  ])
+  if (!loading) {
+    session?.token?.role === "admin" &&
+      (menuItems = [
+        {
+          label: "Início",
+          icon: "pi pi-home",
+          path: `/pages/${session?.token?.role}/home`,
+        },
+        {
+          label: "Serviços",
+          icon: "pi pi-briefcase",
+          path: `/pages/${session?.token?.role}/services`,
+        },
+        {
+          label: "Configurações",
+          icon: "pi pi-cog",
+          path: `/pages/${session?.token?.role}/settings`,
+        },
+      ]);
 
-  session?.token?.role === "supplier" && (menuItems = [
-    { label: "Início", icon: "pi pi-home", path: `/pages/${session?.token?.role}/home`},
-    { label: "Meus Serviços", icon: "pi pi-briefcase", path: `/pages/${session?.token?.role}/services` },
-    { label: "Propostas", icon: "pi pi-file", path: `/pages/${session?.token?.role}/proposal` },
-    { label: "Configurações", icon: "pi pi-cog", path: `/pages/${session?.token?.role}/settings` },            
-  ])
+    session?.token?.role === "provider" &&
+      (menuItems = [
+        {
+          label: "Início",
+          icon: "pi pi-home",
+          path: `/pages/${session?.token?.role}/home`,
+        },
+        {
+          label: "Meus Serviços",
+          icon: "pi pi-briefcase",
+          path: `/pages/${session?.token?.role}/services`,
+        },
+        {
+          label: "Propostas",
+          icon: "pi pi-file",
+          path: `/pages/${session?.token?.role}/proposal`,
+        },
+        {
+          label: "Configurações",
+          icon: "pi pi-cog",
+          path: `/pages/${session?.token?.role}/settings`,
+        },
+      ]);
 
-  session?.token?.role === "client" && (menuItems = [
-    { label: "Início", icon: "pi pi-home", path:`/pages/${session?.token?.role}/home`},
-    { label: "Configurações", icon: "pi pi-cog", path: `/pages/${session?.token?.role}/settings` },            
-  ])
-}
+    session?.token?.role === "client" &&
+      (menuItems = [
+        {
+          label: "Início",
+          icon: "pi pi-home",
+          path: `/pages/${session?.token?.role}/home`,
+        },
+        {
+          label: "Configurações",
+          icon: "pi pi-cog",
+          path: `/pages/${session?.token?.role}/settings`,
+        },
+      ]);
+  }
   const handleLogout = () => {
     signOut();
   };
@@ -64,16 +103,19 @@ if(!loading){
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-  
+
   if (loading) {
     fetchSession();
   }
 
   return (
-    <div className={`flex ${isMobile ? "w-20" : "w-64"} h-full bg-gradient-to-b from-blue-900 to-blue-600 shadow-xl transition-all duration-300`}>
+    <div
+      className={`flex ${
+        isMobile ? "w-20" : "w-64"
+      } h-full bg-gradient-to-b from-blue-900 to-blue-600 shadow-xl transition-all duration-300`}
+    >
       {/* Sidebar */}
       <div className="flex flex-col items-center p-4 space-y-6 w-full">
-        
         {/* Profile Section */}
         {username && (
           <div className="flex flex-col items-center space-y-2">
@@ -103,7 +145,9 @@ if(!loading){
               className="flex items-center w-full p-3 space-x-3 hover:bg-blue-500/30 text-white hover:text-blue-200 rounded-md transition-all duration-200"
             >
               <i className={`${item.icon} text-lg`}></i>
-              {!isMobile && <span className="text-md font-medium">{item.label}</span>}
+              {!isMobile && (
+                <span className="text-md font-medium">{item.label}</span>
+              )}
             </button>
           ))}
         </nav>

@@ -1,17 +1,23 @@
-'use client';
+"use client";
 import { useState } from "react";
-import { ArrowPathIcon, CheckCircleIcon, ClockIcon, DocumentCheckIcon, QuestionMarkCircleIcon } from "@heroicons/react/24/solid";
-import  { NumericFormat }  from 'react-number-format';
+import {
+  ArrowPathIcon,
+  CheckCircleIcon,
+  ClockIcon,
+  DocumentCheckIcon,
+  QuestionMarkCircleIcon,
+} from "@heroicons/react/24/solid";
+import { NumericFormat } from "react-number-format";
 import { useRouter } from "next/navigation";
 import Budget from "./Budget";
 
-type ServiceSupplier = {
+type ServiceProvider = {
   id: number;
   name: string;
   cityState: string;
   quantity: number;
   startDate: string;
-  duration: number
+  duration: number;
   deadline: string;
   cost: number;
   status: "Em andamento" | "Finalizado";
@@ -19,26 +25,80 @@ type ServiceSupplier = {
 
 type ServiceClient = {
   id: number;
-  supplier: string;
+  provider: string;
   cityState: string;
   quantity: number;
   startDate: string;
-  duration: number
+  duration: number;
   deadline: string;
   budget: number;
-  status: "Aguardando prestador" | "Em aprovação" | "Em andamento" | "Finalizado";
-}
+  status:
+    | "Aguardando prestador"
+    | "Em aprovação"
+    | "Em andamento"
+    | "Finalizado";
+};
 
 // Dados Mocados apenas para exemplo
-const initialDataSupplier: ServiceSupplier[] = [
-  { id: 1, name: "João Silva", cityState: "São Paulo-SP", quantity: 10, startDate: "10/11/2020", duration: 10, deadline: "11/12/2024", cost: 1000, status: "Finalizado" },
-  { id: 2, name: "Maria Oliveira", cityState: "Rio de Janeiro-RJ", quantity: 20, startDate: "10/11/2020", duration: 15, deadline: " - ", cost: 1000, status: "Em andamento" },
-  { id: 3, name: "Carlos Souza", cityState: "Belo Horizonte-MG", quantity: 15, startDate: "10/11/2024", duration: 20, deadline: "11/12/2024", cost: 2500, status: "Finalizado" },
+const initialDataProvider: ServiceProvider[] = [
+  {
+    id: 1,
+    name: "João Silva",
+    cityState: "São Paulo-SP",
+    quantity: 10,
+    startDate: "10/11/2020",
+    duration: 10,
+    deadline: "11/12/2024",
+    cost: 1000,
+    status: "Finalizado",
+  },
+  {
+    id: 2,
+    name: "Maria Oliveira",
+    cityState: "Rio de Janeiro-RJ",
+    quantity: 20,
+    startDate: "10/11/2020",
+    duration: 15,
+    deadline: " - ",
+    cost: 1000,
+    status: "Em andamento",
+  },
+  {
+    id: 3,
+    name: "Carlos Souza",
+    cityState: "Belo Horizonte-MG",
+    quantity: 15,
+    startDate: "10/11/2024",
+    duration: 20,
+    deadline: "11/12/2024",
+    cost: 2500,
+    status: "Finalizado",
+  },
 ];
 
 const initialDataClient: ServiceClient[] = [
-  { id: 1, supplier: "Josmar", cityState: "São Paulo-SP", quantity: 10, startDate: "10/11/2020", duration: 10, deadline: " - ", budget: 1000, status: "Aguardando prestador"},
-  { id: 2, supplier: "Perosa", cityState: "São Paulo-SP", quantity: 10, startDate: "10/11/2020", duration: 10, deadline: " - ", budget: 5000, status: "Em aprovação"}
+  {
+    id: 1,
+    provider: "Josmar",
+    cityState: "São Paulo-SP",
+    quantity: 10,
+    startDate: "10/11/2020",
+    duration: 10,
+    deadline: " - ",
+    budget: 1000,
+    status: "Aguardando prestador",
+  },
+  {
+    id: 2,
+    provider: "Perosa",
+    cityState: "São Paulo-SP",
+    quantity: 10,
+    startDate: "10/11/2020",
+    duration: 10,
+    deadline: " - ",
+    budget: 5000,
+    status: "Em aprovação",
+  },
 ];
 export default function ServiceTable() {
   const router = useRouter();
@@ -50,29 +110,29 @@ export default function ServiceTable() {
     return window.location.pathname.includes(keyWord);
   };
 
-const isSupplier = hasKeyWord("supplier"); // Retorna true se "supplier" estiver na URL
+  const isProvider = hasKeyWord("provider"); // Retorna true se "provider" estiver na URL
 
   // Inicializa o estado de forma condicional
   const [services, setServices] = useState(
-    isSupplier ? initialDataSupplier : initialDataClient
+    isProvider ? initialDataProvider : initialDataClient
   );
   const [search, setSearch] = useState("");
 
   // Filtragem dinâmica com base no tipo de usuário
   const filteredServices = services.filter((service) =>
-    isSupplier
-      ? // Filtragem para fornecedores
-        (service as ServiceSupplier).name
+    isProvider
+      ? // Filtragem para prestadores
+        (service as ServiceProvider).name
           .toLowerCase()
           .includes(search.toLowerCase()) ||
-        (service as ServiceSupplier).cityState
+        (service as ServiceProvider).cityState
           .toLowerCase()
           .includes(search.toLowerCase()) ||
-        (service as ServiceSupplier).status
+        (service as ServiceProvider).status
           .toLowerCase()
           .includes(search.toLowerCase())
       : // Filtragem para clientes
-        (service as ServiceClient).supplier
+        (service as ServiceClient).provider
           .toLowerCase()
           .includes(search.toLowerCase()) ||
         (service as ServiceClient).cityState
@@ -85,7 +145,6 @@ const isSupplier = hasKeyWord("supplier"); // Retorna true se "supplier" estiver
 
   return (
     <div className="p-4">
-      
       <h1 className="text-2xl font-bold mb-4">Buscar</h1>
       <input
         type="text"
@@ -98,9 +157,9 @@ const isSupplier = hasKeyWord("supplier"); // Retorna true se "supplier" estiver
       <table className="min-w-full bg-white border border-gray-200 shadow-md rounded">
         <thead className="bg-gray-100">
           <tr>
-            {isSupplier ? (
+            {isProvider ? (
               <>
-                <th className="p-3 text-left">Nome</th>
+                <th className="p-3 text-left">Cliente</th>
                 <th className="p-3 text-left">Cidade-Estado</th>
                 <th className="p-3 text-left">Placas</th>
                 <th className="p-3 text-left">Data de Início</th>
@@ -126,9 +185,9 @@ const isSupplier = hasKeyWord("supplier"); // Retorna true se "supplier" estiver
         <tbody>
           {filteredServices.map((service) => (
             <tr key={service.id} className="border-b">
-              {isSupplier ? (
+              {isProvider ? (
                 <>
-                  <td className="p-3">{(service as ServiceSupplier).name}</td>
+                  <td className="p-3">{(service as ServiceProvider).name}</td>
                   <td className="p-3">{service.cityState}</td>
                   <td className="p-3">{service.quantity}</td>
                   <td className="p-3">{service.startDate}</td>
@@ -136,7 +195,7 @@ const isSupplier = hasKeyWord("supplier"); // Retorna true se "supplier" estiver
                   <td className="p-3">{service.deadline}</td>
                   <td className="p-3">
                     <NumericFormat
-                      value={(service as ServiceSupplier).cost}
+                      value={(service as ServiceProvider).cost}
                       displayType="text"
                       thousandSeparator="."
                       decimalSeparator=","
@@ -145,22 +204,25 @@ const isSupplier = hasKeyWord("supplier"); // Retorna true se "supplier" estiver
                   </td>
                   <td className="p-3">
                     {service.status === "Finalizado" ? (
-                    <div className="flex">
-                      <CheckCircleIcon className="h-5 w-5 text-green-500 mr-1" />
-                      <span className="text-green-500 font-medium">{service.status}</span>
-                    </div>
+                      <div className="flex">
+                        <CheckCircleIcon className="h-5 w-5 text-green-500 mr-1" />
+                        <span className="text-green-500 font-medium">
+                          {service.status}
+                        </span>
+                      </div>
                     ) : (
                       <div className="flex">
                         <ArrowPathIcon className="h-5 w-5 text-blue-400 mr-1" />
-                        <span className="text-blue-400 font-medium">{service.status}</span>
-
+                        <span className="text-blue-400 font-medium">
+                          {service.status}
+                        </span>
                       </div>
                     )}
                   </td>
                 </>
               ) : (
                 <>
-                  <td className="p-3">{(service as ServiceClient).supplier}</td>
+                  <td className="p-3">{(service as ServiceClient).provider}</td>
                   <td className="p-3">{service.cityState}</td>
                   <td className="p-3">{service.quantity}</td>
                   <td className="p-3">{service.startDate}</td>
@@ -176,48 +238,57 @@ const isSupplier = hasKeyWord("supplier"); // Retorna true se "supplier" estiver
                     />
                   </td>
                   <td className="p-3">
-                  <>
-                    {(() => {
-                      switch (service.status) {
-                        case "Finalizado":
-                          return (
-                            <div className="flex">
-                              <CheckCircleIcon className="h-5 w-5 text-green-500 mr-1" />
-                              <span className="text-green-500 font-medium">{service.status}</span>
-                            </div>
-                          );
-                        case "Em andamento":
-                          return (
-                            <div className="flex">
-                              <ArrowPathIcon className="h-5 w-5 text-blue-400 mr-1" />
-                              <span className="text-blue-400 font-medium">{service.status}</span>
-                            </div>
-                          );
-                        case "Aguardando prestador":
-                          return (
-                            <div className="flex">
-                              <ClockIcon className="h-5 w-5 text-yellow-500 mr-1" />
-                              <span className="text-yellow-500 font-medium">{service.status}</span>
-                            </div>
-                          );
-                        case "Em aprovação":
-                          return (
-                            <div className="flex">
-                              <DocumentCheckIcon className="h-5 w-5 text-purple-500 mr-1" />
-                              <span className="text-purple-500 font-medium">{service.status}</span>
-                            </div>
-                          );
-                        default:
-                          return (
-                            <div>
-                              <QuestionMarkCircleIcon className="h-5 w-5 text-gray-400" />
-                              <span className="text-gray-400 font-medium">Desconhecido</span>
-                            </div>
-                          );
-                      }
-                    })()}
-                  </>
-
+                    <>
+                      {(() => {
+                        switch (service.status) {
+                          case "Finalizado":
+                            return (
+                              <div className="flex">
+                                <CheckCircleIcon className="h-5 w-5 text-green-500 mr-1" />
+                                <span className="text-green-500 font-medium">
+                                  {service.status}
+                                </span>
+                              </div>
+                            );
+                          case "Em andamento":
+                            return (
+                              <div className="flex">
+                                <ArrowPathIcon className="h-5 w-5 text-blue-400 mr-1" />
+                                <span className="text-blue-400 font-medium">
+                                  {service.status}
+                                </span>
+                              </div>
+                            );
+                          case "Aguardando prestador":
+                            return (
+                              <div className="flex">
+                                <ClockIcon className="h-5 w-5 text-yellow-500 mr-1" />
+                                <span className="text-yellow-500 font-medium">
+                                  {service.status}
+                                </span>
+                              </div>
+                            );
+                          case "Em aprovação":
+                            return (
+                              <div className="flex">
+                                <DocumentCheckIcon className="h-5 w-5 text-purple-500 mr-1" />
+                                <span className="text-purple-500 font-medium">
+                                  {service.status}
+                                </span>
+                              </div>
+                            );
+                          default:
+                            return (
+                              <div>
+                                <QuestionMarkCircleIcon className="h-5 w-5 text-gray-400" />
+                                <span className="text-gray-400 font-medium">
+                                  Desconhecido
+                                </span>
+                              </div>
+                            );
+                        }
+                      })()}
+                    </>
                   </td>
                 </>
               )}
@@ -225,19 +296,24 @@ const isSupplier = hasKeyWord("supplier"); // Retorna true se "supplier" estiver
           ))}
         </tbody>
       </table>
-      
-      {/* Novo serviço */}
-      {!isSupplier ? (
-      <div className="flex justify-end mt-3 mr-2">
-        <div>
-          <button onClick={() => setShowBudget(true)} className="bg-blue-500 text-white p-2 rounded">
-            Novo serviço
-          </button>
 
-          {showBudget && <Budget setShowModal={setShowBudget} />}
+      {/* Novo serviço */}
+      {!isProvider ? (
+        <div className="flex justify-end mt-3 mr-2">
+          <div>
+            <button
+              onClick={() => setShowBudget(true)}
+              className="bg-blue-500 text-white p-2 rounded"
+            >
+              Novo serviço
+            </button>
+
+            {showBudget && <Budget setShowModal={setShowBudget} />}
+          </div>
         </div>
-      </div>) : <></>
-      }
+      ) : (
+        <></>
+      )}
     </div>
-);
+  );
 }

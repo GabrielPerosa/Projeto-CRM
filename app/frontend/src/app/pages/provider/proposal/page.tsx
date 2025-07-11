@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
 import '@/style/styles.css';
 import ClientTable from '@/components/ClientTable';
