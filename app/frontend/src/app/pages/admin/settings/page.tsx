@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "@/components/Sidebar";
+import { Button } from "primereact/button";
 
 export default function Settings() {
   const [emailError, setEmailError] = useState<string | null>(null);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   const [formData, setFormData] = useState({
     nome: "",
@@ -13,6 +15,7 @@ export default function Settings() {
     senha: "",
     confirmarSenha: "",
     valorAssinatura: "",
+    valorMaterial: "",
   });
 
   // Validação de e-mail
@@ -53,7 +56,7 @@ export default function Settings() {
       }
     }
 
-    if (name === "valorAssinatura") {
+    if (name === "valorAssinatura" || "valorMaterial") {
       const formatted = formatCurrencyLive(value);
       setFormData({ ...formData, [name]: formatted });
       return;
@@ -69,12 +72,23 @@ export default function Settings() {
       setEmailError("Por favor, insira um e-mail válido.");
       return;
     }
-
-    alert("Configurações salvas com sucesso!");
   };
+
+  useEffect(() => {
+    const dadosSalvos = localStorage.getItem("configuracoes_admin");
+    if (dadosSalvos) {
+      const dados = JSON.parse(dadosSalvos);
+      setFormData(dados.formData || {});
+    }
+  }, []);
 
   return (
     <div className="flex h-screen bg-gray-100">
+      {saveSuccess && (
+        <div className="fixed top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded shadow-md z-50">
+          Configurações salvas com sucesso!
+        </div>
+      )}
       {/* Sidebar fixa */}
       <div className="w-64 bg-gray-100 shadow-md">
         <Sidebar title="Configurações" username="Usuário" />
@@ -190,33 +204,60 @@ export default function Settings() {
               </div>
             </div>
 
-            {/* Novo Campo: Valor da Assinatura */}
-            <div>
-              <label
-                htmlFor="valorAssinatura"
-                className="block text-gray-700 font-medium mb-2"
-              >
-                Valor da Assinatura (R$)
-              </label>
-              <input
-                type="text"
-                id="valorAssinatura"
-                name="valorAssinatura"
-                value={formData.valorAssinatura}
-                onChange={handleChange}
-                placeholder="Ex: 29,90"
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+            {/*Valor da Assinatura e Material */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label
+                  htmlFor="valorAssinatura"
+                  className="block text-gray-700 font-medium mb-2"
+                >
+                  Valor da Assinatura (R$)
+                </label>
+                <input
+                  type="text"
+                  id="valorAssinatura"
+                  name="valorAssinatura"
+                  value={formData.valorAssinatura}
+                  onChange={handleChange}
+                  placeholder="Ex: 29,90"
+                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="valorMaterial"
+                  className="block text-gray-700 font-medium mb-2"
+                >
+                  Valor do Material (R$)
+                </label>
+                <input
+                  type="text"
+                  id="valorMaterial"
+                  name="valorMaterial"
+                  value={formData.valorMaterial}
+                  onChange={handleChange}
+                  placeholder="Ex: 29,90"
+                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
             </div>
 
             {/* Botão Salvar */}
             <div className="text-right">
-              <button
-                type="submit"
+              <Button
+                label="Salvar Alterações"
+                icon="pi pi-save"
                 className="bg-blue-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                Salvar Alterações
-              </button>
+                onClick={() => {
+                  localStorage.setItem(
+                    "configuracoes_admin",
+                    JSON.stringify({ formData })
+                  );
+                  setSaveSuccess(true);
+                  setTimeout(() => setSaveSuccess(false), 3000);
+                }}
+              />
             </div>
           </form>
         </div>

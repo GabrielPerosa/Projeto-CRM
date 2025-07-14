@@ -48,7 +48,7 @@ const authOptions: AuthOptions = {
           id: '10',  
           email: "josmar@gmail.com",
           name: "Josmar",
-          role: "provider",
+          role: "admin",
           }
       },
     }),
