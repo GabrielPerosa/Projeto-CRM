@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "@/components/Sidebar";
 import StatesForm from "@/components/form/StatesForm";
+import { Button } from "primereact/button";
 
 interface Estado {
   id: number;
@@ -358,12 +359,11 @@ export default function Settings() {
           </div>
 
           <div className="col-span-1 lg:col-span-2 text-right mt-4">
-            <button
-              type="submit"
-              className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
-            >
-              Salvar Alterações
-            </button>
+            <Button
+                  label="Salvar Alterações"
+                  icon="pi pi-save"
+                  className="bg-blue-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
           </div>
         </form>
       </div>
