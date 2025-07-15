@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "@/components/Sidebar";
+import { Button } from "primereact/button";
 
 export default function Settings() {
   const [formData, setFormData] = useState({
@@ -22,43 +23,48 @@ export default function Settings() {
     cep: "",
   });
 
-  const [emailError, setEmailError] = useState<string | null>(null); // Estado para mensagem de erro do e-mail
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [nameError, setNameError] = useState<string | null>(null);
+  const [cepError, setCepError] = useState<string | null>(null);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
-  // Função para validar o e-mail
   const validateEmail = (email: string) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
   };
 
-  // Função para lidar com mudanças nos campos do formulário
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
-    // Validação para nome e sobrenome (não pode conter números)
     if (name === "nome" || name === "sobrenome") {
       if (/\d/.test(value)) {
-        alert("Nome e sobrenome não podem conter números.");
+        setNameError("Nome e sobrenome não podem conter números.");
         return;
+      } else {
+        setNameError(null);
       }
     }
 
-    // Formatação para telefone (formato (99) 99999-9999)
     if (name === "telefone") {
-      const numericValue = value.replace(/\D/g, ""); // Remove tudo que não é número
+      const numericValue = value.replace(/\D/g, "");
       let formattedValue = numericValue;
 
       if (numericValue.length > 2) {
-        formattedValue = `(${numericValue.slice(0, 2)}) ${numericValue.slice(2)}`;
+        formattedValue = `(${numericValue.slice(0, 2)}) ${numericValue.slice(
+          2
+        )}`;
       }
       if (numericValue.length > 7) {
-        formattedValue = `(${numericValue.slice(0, 2)}) ${numericValue.slice(2, 7)}-${numericValue.slice(7, 11)}`;
+        formattedValue = `(${numericValue.slice(0, 2)}) ${numericValue.slice(
+          2,
+          7
+        )}-${numericValue.slice(7, 11)}`;
       }
 
       setFormData({ ...formData, [name]: formattedValue });
       return;
     }
 
-    // Validação para e-mail
     if (name === "email") {
       if (value && !validateEmail(value)) {
         setEmailError("Por favor, insira um e-mail válido.");
@@ -70,14 +76,14 @@ export default function Settings() {
     setFormData({ ...formData, [name]: value });
   };
 
-  // Função para lidar com mudanças nos campos de endereço
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
-    // Validação para CEP (não pode aceitar letras)
     if (name === "cep" && !/^\d*$/.test(value)) {
-      alert("CEP deve conter apenas números.");
+      setCepError("CEP deve conter apenas números.");
       return;
+    } else {
+      setCepError(null);
     }
 
     setAddress((prev) => ({
@@ -86,7 +92,6 @@ export default function Settings() {
     }));
   };
 
-  // Função para buscar endereço pelo CEP
   const fetchAddressByZip = async (zip: string) => {
     if (zip.length === 8) {
       try {
@@ -100,45 +105,65 @@ export default function Settings() {
             estado: data.uf,
           }));
         } else {
-          alert("CEP não encontrado.");
+          setCepError("CEP não encontrado.");
         }
-      } catch (error) {
-        alert("Erro ao buscar o endereço. Tente novamente.");
+      } catch {
+        setCepError("Erro ao buscar o endereço. Tente novamente.");
       }
     }
   };
 
-  // Função de envio do formulário
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validação final do e-mail
     if (!validateEmail(formData.email)) {
       setEmailError("Por favor, insira um e-mail válido.");
       return;
     }
 
-    // Se tudo estiver válido, prossegue com o envio
-    alert("Configurações salvas com sucesso!");
+    // Se tudo estiver válido, salva
+    localStorage.setItem(
+      "configuracoes_cliente",
+      JSON.stringify({ formData, address })
+    );
+    setSaveSuccess(true);
+    setTimeout(() => setSaveSuccess(false), 3000);
   };
+
+  useEffect(() => {
+    const dadosSalvos = localStorage.getItem("configuracoes_cliente");
+    if (dadosSalvos) {
+      const dados = JSON.parse(dadosSalvos);
+      setFormData(dados.formData || {});
+      setAddress(dados.address || {});
+    }
+  }, []);
 
   return (
     <div className="flex h-screen bg-gray-100">
-      {/* Sidebar fixa */}
+      {saveSuccess && (
+        <div className="fixed top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded shadow-md z-50">
+          Configurações salvas com sucesso!
+        </div>
+      )}
+
       <div className="hidden md:block w-64 bg-gray-100 shadow-md">
         <Sidebar title="Configurações" username="Usuário" />
       </div>
 
-      {/* Conteúdo principal */}
       <div className="flex-1 flex flex-col items-center justify-center overflow-auto p-4">
         <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-          <h2 className="text-xl font-semibold mb-4 text-gray-800">Editar Perfil</h2>
+          <h2 className="text-xl font-semibold mb-4 text-gray-800">
+            Editar Perfil
+          </h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Nome e Sobrenome */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="nome" className="block text-gray-700 font-medium mb-1">
+                <label
+                  htmlFor="nome"
+                  className="block text-gray-700 font-medium mb-1"
+                >
                   Nome
                 </label>
                 <input
@@ -152,7 +177,10 @@ export default function Settings() {
                 />
               </div>
               <div>
-                <label htmlFor="sobrenome" className="block text-gray-700 font-medium mb-1">
+                <label
+                  htmlFor="sobrenome"
+                  className="block text-gray-700 font-medium mb-1"
+                >
                   Sobrenome
                 </label>
                 <input
@@ -166,11 +194,16 @@ export default function Settings() {
                 />
               </div>
             </div>
+            {nameError && (
+              <p className="text-red-500 text-sm">{nameError}</p>
+            )}
 
-            {/* Endereço */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="cep" className="block text-gray-700 font-medium mb-1">
+                <label
+                  htmlFor="cep"
+                  className="block text-gray-700 font-medium mb-1"
+                >
                   CEP
                 </label>
                 <input
@@ -183,9 +216,15 @@ export default function Settings() {
                   placeholder="Digite seu CEP"
                   className="w-full px-3 py-2 border rounded-lg"
                 />
+                {cepError && (
+                  <p className="text-red-500 text-sm">{cepError}</p>
+                )}
               </div>
               <div>
-                <label htmlFor="rua" className="block text-gray-700 font-medium mb-1">
+                <label
+                  htmlFor="rua"
+                  className="block text-gray-700 font-medium mb-1"
+                >
                   Rua
                 </label>
                 <input
@@ -202,7 +241,10 @@ export default function Settings() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label htmlFor="numero" className="block text-gray-700 font-medium mb-1">
+                <label
+                  htmlFor="numero"
+                  className="block text-gray-700 font-medium mb-1"
+                >
                   Número
                 </label>
                 <input
@@ -216,7 +258,10 @@ export default function Settings() {
                 />
               </div>
               <div>
-                <label htmlFor="cidade" className="block text-gray-700 font-medium mb-1">
+                <label
+                  htmlFor="cidade"
+                  className="block text-gray-700 font-medium mb-1"
+                >
                   Cidade
                 </label>
                 <input
@@ -229,7 +274,10 @@ export default function Settings() {
                 />
               </div>
               <div>
-                <label htmlFor="estado" className="block text-gray-700 font-medium mb-1">
+                <label
+                  htmlFor="estado"
+                  className="block text-gray-700 font-medium mb-1"
+                >
                   Estado
                 </label>
                 <input
@@ -243,9 +291,11 @@ export default function Settings() {
               </div>
             </div>
 
-            {/* E-mail e Telefone */}
             <div>
-              <label htmlFor="email" className="block text-gray-700 font-medium mb-1">
+              <label
+                htmlFor="email"
+                className="block text-gray-700 font-medium mb-1"
+              >
                 E-mail
               </label>
               <input
@@ -254,15 +304,21 @@ export default function Settings() {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                onBlur={handleChange} // Valida o e-mail ao sair do campo
+                onBlur={handleChange}
                 required
                 className="w-full px-3 py-2 border rounded-lg"
                 placeholder="Digite seu email"
               />
-              {emailError && <p className="text-red-500 text-sm mt-1">{emailError}</p>}
+              {emailError && (
+                <p className="text-red-500 text-sm">{emailError}</p>
+              )}
             </div>
+
             <div>
-              <label htmlFor="telefone" className="block text-gray-700 font-medium mb-1">
+              <label
+                htmlFor="telefone"
+                className="block text-gray-700 font-medium mb-1"
+              >
                 Telefone
               </label>
               <input
@@ -276,10 +332,12 @@ export default function Settings() {
               />
             </div>
 
-            {/* Senha */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="senha" className="block text-gray-700 font-medium mb-1">
+                <label
+                  htmlFor="senha"
+                  className="block text-gray-700 font-medium mb-1"
+                >
                   Nova Senha
                 </label>
                 <input
@@ -293,7 +351,10 @@ export default function Settings() {
                 />
               </div>
               <div>
-                <label htmlFor="confirmarSenha" className="block text-gray-700 font-medium mb-1">
+                <label
+                  htmlFor="confirmarSenha"
+                  className="block text-gray-700 font-medium mb-1"
+                >
                   Confirmar Senha
                 </label>
                 <input
@@ -308,11 +369,13 @@ export default function Settings() {
               </div>
             </div>
 
-            {/* Botão Salvar */}
             <div className="text-right">
-              <button className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600">
-                Salvar Alterações
-              </button>
+              <Button
+                label="Salvar Alterações"
+                icon="pi pi-save"
+                className="bg-blue-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                type="submit"
+              />
             </div>
           </form>
         </div>

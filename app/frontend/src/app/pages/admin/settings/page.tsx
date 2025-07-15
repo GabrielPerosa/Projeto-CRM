@@ -6,6 +6,7 @@ import { Button } from "primereact/button";
 
 export default function Settings() {
   const [emailError, setEmailError] = useState<string | null>(null);
+  const [nameError, setNameError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -24,7 +25,7 @@ export default function Settings() {
     return regex.test(email);
   };
 
-  // Formata o número conforme o usuário digita
+  // Formata o número para moeda
   const formatCurrencyLive = (value: string) => {
     const onlyDigits = value.replace(/\D/g, "");
     const numericValue = parseFloat(onlyDigits) / 100;
@@ -43,8 +44,10 @@ export default function Settings() {
 
     if (name === "nome" || name === "sobrenome") {
       if (/\d/.test(value)) {
-        alert("Nome e sobrenome não podem conter números.");
+        setNameError("Nome e sobrenome não podem conter números.");
         return;
+      } else {
+        setNameError(null);
       }
     }
 
@@ -56,7 +59,7 @@ export default function Settings() {
       }
     }
 
-    if (name === "valorAssinatura" || "valorMaterial") {
+    if (name === "valorAssinatura" || name === "valorMaterial") {
       const formatted = formatCurrencyLive(value);
       setFormData({ ...formData, [name]: formatted });
       return;
@@ -72,6 +75,13 @@ export default function Settings() {
       setEmailError("Por favor, insira um e-mail válido.");
       return;
     }
+
+    localStorage.setItem(
+      "configuracoes_admin",
+      JSON.stringify({ formData })
+    );
+    setSaveSuccess(true);
+    setTimeout(() => setSaveSuccess(false), 3000);
   };
 
   useEffect(() => {
@@ -89,12 +99,11 @@ export default function Settings() {
           Configurações salvas com sucesso!
         </div>
       )}
-      {/* Sidebar fixa */}
+
       <div className="w-64 bg-gray-100 shadow-md">
         <Sidebar title="Configurações" username="Usuário" />
       </div>
 
-      {/* Conteúdo principal */}
       <div className="flex-1 p-4 mt-20">
         <div className="bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto">
           <h2 className="text-xl font-semibold mb-4 text-gray-800">
@@ -140,6 +149,9 @@ export default function Settings() {
                 />
               </div>
             </div>
+            {nameError && (
+              <p className="text-red-500 text-sm mt-1">{nameError}</p>
+            )}
 
             {/* E-mail */}
             <div>
@@ -155,7 +167,7 @@ export default function Settings() {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                onBlur={handleChange} // Valida o e-mail ao sair do campo
+                onBlur={handleChange}
                 required
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Digite seu email"
@@ -204,7 +216,7 @@ export default function Settings() {
               </div>
             </div>
 
-            {/*Valor da Assinatura e Material */}
+            {/* Valor Assinatura e Valor Material */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label
@@ -249,14 +261,7 @@ export default function Settings() {
                 label="Salvar Alterações"
                 icon="pi pi-save"
                 className="bg-blue-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                onClick={() => {
-                  localStorage.setItem(
-                    "configuracoes_admin",
-                    JSON.stringify({ formData })
-                  );
-                  setSaveSuccess(true);
-                  setTimeout(() => setSaveSuccess(false), 3000);
-                }}
+                type="submit"
               />
             </div>
           </form>
