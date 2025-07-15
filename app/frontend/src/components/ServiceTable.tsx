@@ -145,7 +145,7 @@ export default function ServiceTable() {
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Buscar</h1>
+      <h1 className="text-2xl font-bold mb-4 mt-5">Buscar</h1>
       <input
         type="text"
         placeholder="Pesquisar..."

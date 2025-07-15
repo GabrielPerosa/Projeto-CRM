@@ -18,7 +18,6 @@ export default function Proposal() {
 
       {/* MAIN CONTENT */}
       <div className="flex-1 p-6">
-        <h1 className="text-2xl font-semibold mb-6 text-gray-800">Propostas</h1>
         <div className="text-black">
           <ClientTable />
         </div>

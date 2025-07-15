@@ -1,10 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "@/components/Sidebar";
+import { Button } from "primereact/button";
 
 export default function Settings() {
   const [emailError, setEmailError] = useState<string | null>(null);
+  const [nameError, setNameError] = useState<string | null>(null);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   const [formData, setFormData] = useState({
     nome: "",
@@ -13,6 +16,7 @@ export default function Settings() {
     senha: "",
     confirmarSenha: "",
     valorAssinatura: "",
+    valorMaterial: "",
   });
 
   // Validação de e-mail
@@ -21,7 +25,7 @@ export default function Settings() {
     return regex.test(email);
   };
 
-  // Formata o número conforme o usuário digita
+  // Formata o número para moeda
   const formatCurrencyLive = (value: string) => {
     const onlyDigits = value.replace(/\D/g, "");
     const numericValue = parseFloat(onlyDigits) / 100;
@@ -40,8 +44,10 @@ export default function Settings() {
 
     if (name === "nome" || name === "sobrenome") {
       if (/\d/.test(value)) {
-        alert("Nome e sobrenome não podem conter números.");
+        setNameError("Nome e sobrenome não podem conter números.");
         return;
+      } else {
+        setNameError(null);
       }
     }
 
@@ -53,7 +59,7 @@ export default function Settings() {
       }
     }
 
-    if (name === "valorAssinatura") {
+    if (name === "valorAssinatura" || name === "valorMaterial") {
       const formatted = formatCurrencyLive(value);
       setFormData({ ...formData, [name]: formatted });
       return;
@@ -70,17 +76,34 @@ export default function Settings() {
       return;
     }
 
-    alert("Configurações salvas com sucesso!");
+    localStorage.setItem(
+      "configuracoes_admin",
+      JSON.stringify({ formData })
+    );
+    setSaveSuccess(true);
+    setTimeout(() => setSaveSuccess(false), 3000);
   };
+
+  useEffect(() => {
+    const dadosSalvos = localStorage.getItem("configuracoes_admin");
+    if (dadosSalvos) {
+      const dados = JSON.parse(dadosSalvos);
+      setFormData(dados.formData || {});
+    }
+  }, []);
 
   return (
     <div className="flex h-screen bg-gray-100">
-      {/* Sidebar fixa */}
+      {saveSuccess && (
+        <div className="fixed top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded shadow-md z-50">
+          Configurações salvas com sucesso!
+        </div>
+      )}
+
       <div className="w-64 bg-gray-100 shadow-md">
         <Sidebar title="Configurações" username="Usuário" />
       </div>
 
-      {/* Conteúdo principal */}
       <div className="flex-1 p-4 mt-20">
         <div className="bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto">
           <h2 className="text-xl font-semibold mb-4 text-gray-800">
@@ -126,6 +149,9 @@ export default function Settings() {
                 />
               </div>
             </div>
+            {nameError && (
+              <p className="text-red-500 text-sm mt-1">{nameError}</p>
+            )}
 
             {/* E-mail */}
             <div>
@@ -141,7 +167,7 @@ export default function Settings() {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                onBlur={handleChange} // Valida o e-mail ao sair do campo
+                onBlur={handleChange}
                 required
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Digite seu email"
@@ -190,33 +216,53 @@ export default function Settings() {
               </div>
             </div>
 
-            {/* Novo Campo: Valor da Assinatura */}
-            <div>
-              <label
-                htmlFor="valorAssinatura"
-                className="block text-gray-700 font-medium mb-2"
-              >
-                Valor da Assinatura (R$)
-              </label>
-              <input
-                type="text"
-                id="valorAssinatura"
-                name="valorAssinatura"
-                value={formData.valorAssinatura}
-                onChange={handleChange}
-                placeholder="Ex: 29,90"
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+            {/* Valor Assinatura e Valor Material */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label
+                  htmlFor="valorAssinatura"
+                  className="block text-gray-700 font-medium mb-2"
+                >
+                  Valor da Assinatura (R$)
+                </label>
+                <input
+                  type="text"
+                  id="valorAssinatura"
+                  name="valorAssinatura"
+                  value={formData.valorAssinatura}
+                  onChange={handleChange}
+                  placeholder="Ex: 29,90"
+                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="valorMaterial"
+                  className="block text-gray-700 font-medium mb-2"
+                >
+                  Valor do Material (R$)
+                </label>
+                <input
+                  type="text"
+                  id="valorMaterial"
+                  name="valorMaterial"
+                  value={formData.valorMaterial}
+                  onChange={handleChange}
+                  placeholder="Ex: 29,90"
+                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
             </div>
 
             {/* Botão Salvar */}
             <div className="text-right">
-              <button
-                type="submit"
+              <Button
+                label="Salvar Alterações"
+                icon="pi pi-save"
                 className="bg-blue-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                Salvar Alterações
-              </button>
+                type="submit"
+              />
             </div>
           </form>
         </div>

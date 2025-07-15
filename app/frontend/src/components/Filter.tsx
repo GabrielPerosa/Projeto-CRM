@@ -10,14 +10,14 @@ import { Dialog } from "primereact/dialog";
 import { addLocale, locale } from "primereact/api";
 import { FilterMatchMode } from "primereact/api";
 import "../style/globals.css";
-import { FaUser, FaMapMarkerAlt } from "react-icons/fa";
+import { FaUser, FaMapMarkerAlt, FaPencilAlt } from "react-icons/fa";
+import { FaClockRotateLeft } from "react-icons/fa6";
 
 // 📌 Configuração para português
 addLocale("pt", {
   clear: "Remover",
   apply: "Aplicar",
 });
-
 locale("pt");
 
 // 📌 Definição dos tipos
@@ -31,6 +31,14 @@ interface Cliente {
   data: string;
   status: string;
   valor: string;
+  email?: string;
+  telefone?: string;
+  cep?: string;
+  numeroComplemento?: string;
+  cidade: string;
+  rua: string
+
+
 }
 
 interface prestador {
@@ -40,7 +48,6 @@ interface prestador {
   valor: string;
 }
 
-// 📌 Lista de prestadores (dados mockados)
 const prestadoresMock: prestador[] = [
   {
     nome: "prestador A",
@@ -62,7 +69,6 @@ const prestadoresMock: prestador[] = [
   },
 ];
 
-// 📌 Lista de clientes (dados mockados)
 const clientesMock: Cliente[] = [
   {
     id: 1,
@@ -74,6 +80,12 @@ const clientesMock: Cliente[] = [
     status: "Aprovação de Crédito",
     dataInicio: null,
     dataEntrega: null,
+    email: "carlos@email.com",
+    telefone: "(11) 99999-9999",
+    cep: "18072-000",
+    numeroComplemento: "20",
+    cidade: "Guarulhos",
+    rua: "Alameda Amélia"
   },
   {
     id: 2,
@@ -85,6 +97,13 @@ const clientesMock: Cliente[] = [
     status: "Aguardando Orçamento",
     dataInicio: null,
     dataEntrega: null,
+    email: "ana@email.com",
+    telefone: "(31) 98888-8888",
+    cep: "18050-001",
+    numeroComplemento: "20",
+    cidade: "Abaeté",
+    rua: "Antônio Jacinto Lasma"
+
   },
   {
     id: 3,
@@ -96,6 +115,12 @@ const clientesMock: Cliente[] = [
     status: "Em Andamento",
     dataInicio: null,
     dataEntrega: null,
+    email: "joao@email.com",
+    telefone: "(71) 97777-7777",
+    cep: "18040-020",
+    numeroComplemento: "20",
+    cidade: "Candeias",
+    rua: "Loteamento Cruz"
   },
   {
     id: 4,
@@ -107,75 +132,154 @@ const clientesMock: Cliente[] = [
     status: "Concluído",
     dataInicio: null,
     dataEntrega: null,
+    email: "maria@email.com",
+    telefone: "(82) 96666-6666",
+    cep: "18051-030",
+    numeroComplemento: "20",
+    cidade: "Anadia",
+    rua: "Doutor Fernandes Lima"
+  },
+  {
+    id: 5,
+    cliente: "Maria Oliveira",
+    prestador: "",
+    estado: "AL",
+    data: "",
+    valor: "R$ 15.000",
+    status: "Concluído",
+    dataInicio: null,
+    dataEntrega: null,
+    email: "maria@email.com",
+    telefone: "(82) 96666-6666",
+    cep: "18051-030",
+    numeroComplemento: "20",
+    cidade: "Anadia",
+    rua: "Doutor Fernandes Lima"
+  },
+  {
+    id: 6,
+    cliente: "Maria Oliveira",
+    prestador: "",
+    estado: "AL",
+    data: "",
+    valor: "R$ 15.000",
+    status: "Concluído",
+    dataInicio: null,
+    dataEntrega: null,
+    email: "maria@email.com",
+    telefone: "(82) 96666-6666",
+    cep: "18051-030",
+    numeroComplemento: "20",
+    cidade: "Anadia",
+    rua: "Doutor Fernandes Lima"
+  },
+  {
+    id: 7,
+    cliente: "Maria Oliveira",
+    prestador: "",
+    estado: "AL",
+    data: "",
+    valor: "R$ 15.000",
+    status: "Concluído",
+    dataInicio: null,
+    dataEntrega: null,
+    email: "maria@email.com",
+    telefone: "(82) 96666-6666",
+    cep: "18051-030",
+    numeroComplemento: "20",
+    cidade: "Anadia",
+    rua: "Doutor Fernandes Lima"
   },
 ];
 
 export default function TabelaClientes() {
-  // 📌 Estados da aplicação
-  const [clientes, setClientes] = useState<Cliente[]>([]); // Armazena a lista de clientes
-  const [showDialog, setShowDialog] = useState<boolean>(false); // Controla a visibilidade do popup de prestadores
-  const [selectedRow, setSelectedRow] = useState<Cliente | null>(null); // Armazena a linha selecionada na tabela
+  const [clientes, setClientes] = useState<Cliente[]>([]);
+  const [showDialog, setShowDialog] = useState<boolean>(false);
+  const [selectedRow, setSelectedRow] = useState<Cliente | null>(null);
+  const [dialogType, setDialogType] = useState<"prestador" | "cliente" | null>(
+    null
+  );
 
-  // 📌 Filtros da tabela
+  const [editandoValorId, setEditandoValorId] = useState<number | null>(null);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
   const [filtros, setFiltros] = useState({
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS }, // Filtro global
-    cliente: { value: null, matchMode: FilterMatchMode.CONTAINS }, // Filtro por cliente
-    prestador: { value: null, matchMode: FilterMatchMode.CONTAINS }, // Filtro por prestador
-    estado: { value: null, matchMode: FilterMatchMode.CONTAINS }, // Filtro por estado
-    status: { value: null, matchMode: FilterMatchMode.EQUALS }, // Filtro por status
-    data: { value: null, matchMode: FilterMatchMode.DATE_IS }, // Filtro por data
-    dataInicio: { value: null, matchMode: FilterMatchMode.DATE_IS }, // Filtro por data de início
-    dataEntrega: { value: null, matchMode: FilterMatchMode.DATE_IS }, // Filtro por data de entrega
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    cliente: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    prestador: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    estado: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    status: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    data: { value: null, matchMode: FilterMatchMode.DATE_IS },
+    dataInicio: { value: null, matchMode: FilterMatchMode.DATE_IS },
+    dataEntrega: { value: null, matchMode: FilterMatchMode.DATE_IS },
   });
 
-  // 📌 Efeito para carregar os dados mockados ao iniciar
   useEffect(() => {
-    setClientes(clientesMock);
+    const saved = localStorage.getItem("servicos_admin");
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed.length === 0) {
+        setClientes(clientesMock);
+      } else {
+        setClientes(parsed);
+      }
+    } else {
+      setClientes(clientesMock);
+    }
   }, []);
 
-  // 📌 Função para selecionar um prestador e atualizar a lista de clientes
-  const selecionarprestador = (prestador: prestador) => {
+  useEffect(() => {
+    localStorage.setItem("servicos_admin", JSON.stringify(clientes));
+  }, [clientes]);
+
+  const selecionarPrestador = (prestador: prestador) => {
     if (!selectedRow) return;
-
-    const novosClientes = clientes.map((cliente) =>
-      cliente.id === selectedRow.id
-        ? { ...cliente, prestador: prestador.nome } // Atualiza o prestador do cliente selecionado
-        : cliente
+    const novos = clientes.map((c) =>
+      c.id === selectedRow.id ? { ...c, prestador: prestador.nome } : c
     );
-    setClientes(novosClientes); // Atualiza o estado dos clientes
-    setShowDialog(false); // Fecha o popup
+    setClientes(novos);
+    setShowDialog(false);
   };
 
-  // 📌 Função para abrir o popup de seleção de prestador
-  const abrirPopupprestador = (rowData: Cliente) => {
-    setSelectedRow(rowData); // Define a linha selecionada
-    setShowDialog(true); // Abre o popup
+  const abrirPopupPrestador = (row: Cliente) => {
+    setSelectedRow(row);
+    setDialogType("prestador");
+    setShowDialog(true);
   };
 
-  // 📌 Função para atualizar o status de um cliente
-  const atualizarStatus = (novaOpcao: string, rowData: Cliente) => {
-    const novosClientes = clientes.map(
-      (cliente) =>
-        cliente.id === rowData.id ? { ...cliente, status: novaOpcao } : cliente // Atualiza o status do cliente selecionado
+  const abrirPopupCliente = (row: Cliente) => {
+    setSelectedRow(row);
+    setDialogType("cliente");
+    setShowDialog(true);
+  };
+
+  const atualizarStatus = (nova: string, row: Cliente) => {
+    const novos = clientes.map((c) =>
+      c.id === row.id ? { ...c, status: nova } : c
     );
-    setClientes(novosClientes); // Atualiza o estado dos clientes
+    setClientes(novos);
   };
 
-  // 📌 Função para limpar todos os filtros da tabela
+  const atualizarValor = (valor: string, row: Cliente) => {
+    const novos = clientes.map((c) =>
+      c.id === row.id ? { ...c, valor: valor } : c
+    );
+    setClientes(novos);
+  };
+
   const limparFiltros = () => {
     setFiltros({
       global: { value: null, matchMode: FilterMatchMode.CONTAINS },
       cliente: { value: null, matchMode: FilterMatchMode.CONTAINS },
       prestador: { value: null, matchMode: FilterMatchMode.CONTAINS },
       estado: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      status: { value: null, matchMode: FilterMatchMode.EQUALS },
+      status: { value: null, matchMode: FilterMatchMode.CONTAINS },
       data: { value: null, matchMode: FilterMatchMode.DATE_IS },
       dataInicio: { value: null, matchMode: FilterMatchMode.DATE_IS },
       dataEntrega: { value: null, matchMode: FilterMatchMode.DATE_IS },
     });
   };
 
-  // 📌 Função para renderizar o cabeçalho da tabela com botão de limpar filtros
   const renderizarCabecalho = () => (
     <div className="flex justify-content-between">
       <Button
@@ -186,7 +290,6 @@ export default function TabelaClientes() {
     </div>
   );
 
-  // 📌 Lista de opções de status para o dropdown
   const statusOptions = [
     { label: "Aprovação de Crédito", value: "Aprovação de Crédito" },
     { label: "Aguardando Orçamento", value: "Aguardando Orçamento" },
@@ -194,37 +297,67 @@ export default function TabelaClientes() {
     { label: "Concluído", value: "Concluído" },
   ];
 
-  // 📌 Template para a coluna de status com dropdown
-  const statusTemplate = (rowData: Cliente) => {
-    return (
-      <Dropdown
-        value={rowData.status}
-        options={statusOptions}
-        onChange={(e) => atualizarStatus(e.value, rowData)} // Atualiza o status ao selecionar uma opção
-        placeholder="Selecione o status"
-        className="w-full"
+  const statusTemplate = (row: Cliente) => (
+    <Dropdown
+      value={row.status}
+      options={statusOptions}
+      onChange={(e) => atualizarStatus(e.value, row)}
+      className="w-full"
+    />
+  );
+
+  const valorTemplate = (row: Cliente) => (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        position: "relative",
+        width: "150px",
+      }}
+    >
+      <InputText
+        value={row.valor}
+        onChange={(e) => atualizarValor(e.target.value, row)}
+        disabled={editandoValorId !== row.id}
+        className="p-inputtext-sm"
+        style={{ width: "100%", paddingRight: "2rem" }}
       />
-    );
-  };
+      <FaPencilAlt
+        style={{
+          position: "absolute",
+          right: "0.5rem",
+          cursor: "pointer",
+          color: "#6c757d",
+        }}
+        onClick={() => setEditandoValorId(row.id)}
+      />
+    </div>
+  );
 
   return (
-    <div>
-      {/* 📌 Tabela de clientes */}
+    
+    <div className="relative">
+  {saveSuccess && (
+    <div className="fixed top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded shadow-md z-50">
+      Configurações salvas com sucesso!
+    </div>
+  )}
       <DataTable
         value={clientes}
         paginator
-        rows={5}
+        rows={4}
         filters={filtros}
         header={renderizarCabecalho()}
         emptyMessage="Nenhum dado encontrado."
+        className="mb-4"
+        
       >
-        {/* Coluna de Cliente */}
         <Column
           field="cliente"
           header="Cliente"
           filter
           showFilterMatchModes={false}
-          showClearButton={true}
+          showClearButton
           filterElement={(options) => (
             <div style={{ position: "relative" }}>
               <FaUser
@@ -245,28 +378,34 @@ export default function TabelaClientes() {
               />
             </div>
           )}
+          body={(row: Cliente) => (
+            <Button
+              label={row.cliente}
+              onClick={() => abrirPopupCliente(row)}
+              className="p-button-link"
+            />
+          )}
         />
 
-        {/* Coluna de prestador */}
         <Column
           field="prestador"
-          header="prestador"
-          body={(rowData: Cliente) => (
+          header="Prestador"
+          body={(row: Cliente) => (
             <Button
-              label={rowData.prestador || "Selecionar"}
-              onClick={() => abrirPopupprestador(rowData)}
+              label={row.prestador || "Selecionar"}
+              onClick={() => abrirPopupPrestador(row)}
               className="p-button-outlined p-button-sm"
             />
           )}
         />
 
-        {/* Coluna de Estado */}
         <Column
+          className="p-8"
           field="estado"
           header="Estado"
           filter
           showFilterMatchModes={false}
-          showClearButton={true}
+          showClearButton
           filterElement={(options) => (
             <div style={{ position: "relative" }}>
               <FaMapMarkerAlt
@@ -289,23 +428,22 @@ export default function TabelaClientes() {
           )}
         />
 
-        {/* Coluna de Data de Início */}
         <Column
           field="dataInicio"
           header="Data de Início"
-          body={(rowData: Cliente) => (
+          body={(row) => (
             <Calendar
-              value={rowData.dataInicio ? new Date(rowData.dataInicio) : null}
+              value={row.dataInicio ? new Date(row.dataInicio) : null}
               onChange={(e) => {
-                const novosClientes = clientes.map((cliente) =>
-                  cliente.id === rowData.id
+                const novos = clientes.map((c) =>
+                  c.id === row.id
                     ? {
-                        ...cliente,
+                        ...c,
                         dataInicio: e.value ? e.value.toISOString() : null,
                       }
-                    : cliente
+                    : c
                 );
-                setClientes(novosClientes);
+                setClientes(novos);
               }}
               dateFormat="dd/mm/yy"
               placeholder="Selecionar data"
@@ -313,23 +451,22 @@ export default function TabelaClientes() {
           )}
         />
 
-        {/* Coluna de Data de Entrega */}
         <Column
           field="dataEntrega"
           header="Data de Entrega"
-          body={(rowData: Cliente) => (
+          body={(row) => (
             <Calendar
-              value={rowData.dataEntrega ? new Date(rowData.dataEntrega) : null}
+              value={row.dataEntrega ? new Date(row.dataEntrega) : null}
               onChange={(e) => {
-                const novosClientes = clientes.map((cliente) =>
-                  cliente.id === rowData.id
+                const novos = clientes.map((c) =>
+                  c.id === row.id
                     ? {
-                        ...cliente,
+                        ...c,
                         dataEntrega: e.value ? e.value.toISOString() : null,
                       }
-                    : cliente
+                    : c
                 );
-                setClientes(novosClientes);
+                setClientes(novos);
               }}
               dateFormat="dd/mm/yy"
               placeholder="Selecionar data"
@@ -337,47 +474,163 @@ export default function TabelaClientes() {
           )}
         />
 
-        {/* Coluna de Valor */}
-        <Column
-          field="valor"
-          header="Valor (R$)"
-          body={(rowData: Cliente) => (
-            <div style={{ whiteSpace: "nowrap" }}>{rowData.valor}</div>
-          )}
-        />
-
-        {/* Coluna de Status */}
+        <Column field="valor" header="Valor (R$)" body={valorTemplate} />
         <Column
           field="status"
           header="Status"
-          body={statusTemplate} // Usa o template personalizado
+          body={statusTemplate}
+          filter
+          showFilterMatchModes={false}
+          showClearButton
+          filterElement={(options) => (
+            <div style={{ position: "relative" }}>
+              <FaClockRotateLeft
+                style={{
+                  position: "absolute",
+                  left: "0.75rem",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  color: "#6c757d",
+                }}
+              />
+
+              <InputText
+                value={options.value || ""}
+                onChange={(e) => options.filterCallback(e.target.value)}
+                placeholder="Digite o status"
+                className="w-full"
+                style={{ paddingLeft: "2.5rem" }}
+              />
+            </div>
+          )}
         />
+
+        
       </DataTable>
 
-      {/* 📌 Popup de seleção de prestador */}
       <Dialog
-        header="Selecionar prestador"
+        header={
+          dialogType === "prestador"
+            ? "Selecionar Prestador"
+            : "Detalhes do Cliente"
+        }
         visible={showDialog}
         onHide={() => setShowDialog(false)}
         style={{ width: "50vw" }}
       >
-        <DataTable value={prestadoresMock}>
-          <Column field="nome" header="Nome" />
-          <Column field="duracao" header="Duração (dias)" />
-          <Column field="dataDisponivel" header="Data Disponivel" />
-          <Column field="valor" header="Valor Cobrado" />
-          <Column
-            header="Ação"
-            body={(rowData: prestador) => (
+        {dialogType === "prestador" ? (
+          <DataTable value={prestadoresMock}>
+            <Column field="nome" header="Nome" />
+            <Column field="duracao" header="Duração (dias)" />
+            <Column field="dataDisponivel" header="Data Disponível" />
+            <Column field="valor" header="Valor Cobrado" />
+            <Column
+              header="Ação"
+              body={(row: prestador) => (
+                <Button
+                  label="Selecionar"
+                  onClick={() => selecionarPrestador(row)}
+                  className="p-button-sm"
+                />
+              )}
+            />
+          </DataTable>
+        ) : (
+          selectedRow && (
+            <div className="relative pb-20 overflow-x-auto">
+              <table className="min-w-full text-left text-sm border border-gray-200 rounded-lg">
+                <tbody className="divide-y divide-gray-200">
+                  <tr>
+                    <td className="px-4 py-2 font-semibold text-gray-700">
+                      Nome
+                    </td>
+                    <td className="px-4 py-2">{selectedRow.cliente}</td>
+                  </tr>
+                  <tr>
+                    <td className="px-4 py-2 font-semibold text-gray-700">
+                      CEP
+                    </td>
+                    <td className="px-4 py-2">{selectedRow.cep}</td>
+                  </tr>
+                  <tr>
+                    <td className="px-4 py-2 font-semibold text-gray-700">
+                      Rua
+                    </td>
+                    <td className="px-4 py-2">{selectedRow.rua}</td>
+                  </tr>
+                  <tr>
+                    <td className="px-4 py-2 font-semibold text-gray-700">
+                      Número/Complemento
+                    </td>
+                    <td className="px-4 py-2">
+                      {selectedRow.numeroComplemento}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="px-4 py-2 font-semibold text-gray-700">
+                      Cidade
+                    </td>
+                    <td className="px-4 py-2">{selectedRow.cidade}</td>
+                  </tr>
+                  <tr>
+                    <td className="px-4 py-2 font-semibold text-gray-700">
+                      Estado
+                    </td>
+                    <td className="px-4 py-2">{selectedRow.estado}</td>
+                  </tr>
+                  <tr>
+                    <td className="px-4 py-2 font-semibold text-gray-700">
+                      E-mail
+                    </td>
+                    <td className="px-4 py-2">{selectedRow.email}</td>
+                  </tr>
+                  <tr>
+                    <td className="px-4 py-2 font-semibold text-gray-700">
+                      Telefone
+                    </td>
+                    <td className="px-4 py-2">{selectedRow.telefone}</td>
+                  </tr>
+                </tbody>
+              </table>
+
               <Button
-                label="Selecionar"
-                onClick={() => selecionarprestador(rowData)}
-                className="p-button-sm"
+                label="Download Documento"
+                icon="pi pi-download"
+                className="absolute bottom-4 right-4 bg-blue-500 text-white px-6 py-2 rounded-lg text-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onClick={() => {
+                  const blob = new Blob(
+                    [
+                      `Dados do cliente:\nNome: ${selectedRow.cliente}\nE-mail: ${selectedRow.email}\nTelefone: ${selectedRow.telefone}\nEstado: ${selectedRow.estado}`,
+                    ],
+                    { type: "application/pdf" }
+                  );
+                  const url = URL.createObjectURL(blob);
+                  const link = document.createElement("a");
+                  link.href = url;
+                  link.download = `cliente_${selectedRow.cliente}.pdf`;
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }}
               />
-            )}
-          />
-        </DataTable>
+            </div>
+          )
+        )}
       </Dialog>
+
+      <div className="col-span-1 lg:col-span-2 text-right mt-4">
+    <Button
+      label="Salvar Alterações"
+      icon="pi pi-save"
+      className="bg-blue-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      onClick={() => {
+        localStorage.setItem("servicos_admin", JSON.stringify(clientes));
+        setSaveSuccess(true);
+        setTimeout(() => setSaveSuccess(false), 3000);
+      }}
+    />
+  </div>
     </div>
+    
   );
 }

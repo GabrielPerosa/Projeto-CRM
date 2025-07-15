@@ -82,7 +82,7 @@ export default function Sidebar({ username }: SidebarProps) {
     session?.token?.role === "client" &&
       (menuItems = [
         {
-          label: "Início",
+          label: "Meus Serviços",
           icon: "pi pi-home",
           path: `/pages/${session?.token?.role}/home`,
         },
