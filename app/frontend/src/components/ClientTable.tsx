@@ -1,11 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
-import {
-  CheckCircleIcon,
-  ExclamationCircleIcon,
-} from "@heroicons/react/24/solid";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import { CheckCircleIcon, ExclamationCircleIcon } from "@heroicons/react/24/solid";
+import { Calendar } from "primereact/calendar";
 import { NumericFormat } from "react-number-format";
 
 type Client = {
@@ -61,24 +57,23 @@ export default function ClientTable() {
   const [search, setSearch] = useState("");
   const [showPopup, setShowPopup] = useState(false);
 
- const [clients, setClients] = useState<Client[]>(() => {
-  if (typeof window !== "undefined") {
-    const stored = localStorage.getItem("clients_data");
-    if (stored) {
-      const parsed = (JSON.parse(stored) as StoredClient[]).map((c) => ({
-        ...c,
-        startDate: c.startDate ? new Date(c.startDate) : null,
-        deliveryDate: c.deliveryDate ? new Date(c.deliveryDate) : null,
-      }));
-      return parsed;
+  const [clients, setClients] = useState<Client[]>(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("proposta_prestador");
+      if (stored) {
+        const parsed = (JSON.parse(stored) as StoredClient[]).map((c) => ({
+          ...c,
+          startDate: c.startDate ? new Date(c.startDate) : null,
+          deliveryDate: c.deliveryDate ? new Date(c.deliveryDate) : null,
+        }));
+        return parsed;
+      }
     }
-  }
-  return initialData;
-});
-
+    return initialData;
+  });
 
   useEffect(() => {
-    localStorage.setItem("clients_data", JSON.stringify(clients));
+    localStorage.setItem("proposta_prestador", JSON.stringify(clients));
   }, [clients]);
 
   const handleUpdate = (
@@ -119,7 +114,7 @@ export default function ClientTable() {
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Propostas</h1>
+      <h1 className="text-2xl font-bold mb-4 mt-5">Propostas</h1>
 
       <input
         type="text"
@@ -155,33 +150,32 @@ export default function ClientTable() {
               <td className="p-3">{client.cityState}</td>
               <td className="p-3">{client.quantity}</td>
 
-              {/* Calendário para data de início */}
+              {/*  data de início */}
               <td className="p-3">
-                <DatePicker
-                  selected={client.startDate}
-                  onChange={(date) =>
-                    handleUpdate(client.id, "startDate", date)
+                <Calendar
+                  value={client.startDate}
+                  onChange={(e) =>
+                    handleUpdate(client.id, "startDate", e.value ?? null)
                   }
-                  dateFormat="dd/MM/yyyy"
-                  placeholderText="Selecionar data"
+                  dateFormat="dd/mm/yy"
+                  placeholder="Selecionar data"
                   className="border border-gray-300 rounded p-1 w-full"
                 />
               </td>
 
-              {/* Calendário para data de entrega */}
+              {/* data de entrega */}
               <td className="p-3">
-                <DatePicker
-                  selected={client.deliveryDate}
-                  onChange={(date) =>
-                    handleUpdate(client.id, "deliveryDate", date)
+                <Calendar
+                  value={client.deliveryDate}
+                  onChange={(e) =>
+                    handleUpdate(client.id, "deliveryDate", e.value ?? null)
                   }
-                  dateFormat="dd/MM/yyyy"
-                  placeholderText="Selecionar data"
+                  dateFormat="dd/mm/yy"
+                  placeholder="Selecionar data"
                   className="border border-gray-300 rounded p-1 w-full"
                 />
               </td>
 
-              {/* Valor formatado como R$ */}
               <td className="p-3">
                 <NumericFormat
                   value={client.value ?? ""}
@@ -198,7 +192,6 @@ export default function ClientTable() {
                 />
               </td>
 
-              {/* Status */}
               <td className="p-3 flex items-center space-x-2">
                 {client.status === "Enviado" ? (
                   <>
@@ -215,7 +208,6 @@ export default function ClientTable() {
                 )}
               </td>
 
-              {/* Botão Enviar */}
               <td className="p-3">
                 <button
                   type="button"

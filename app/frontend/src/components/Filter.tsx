@@ -215,7 +215,7 @@ export default function TabelaClientes() {
   });
 
   useEffect(() => {
-    const saved = localStorage.getItem("clientes");
+    const saved = localStorage.getItem("servicos_admin");
     if (saved) {
       const parsed = JSON.parse(saved);
       if (parsed.length === 0) {
@@ -229,7 +229,7 @@ export default function TabelaClientes() {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("clientes", JSON.stringify(clientes));
+    localStorage.setItem("servicos_admin", JSON.stringify(clientes));
   }, [clientes]);
 
   const selecionarPrestador = (prestador: prestador) => {
@@ -624,7 +624,7 @@ export default function TabelaClientes() {
       icon="pi pi-save"
       className="bg-blue-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
       onClick={() => {
-        localStorage.setItem("clientes", JSON.stringify(clientes));
+        localStorage.setItem("servicos_admin", JSON.stringify(clientes));
         setSaveSuccess(true);
         setTimeout(() => setSaveSuccess(false), 3000);
       }}

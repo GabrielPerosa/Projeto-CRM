@@ -35,7 +35,7 @@ export default function Settings() {
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   useEffect(() => {
-    const dadosSalvos = localStorage.getItem("configuracoes_usuario");
+    const dadosSalvos = localStorage.getItem("configuracoes_prestador");
     if (dadosSalvos) {
       const dados = JSON.parse(dadosSalvos);
       setFormData(dados.formData || {});
@@ -165,7 +165,7 @@ export default function Settings() {
     };
 
     localStorage.setItem(
-      "configuracoes_usuario",
+      "configuracoes_prestador",
       JSON.stringify(dadosParaSalvar)
     );
 
