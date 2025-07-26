@@ -104,7 +104,7 @@ export default function Home() {
       }
     });
   }
-  function getRevenue(option: string) {
+  function getValues(option: string) {
     let values: number[] = []
     let months: string[] = []
 
@@ -155,13 +155,13 @@ export default function Home() {
           {/* Gráfico de Serviços Realizados */}
           <div className="bg-white rounded-lg shadow p-4 h-96">
             <h2 className="text-lg font-medium mb-4 text-black">Serviços Realizados</h2>
-            <Chart type="bar" data={{ labels: selectedMonths.length == 0 ? availableMonths : sortedMonths, datasets: [{ label: 'Serviços', data: getRevenue("done"), backgroundColor: '#36A2EB' }] }} style={{ height: '320px' }} />
+            <Chart type="bar" data={{ labels: selectedMonths.length == 0 ? availableMonths : sortedMonths, datasets: [{ label: 'Serviços', data: getValues("done"), backgroundColor: '#36A2EB' }] }} style={{ height: '320px' }} />
           </div>
 
           {/* Gráfico de Lucro */}
           <div className="bg-white rounded-lg shadow p-4 h-96">
             <h2 className="text-lg font-medium mb-4 text-black">Faturamento</h2>
-            <Chart type="bar" data={{ labels: selectedMonths.length == 0 ? availableMonths : sortedMonths, datasets: [{ label: 'Faturamento', data: getRevenue("revenue"), backgroundColor: '#9CCC65' }] }} style={{ height: '320px' }} />
+            <Chart type="bar" data={{ labels: selectedMonths.length == 0 ? availableMonths : sortedMonths, datasets: [{ label: 'Faturamento', data: getValues("revenue"), backgroundColor: '#9CCC65' }] }} style={{ height: '320px' }} />
           </div>
         </div>
       </div>
