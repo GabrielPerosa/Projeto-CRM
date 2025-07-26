@@ -1,44 +1,131 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import { Chart } from 'primereact/chart';
 import { MultiSelect } from 'primereact/multiselect';
+import { getSession } from 'next-auth/react';
+import { Loading } from '@/components/Loading';
+import { Dropdown } from 'primereact/dropdown';
 
 export default function Home() {
-  const [anoSelecionado, setAnoSelecionado] = useState<number>(2024);
-  const [mesesSelecionados, setMesesSelecionados] = useState<string[]>([]);
- 
+  const [selectedYear, setSelectedYear] = useState<any>();
+  const [selectedMonths, setSelectedMonths] = useState([]);
+  const [providerData, setProviderData] = useState<any>()
+  const [session, setSession] = useState<any>(null);
+  const [loading, setLoading] = useState(true); // Inicia como true
 
-  const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-
-  const dados: Record<number, number[]> = {
-    2023: [20, 30, 50, 10, 80, 15, 55, 40, 30, 60, 20, 25],
-    2024: [28, 48, 40, 19, 86, 28, 48, 40, 19, 86, 20, 22],
-    2025: [25, 35, 45, 30, 70, 20, 60, 50, 35, 75, 25, 30],
+  // Funções de busca de dados
+  const fetchSession = async () => {
+    try {
+      const sessionData = await getSession();
+      if (sessionData) {
+        setSession(sessionData);
+      }
+    } catch (error) {
+      console.error("Erro ao buscar sessão:", error);
+    }
   };
 
-  const lucro: Record<number, number[]> = {
-    2023: [15, 25, 35, 12, 65, 10, 45, 38, 28, 50, 18, 20],
-    2024: [22, 38, 30, 14, 75, 18, 42, 34, 24, 78, 15, 19],
-    2025: [18, 28, 38, 20, 60, 12, 50, 40, 32, 68, 22, 25],
+  const fetchData = async () => {
+    const data = {
+      2023: {
+        'Jan': { "done": 2, "revenue": 3000 },
+        'Fev': { "done": 1, "revenue": 3000 },
+        'Mar': { "done": 2, "revenue": 5200 },
+        'Abr': { "done": 0, "revenue": 0 },
+        'Mai': { "done": 1, "revenue": 6100 },
+        'Jun': { "done": 1, "revenue": 4700 },
+        'Jul': { "done": 4, "revenue": 5600 },
+        'Ago': { "done": 1, "revenue": 5800 },
+        'Set': { "done": 0, "revenue": 0 },
+        'Out': { "done": 3, "revenue": 6200 },
+        'Nov': { "done": 1, "revenue": 7100 },
+        'Dez': { "done": 1, "revenue": 7400 }
+      },
+      2024: {
+        'Fev': { "done": 1, "revenue": 4500 },
+        'Mar': { "done": 1, "revenue": 5200 },
+        'Abr': { "done": 0, "revenue": 0 },
+        'Mai': { "done": 1, "revenue": 6100 },
+        'Jun': { "done": 1, "revenue": 4700 },
+        'Jul': { "done": 1, "revenue": 5600 },
+        'Ago': { "done": 1, "revenue": 5800 },
+        'Set': { "done": 0, "revenue": 0 },
+        'Out': { "done": 1, "revenue": 6200 },
+        'Nov': { "done": 1, "revenue": 7100 },
+        'Dez': { "done": 1, "revenue": 7400 }
+      }
+    }
+    setProviderData(data)
+    setSelectedYear(Math.max(...Object.keys(data).map(Number)))
   };
+    useEffect(() => {
+    const initializeApp = async () => {
+      try {
+        await fetchSession();
+        await fetchData();
+      } catch (error) {
+        console.error("Erro ao inicializar dados:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const dadosFiltrados =
-    mesesSelecionados.length > 0
-      ? mesesSelecionados.map((mes) => dados[anoSelecionado][meses.indexOf(mes)] || 0)
-      : dados[anoSelecionado];
+    initializeApp();
+  }, []);
+  if (loading) {
+    return <Loading />;
+  }
+  const availableMonths = Object.keys(providerData[selectedYear]); // meses disponiveis do ano selecionado'
+  const availableYears = Object.keys(providerData); // meses disponiveis do ano selecionado'
+  const sortMonths = { // ordenação dos meses apenas'
+      'Jan': 1,
+      'Fev': 2,
+      'Mar': 3,
+      'Abr': 4,
+      'Mai': 5,
+      'Jun': 6,
+      'Jul': 7,
+      'Ago': 8,
+      'Set': 9,
+      'Out': 10,
+      'Nov': 11,
+      'Dez': 12
+  };  // Ordena os meses de acordo com a ordem definida
+  const sortedMonths = [...selectedMonths].sort((a, b) => sortMonths[a] - sortMonths[b])
+  
+  function checkoutMonthsSelected(year: any) {
+    const avaliableMonthsInYear = Object.keys(providerData[year])
+    selectedMonths.forEach((month) => {
+      if (!avaliableMonthsInYear.includes(month)) {
+        // Remove os meses não disponíveis no ano selecionado
+        setSelectedMonths((prevMonths) => prevMonths.filter((m) => m !== month));
+      }
+    });
+  }
+  function getRevenue(option: string) {
+    let values: number[] = []
+    let months: string[] = []
 
-  const lucroFiltrados =
-    mesesSelecionados.length > 0
-      ? mesesSelecionados.map((mes) => lucro[anoSelecionado][meses.indexOf(mes)] || 0)
-      : lucro[anoSelecionado];
+    if (sortedMonths.length == 0) {
+      months = availableMonths
+    }
+    else {
+      months = sortedMonths
+    }  
+    months.forEach((month) => {
+      const value = providerData[selectedYear][month][option]
+      values.push(value)
+    })
+    return values
+  }
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-100">
       {/* Sidebar fixa */}
       <div className="w-64 bg-gray-100 shadow-md">
-        <Sidebar title="Irrigação Smart" username="Usuário" />
+        <Sidebar title="Olá Amigão" username="Usuário" />
       </div>
 
       {/* Conteúdo principal */}
@@ -46,20 +133,18 @@ export default function Home() {
         {/* Filtros */}
         <div className="bg-white p-4 mb-6 rounded-lg shadow flex flex-wrap gap-4">
           {/* Filtro de Ano */}
-          <select
-            value={anoSelecionado}
-            onChange={(e) => setAnoSelecionado(Number(e.target.value))}
-            className="p-2 border rounded"
-          >
-            <option value="2024">2024</option>
-            <option value="2025">2025</option>
-          </select>
+          <Dropdown
+            value={selectedYear}
+            options={availableYears}
+            onChange={(e) => { checkoutMonthsSelected(e.value); setSelectedYear(e.value); }} // Atualiza o estado do year
+            placeholder={selectedYear}
+          />
 
           {/* Filtro de Meses */}
           <MultiSelect
-            value={mesesSelecionados}
-            options={meses.map((mes) => ({ label: mes, value: mes }))}
-            onChange={(e) => setMesesSelecionados(e.value)}
+            value={sortedMonths}
+            options={availableMonths}
+            onChange={(e) => setSelectedMonths(e.value)}
             placeholder="Selecione os meses"
             className="w-72"
           />
@@ -70,13 +155,13 @@ export default function Home() {
           {/* Gráfico de Serviços Realizados */}
           <div className="bg-white rounded-lg shadow p-4 h-96">
             <h2 className="text-lg font-medium mb-4 text-black">Serviços Realizados</h2>
-            <Chart type="bar" data={{ labels: meses, datasets: [{ label: 'Serviços', data: dadosFiltrados, backgroundColor: '#36A2EB' }] }} style={{ height: '320px' }} />
+            <Chart type="bar" data={{ labels: selectedMonths.length == 0 ? availableMonths : sortedMonths, datasets: [{ label: 'Serviços', data: getRevenue("done"), backgroundColor: '#36A2EB' }] }} style={{ height: '320px' }} />
           </div>
 
           {/* Gráfico de Lucro */}
           <div className="bg-white rounded-lg shadow p-4 h-96">
             <h2 className="text-lg font-medium mb-4 text-black">Faturamento</h2>
-            <Chart type="bar" data={{ labels: meses, datasets: [{ label: 'Faturamento', data: lucroFiltrados, backgroundColor: '#9CCC65' }] }} style={{ height: '320px' }} />
+            <Chart type="bar" data={{ labels: selectedMonths.length == 0 ? availableMonths : sortedMonths, datasets: [{ label: 'Faturamento', data: getRevenue("revenue"), backgroundColor: '#9CCC65' }] }} style={{ height: '320px' }} />
           </div>
         </div>
       </div>

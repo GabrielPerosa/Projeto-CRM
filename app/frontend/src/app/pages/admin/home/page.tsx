@@ -13,19 +13,20 @@ import { Dropdown } from 'primereact/dropdown';
 
 export default function Home() {
   // const session = await getServerSession(authOptions);
-  const [selectedChart, setSelectedChart] = useState<string| null>(null);
-  const [year, setYear] = useState<any>();
+  const [selectedChart, setSelectedChart] = useState<string | null>('A');
+  const [selectedYear, setSelectedYear] = useState<any>();
   const [selectedMonths, setMonths] = useState([]);
   const [selectedStates, setStates] = useState([]);
   const [session, setSession] = useState<any>(null);
   const [loading, setLoading] = useState(true); // Inicia como true
   const [dataTime, setDataTime] = useState<any>(null); // Inicia como null
+  const [providersData, setProvidersData] = useState<any>(null); 
 
   // Funções de busca de dados
   const fetchSession = async () => {
     try {
       const sessionData = await getSession();
-      if(sessionData){
+      if (sessionData) {
         setSession(sessionData);
       }
     } catch (error) {
@@ -36,36 +37,38 @@ export default function Home() {
     // Simula uma chamada de API
     const data = {
       2023: {
-        "Janeiro":   { "SP": 1500, "RJ": 1300, "MG": 1100, "BA": 900, "PR": 1000, "RS": 950, "SC": 920, "PE": 800, "CE": 850, "GO": 870 },
-        "Fevereiro": { "SP": 1550, "RJ": 1340, "MG": 1120, "BA": 970, "PR": 1080, "RS": 1030, "SC": 1010, "PE": 870, "CE": 900, "GO": 920 },
-        "Março":     { "SP": 1600, "RJ": 1380, "MG": 1150, "BA": 990, "PR": 1100, "RS": 1050, "SC": 1030, "PE": 890, "CE": 920, "GO": 940 },
-        "Abril":     { "SP": 1650, "RJ": 1420, "MG": 1180, "BA": 1010, "PR": 1130, "RS": 1080, "SC": 1060, "PE": 910, "CE": 940, "GO": 960 },
-        "Maio":      { "SP": 1700, "RJ": 1460, "MG": 1210, "BA": 1030, "PR": 1160, "RS": 1110, "SC": 1090, "PE": 930, "CE": 960, "GO": 980 },
-        "Junho":     { "SP": 1750, "RJ": 1500, "MG": 1240, "BA": 1050, "PR": 1190, "RS": 1140, "SC": 1120, "PE": 950, "CE": 980, "GO": 1000 },
-        "Julho":     { "SP": 1800, "RJ": 1540, "MG": 1270, "BA": 1070, "PR": 1220, "RS": 1170, "SC": 1150, "PE": 970, "CE": 1000, "GO": 1020 },
-        "Agosto":    { "SP": 1850, "RJ": 1580, "MG": 1300, "BA": 1090, "PR": 1250, "RS": 1200, "SC": 1180, "PE": 990, "CE": 1020, "GO": 1040 },
-        "Setembro":  { "SP": 1900, "RJ": 1620, "MG": 1330, "BA": 1110, "PR": 1280, "RS": 1230, "SC": 1210, "PE": 1010, "CE": 1040, "GO": 1060 },
-        "Outubro":   { "SP": 1950, "RJ": 1660, "MG": 1360, "BA": 1130, "PR": 1310, "RS": 1260, "SC": 1240, "PE": 1030, "CE": 1060, "GO": 1080 },
-        "Novembro":  { "SP": 2000, "RJ": 1700, "MG": 1390, "BA": 1150, "PR": 1340, "RS": 1290, "SC": 1270, "PE": 1050, "CE": 1080, "GO": 1100 },
-        "Dezembro":  { "SP": 2100, "RJ": 1800, "MG": 1450, "BA": 1200, "PR": 1400, "RS": 1350, "SC": 1330, "PE": 1100, "CE": 1130, "GO": 1150 }
+        "Janeiro": { "SP": { orders: 1500, revenue: 3000 }, "RJ": { orders: 1300, revenue: 2600 }, "MG": { orders: 1100, revenue: 2200 }, "BA": { orders: 900, revenue: 1800 }, "PR": { orders: 1000, revenue: 2000 }, "RS": { orders: 950, revenue: 1900 }, "SC": { orders: 920, revenue: 1840 }, "PE": { orders: 800, revenue: 1600 }, "CE": { orders: 850, revenue: 1700 }, "GO": { orders: 870, revenue: 1740 } },
+        "Fevereiro": { "SP": { orders: 1550, revenue: 3100 }, "RJ": { orders: 1340, revenue: 2680 }, "MG": { orders: 1120, revenue: 2240 }, "BA": { orders: 970, revenue: 1940 }, "PR": { orders: 1080, revenue: 2160 }, "RS": { orders: 1030, revenue: 2060 }, "SC": { orders: 1010, revenue: 2020 }, "PE": { orders: 870, revenue: 1740 }, "CE": { orders: 900, revenue: 1800 }, "GO": { orders: 920, revenue: 1840 } },
+        "Março": { "SP": { orders: 1600, revenue: 3200 }, "RJ": { orders: 1380, revenue: 2760 }, "MG": { orders: 1150, revenue: 2300 }, "BA": { orders: 990, revenue: 1980 }, "PR": { orders: 1100, revenue: 2200 }, "RS": { orders: 1050, revenue: 2100 }, "SC": { orders: 1030, revenue: 2060 }, "PE": { orders: 890, revenue: 1780 }, "CE": { orders: 920, revenue: 1840 }, "GO": { orders: 940, revenue: 1880 } },
+        "Abril": { "SP": { orders: 1650, revenue: 3300 }, "RJ": { orders: 1420, revenue: 2840 }, "MG": { orders: 1180, revenue: 2360 }, "BA": { orders: 1010, revenue: 2020 }, "PR": { orders: 1130, revenue: 2260 }, "RS": { orders: 1080, revenue: 2160 }, "SC": { orders: 1060, revenue: 2120 }, "PE": { orders: 910, revenue: 1820 }, "CE": { orders: 940, revenue: 1880 }, "GO": { orders: 960, revenue: 1920 } },
+        "Maio": { "SP": { orders: 1700, revenue: 3400 }, "RJ": { orders: 1460, revenue: 2920 }, "MG": { orders: 1210, revenue: 2420 }, "BA": { orders: 1030, revenue: 2060 }, "PR": { orders: 1160, revenue: 2320 }, "RS": { orders: 1110, revenue: 2220 }, "SC": { orders: 1090, revenue: 2180 }, "PE": { orders: 930, revenue: 1860 }, "CE": { orders: 960, revenue: 1920 }, "GO": { orders: 980, revenue: 1960 } },
+        "Junho": { "SP": { orders: 1750, revenue: 3500 }, "RJ": { orders: 1500, revenue: 3000 }, "MG": { orders: 1240, revenue: 2480 }, "BA": { orders: 1050, revenue: 2100 }, "PR": { orders: 1190, revenue: 2380 }, "RS": { orders: 1140, revenue: 2280 }, "SC": { orders: 1120, revenue: 2240 }, "PE": { orders: 950, revenue: 1900 }, "CE": { orders: 980, revenue: 1960 }, "GO": { orders: 1000, revenue: 2000 } },
+        "Julho": { "SP": { orders: 1800, revenue: 3600 }, "RJ": { orders: 1540, revenue: 3080 }, "MG": { orders: 1270, revenue: 2540 }, "BA": { orders: 1070, revenue: 2140 }, "PR": { orders: 1220, revenue: 2440 }, "RS": { orders: 1170, revenue: 2340 }, "SC": { orders: 1150, revenue: 2300 }, "PE": { orders: 970, revenue: 1940 }, "CE": { orders: 1000, revenue: 2000 }, "GO": { orders: 1020, revenue: 2040 } },
+        "Agosto": { "SP": { orders: 1850, revenue: 3700 }, "RJ": { orders: 1580, revenue: 3160 }, "MG": { orders: 1300, revenue: 2600 }, "BA": { orders: 1090, revenue: 2180 }, "PR": { orders: 1250, revenue: 2500 }, "RS": { orders: 1200, revenue: 2400 }, "SC": { orders: 1180, revenue: 2360 }, "PE": { orders: 990, revenue: 1980 }, "CE": { orders: 1020, revenue: 2040 }, "GO": { orders: 1040, revenue: 2080 } },
+        "Setembro": { "SP": { orders: 1900, revenue: 3800 }, "RJ": { orders: 1620, revenue: 3240 }, "MG": { orders: 1330, revenue: 2660 }, "BA": { orders: 1110, revenue: 2220 }, "PR": { orders: 1280, revenue: 2560 }, "RS": { orders: 1230, revenue: 2460 }, "SC": { orders: 1210, revenue: 2420 }, "PE": { orders: 1010, revenue: 2020 }, "CE": { orders: 1040, revenue: 2080 }, "GO": { orders: 1060, revenue: 2120 } },
+        "Outubro": { "SP": { orders: 1950, revenue: 3900 }, "RJ": { orders: 1660, revenue: 3320 }, "MG": { orders: 1360, revenue: 2720 }, "BA": { orders: 1130, revenue: 2260 }, "PR": { orders: 1310, revenue: 2620 }, "RS": { orders: 1260, revenue: 2520 }, "SC": { orders: 1240, revenue: 2480 }, "PE": { orders: 1030, revenue: 2060 }, "CE": { orders: 1060, revenue: 2120 }, "GO": { orders: 1080, revenue: 2160 } },
+        "Novembro": { "SP": { orders: 2000, revenue: 4000 }, "RJ": { orders: 1700, revenue: 3400 }, "MG": { orders: 1390, revenue: 2780 }, "BA": { orders: 1150, revenue: 2300 }, "PR": { orders: 1340, revenue: 2680 }, "RS": { orders: 1290, revenue: 2580 }, "SC": { orders: 1270, revenue: 2540 }, "PE": { orders: 1050, revenue: 2100 }, "CE": { orders: 1080, revenue: 2160 }, "GO": { orders: 1100, revenue: 2200 } },
+        "Dezembro": { "SP": { orders: 2100, revenue: 4200 }, "RJ": { orders: 1800, revenue: 3600 }, "MG": { orders: 1450, revenue: 2900 }, "BA": { orders: 1200, revenue: 2400 }, "PR": { orders: 1400, revenue: 2800 }, "RS": { orders: 1350, revenue: 2700 }, "SC": { orders: 1330, revenue: 2660 }, "PE": { orders: 1100, revenue: 2200 }, "CE": { orders: 1130, revenue: 2260 }, "GO": { orders: 1150, revenue: 2300 } }
       },
       2024: {
-        "Janeiro":   { "SP": 1500, "RJ": 1890, "MG": 1520, "BA": 1270, "PR": 1480, "RS": 1430, "SC": 1410, "PE": 1170, "CE": 1200, "GO": 1220 },
-        "Fevereiro": { "SP": 1550, "RJ": 1890, "MG": 1520, "BA": 1270, "PR": 1480, "RS": 1430, "SC": 1410, "PE": 1170, "CE": 1200, "GO": 1220 },
-        "Março":     { "SP": 1600, "RJ": 1930, "MG": 1550, "BA": 1290, "PR": 1500, "RS": 1450, "SC": 1430, "PE": 1190, "CE": 1220, "GO": 1240 },
-        "Abril":     { "SP": 1650, "RJ": 1970, "MG": 1580, "BA": 1310, "PR": 1530, "RS": 1480, "SC": 1460, "PE": 1210, "CE": 1240, "GO": 1260 },
-        "Maio":      { "SP": 1700, "RJ": 2010, "MG": 1610, "BA": 1330, "PR": 1560, "RS": 1510, "SC": 1490, "PE": 1230, "CE": 1260, "GO": 1280 },
-        "Junho":     { "SP": 1750, "RJ": 2050, "MG": 1640, "BA": 1350, "PR": 1590, "RS": 1540, "SC": 1520, "PE": 1250, "CE": 1280, "GO": 1300 },
-        "Julho":     { "SP": 1800, "RJ": 2090, "MG": 1670, "BA": 1370, "PR": 1620, "RS": 1570, "SC": 1550, "PE": 1270, "CE": 1300, "GO": 1320 },
-        "Agosto":    { "SP": 1850, "RJ": 2130, "MG": 1700, "BA": 1390, "PR": 1650, "RS": 1600, "SC": 1580, "PE": 1290, "CE": 1320, "GO": 1340 },
-        "Setembro":  { "SP": 1900, "RJ": 2170, "MG": 1730, "BA": 1410, "PR": 1680, "RS": 1630, "SC": 1610, "PE": 1310, "CE": 1340, "GO": 1360 },
-        "Outubro":   { "SP": 1950, "RJ": 2210, "MG": 1760, "BA": 1430, "PR": 1710, "RS": 1660, "SC": 1640, "PE": 1330, "CE": 1360, "GO": 1380 },
-        "Novembro":  { "SP": 2000, "RJ": 2250, "MG": 1790, "BA": 1450, "PR": 1740, "RS": 1690, "SC": 1670, "PE": 1350, "CE": 1380, "GO": 1400 },
-        "Dezembro":  { "SP": 2100, "RJ": 2350, "MG": 1850, "BA": 1500, "PR": 1800, "RS": 1750, "SC": 1730, "PE": 1400, "CE": 1430, "GO": 1450 }
+        "Janeiro": { "SP": { orders: 1500, revenue: 3000 }, "RJ": { orders: 1890, revenue: 3780 }, "MG": { orders: 1520, revenue: 3040 }, "BA": { orders: 1270, revenue: 2540 }, "PR": { orders: 1480, revenue: 2960 }, "RS": { orders: 1430, revenue: 2860 }, "SC": { orders: 1410, revenue: 2820 }, "PE": { orders: 1170, revenue: 2340 }, "CE": { orders: 1200, revenue: 2400 }, "GO": { orders: 1220, revenue: 2440 } },
+        "Fevereiro": { "SP": { orders: 1550, revenue: 3100 }, "RJ": { orders: 1890, revenue: 3780 }, "MG": { orders: 1520, revenue: 3040 }, "BA": { orders: 1270, revenue: 2540 }, "PR": { orders: 1480, revenue: 2960 }, "RS": { orders: 1430, revenue: 2860 }, "SC": { orders: 1410, revenue: 2820 }, "PE": { orders: 1170, revenue: 2340 }, "CE": { orders: 1200, revenue: 2400 }, "GO": { orders: 1220, revenue: 2440 } },
+        "Março": { "SP": { orders: 1600, revenue: 3200 }, "RJ": { orders: 1930, revenue: 3860 }, "MG": { orders: 1550, revenue: 3100 }, "BA": { orders: 1290, revenue: 2580 }, "PR": { orders: 1500, revenue: 3000 }, "RS": { orders: 1450, revenue: 2900 }, "SC": { orders: 1430, revenue: 2860 }, "PE": { orders: 1190, revenue: 2380 }, "CE": { orders: 1220, revenue: 2440 }, "GO": { orders: 1240, revenue: 2480 } },
+        "Abril": { "SP": { orders: 1650, revenue: 3300 }, "RJ": { orders: 1970, revenue: 3940 }, "MG": { orders: 1580, revenue: 3160 }, "BA": { orders: 1310, revenue: 2620 }, "PR": { orders: 1530, revenue: 3060 }, "RS": { orders: 1480, revenue: 2960 }, "SC": { orders: 1460, revenue: 2920 }, "PE": { orders: 1210, revenue: 2420 }, "CE": { orders: 1240, revenue: 2480 }, "GO": { orders: 1260, revenue: 2520 } },
+        "Maio": { "SP": { orders: 1700, revenue: 3400 }, "RJ": { orders: 2010, revenue: 4020 }, "MG": { orders: 1610, revenue: 3220 }, "BA": { orders: 1330, revenue: 2660 }, "PR": { orders: 1560, revenue: 3120 }, "RS": { orders: 1510, revenue: 3020 }, "SC": { orders: 1490, revenue: 2980 }, "PE": { orders: 1230, revenue: 2460 }, "CE": { orders: 1260, revenue: 2520 }, "GO": { orders: 1280, revenue: 2560 } },
+        "Junho": { "SP": { orders: 1750, revenue: 3500 }, "RJ": { orders: 2050, revenue: 4100 }, "MG": { orders: 1640, revenue: 3280 }, "BA": { orders: 1350, revenue: 2700 }, "PR": { orders: 1590, revenue: 3180 }, "RS": { orders: 1540, revenue: 3080 }, "SC": { orders: 1520, revenue: 3040 }, "PE": { orders: 1250, revenue: 2500 }, "CE": { orders: 1280, revenue: 2560 }, "GO": { orders: 1300, revenue: 2600 } },
+        "Julho": { "SP": { orders: 1800, revenue: 3600 }, "RJ": { orders: 2090, revenue: 4180 }, "MG": { orders: 1670, revenue: 3340 }, "BA": { orders: 1370, revenue: 2740 }, "PR": { orders: 1620, revenue: 3240 }, "RS": { orders: 1570, revenue: 3140 }, "SC": { orders: 1550, revenue: 3100 }, "PE": { orders: 1270, revenue: 2540 }, "CE": { orders: 1300, revenue: 2600 }, "GO": { orders: 1320, revenue: 2640 } },
+        "Agosto": { "SP": { orders: 1850, revenue: 3700 }, "RJ": { orders: 2130, revenue: 4260 }, "MG": { orders: 1700, revenue: 3400 }, "BA": { orders: 1390, revenue: 2780 }, "PR": { orders: 1650, revenue: 3300 }, "RS": { orders: 1600, revenue: 3200 }, "SC": { orders: 1580, revenue: 3160 }, "PE": { orders: 1290, revenue: 2580 }, "CE": { orders: 1320, revenue: 2640 }, "GO": { orders: 1340, revenue: 2680 } },
+        "Setembro": { "SP": { orders: 1900, revenue: 3800 }, "RJ": { orders: 2170, revenue: 4340 }, "MG": { orders: 1730, revenue: 3460 }, "BA": { orders: 1410, revenue: 2820 }, "PR": { orders: 1680, revenue: 3360 }, "RS": { orders: 1630, revenue: 3260 }, "SC": { orders: 1610, revenue: 3220 }, "PE": { orders: 1310, revenue: 2620 }, "CE": { orders: 1340, revenue: 2680 }, "GO": { orders: 1360, revenue: 2720 } },
+        "Outubro": { "SP": { orders: 1950, revenue: 3900 }, "RJ": { orders: 2210, revenue: 4420 }, "MG": { orders: 1760, revenue: 3520 }, "BA": { orders: 1430, revenue: 2860 }, "PR": { orders: 1710, revenue: 3420 }, "RS": { orders: 1660, revenue: 3320 }, "SC": { orders: 1640, revenue: 3280 }, "PE": { orders: 1330, revenue: 2660 }, "CE": { orders: 1360, revenue: 2720 }, "GO": { orders: 1380, revenue: 2760 } },
+        "Novembro": { "SP": { orders: 2000, revenue: 4000 }, "RJ": { orders: 2250, revenue: 4500 }, "MG": { orders: 1790, revenue: 3580 }, "BA": { orders: 1450, revenue: 2900 }, "PR": { orders: 1740, revenue: 3480 }, "RS": { orders: 1690, revenue: 3380 }, "SC": { orders: 1670, revenue: 3340 }, "PE": { orders: 1350, revenue: 2700 }, "CE": { orders: 1380, revenue: 2760 }, "GO": { orders: 1400, revenue: 2800 } },
+        "Dezembro": { "SP": { orders: 2100, revenue: 4200 }, "RJ": { orders: 2350, revenue: 4700 }, "MG": { orders: 1850, revenue: 3700 }, "BA": { orders: 1500, revenue: 3000 }, "PR": { orders: 1800, revenue: 3600 }, "RS": { orders: 1750, revenue: 3500 }, "SC": { orders: 1730, revenue: 3460 }, "PE": { orders: 1400, revenue: 2800 }, "CE": { orders: 1430, revenue: 2860 }, "GO": { orders: 1450, revenue: 2900 } }
       }
     };
     setDataTime(data);
-    setYear(Math.max(...Object.keys(data).map(Number))); // Define o ano padrão
+    setSelectedYear(Math.max(...Object.keys(data).map(Number))); // Define o ano padrão
+    const providers = { 2023: {"Gabriel Faria": 20, "Guilherme Kaneda": 17, "Giovani Rodrigues": 15}, 2024: {"Guilherme Kaneda": 17, "Gabriel Faria": 20, "Giovani Rodrigues": 15, "Gabriel Alvim": 10} }
+    setProvidersData(providers)
   };
 
   useEffect(() => {
@@ -81,13 +84,13 @@ export default function Home() {
     };
 
     initializeApp();
-  }, []); 
+  }, []);
 
   if (loading) {
     return <Loading />;
-  }  
+  }
 
-  function checkoutMonthsSelected (year: any) {
+  function checkoutMonthsSelected(year: any) {
     const avaliableMonthsInYear = Object.keys(dataTime[year])
     selectedMonths.forEach((month) => {
       if (!avaliableMonthsInYear.includes(month)) {
@@ -96,54 +99,99 @@ export default function Home() {
       }
     });
   }
-  function returnValue() {
-    const arr: number[] = []
-    //if (sortedMonths.length == 0)
-      
-    sortedMonths.forEach((month) => {
 
+  function getOrdersValue() {
+    const arr: number[] = []
+    let months: string[] = []
+
+    // Determina qual coleção de meses usar
+    if (sortedMonths.length == 0) {
+      months = availableMonths
+    }
+    else {
+      months = sortedMonths
+    }
+
+    months.forEach((month) => {
       let result: number = 0
       if (selectedStates.length == 0) {
         availableStates.forEach((state) => {
-          result += dataTime[year][month][state]
+          result += dataTime[selectedYear][month][state]["orders"]
         })
       }
       else {
         selectedStates.forEach((state) => {
-          result += dataTime[year][month][state]
+          result += dataTime[selectedYear][month][state]["orders"]
         })
       }
-        arr.push(result)
+      arr.push(result)
     })
     return arr
+  }
+
+  function getRevenue() {
+    const arr: number[] = []
+    let states: string[] = []
+
+    // Determina qual coleção de meses usar
+    if (selectedStates.length == 0) {
+      states = availableStates
+    }
+    else {
+      states = selectedStates
+    }
+
+    states.forEach((state) => {
+      let result: number = 0
+      if (selectedMonths.length == 0) {
+        availableMonths.forEach((month) => {
+          result += dataTime[selectedYear][month][state]["revenue"]
+        })
+      }
+      else {
+        selectedMonths.forEach((month) => {
+          result += dataTime[selectedYear][month][state]["revenue"]
+        })
+      }
+      arr.push(result)
+    })
+    return arr
+  }
+
+  function getProvidersData () {
+    providersData.forEach((provider: string) => {
+      provider
+    })
   }
   // CRIAR FUNÇÂO PARA SOMAR VALORES DOS MESES SELECIONADOS (todos os estados)
   // REFATORAR PARA SORTEDMONTHS SER APENAS SELECTEDMONTHS
   // CRIAR FUNÇÂO PARA SOMAR VALORES DOS ESTADOS SELECIONADOS (para os meses selecionados)  
-  const years = Object.keys(dataTime);
-  const availableStates = ["SP", "RJ", "MG", "BA", "PR", "RS", "SC", "PE", "CE", "GO"]; // ISSO VEM DA API TBM
-  const availableMonths = Object.keys(dataTime[year]);
-  const ordenMonths = {
-    'Janeiro': 1, 
-    'Fevereiro': 2, 
-    'Março': 3, 
-    'Abril': 4, 
-    'Maio': 5, 
+  const years = Object.keys(dataTime); // histórico de anos
+  const availableStates = ["SP", "RJ", "MG", "BA", "PR", "RS", "SC", "PE", "CE", "GO"]; // ISSO VEM DA API TBM (Quais UFs estão presentes)
+  const availableMonths = Object.keys(dataTime[selectedYear]); // meses disponiveis do ano selecionado
+  const sortMonths = { // ordenação dos meses apenas
+    'Janeiro': 1,
+    'Fevereiro': 2,
+    'Março': 3,
+    'Abril': 4,
+    'Maio': 5,
     'Junho': 6,
-    'Julho': 7, 
-    'Agosto': 8, 
-    'Setembro': 9, 
-    'Outubro': 10, 
-    'Novembro': 11, 
+    'Julho': 7,
+    'Agosto': 8,
+    'Setembro': 9,
+    'Outubro': 10,
+    'Novembro': 11,
     'Dezembro': 12
   };
 
   // Ordena os meses de acordo com a ordem definida
-  const sortedMonths = [...selectedMonths].sort((a, b) => ordenMonths[a] - ordenMonths[b]);
+  const sortedMonths = [...selectedMonths].sort((a, b) => sortMonths[a] - sortMonths[b]);
 
   // Opções de configurações do gráfico
-  const chartOptions = { responsive: true, maintainAspectRatio: false,};
+  const chartOptions = { responsive: true, maintainAspectRatio: false, };
 
+  // cores para o dashboard
+  const colors = ["#FF6384", "#36A2EB", "#FFCE56", "#238080", "#0000CD", "#008080", "#32CD32", "#D2691E", "#7B68EE", "#DC143C"]
   // Dados mockados para os gráficos
   const mockData = {
     A: {
@@ -151,41 +199,31 @@ export default function Home() {
       labels: selectedStates.length == 0 ? availableStates : selectedStates,
       datasets: [
         {
-          data: [400, 200, 100],
-          backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"],
+          data: getRevenue(),
+          backgroundColor: colors,
         },
       ],
     },
     B: {
       // Gráfico de barras
-      labels: selectedMonths.length == 0 ? availableMonths: sortedMonths,
+      labels: selectedMonths.length == 0 ? availableMonths : sortedMonths,
       datasets: [
         {
-          label: `Pedidos - ${year}`,
-          backgroundColor: "#42A5F5",
-          data: returnValue(),
-          
+          label: `Pedidos - ${selectedYear}`,
+          backgroundColor: colors.slice(0, 3),
+          data: getOrdersValue(),
+
         },
       ],
     },
     C: {
-      // Gráfico de linha
-      labels: ["Semana 1", "Semana 2", "Semana 3", "Semana 4"],
-      datasets: [
-        {
-          label: "A",
-          borderColor: "#FF5733",
-          data: [70, 85, 95, 100], // Dados de performance
-        },
-      ],
-    },
-    D: {
       // Gráfico de donut
-      labels: ["Estado A", "Estado B", "Estado C"],
+      labels: Object.keys(providersData[selectedYear]),
       datasets: [
-        {
-          data: [15000, 9000, 11000],
-          backgroundColor: ["#FFD700", "#32CD32", "#FF4500"],
+        { 
+          label: "Projetos Realizados",
+          data: Object.values(providersData[selectedYear]),
+          backgroundColor: colors,
         },
       ],
     },
@@ -195,14 +233,12 @@ export default function Home() {
   const charts = {
     A: { type: "pie", title: "Faturamento" },
     B: { type: "bar", title: "Pedidos" },
-    C: { type: "line", title: "Tempo de Conclusão" },
-    D: { type: "doughnut", title: "Prestador" },
+    C: { type: "doughnut", title: "Prestador" },
   }
-  const chartsToShow = ['C', 'D'];
-  
+  const chartsToShow = ['A', 'B', 'C'];
+
   // Verifica se a sessão está carregando
 
-  
   return (
     <div className="flex h-screen bg-gray-100 overflow-hidden">
       {/* Componente Sidebar que exibe o menu lateral */}
@@ -211,48 +247,51 @@ export default function Home() {
       <div className="flex-1 p-6 flex flex-col">
         {/* Filtros de seleção (meses, estados e ano) */}
         <div className="flex flex-wrap gap-4 mb-6 justify-center">
-          <MultiSelect
-            value={sortedMonths}
-            options={availableMonths}
-            onChange={(e) => setMonths(e.value)} // Atualiza o estado de meses
-            placeholder="Selecione os meses"
-            display="chip"
-          />
-          <MultiSelect
-            value={selectedStates}
-            options={availableStates}
-            onChange={(e) => setStates(e.value)} // Atualiza o estado de estados
-            placeholder="Selecione os estados"
-            display="chip"
-          />
+          {selectedChart != "C" && (
+            <>
+              <MultiSelect
+                value={sortedMonths}
+                options={availableMonths}
+                onChange={(e) => setMonths(e.value)} // Atualiza o estado de meses
+                placeholder="Selecione os meses"
+                display="chip"
+              />
+              <MultiSelect
+                value={selectedStates}
+                options={availableStates}
+                onChange={(e) => setStates(e.value)} // Atualiza o estado de estados
+                placeholder="Selecione os estados"
+                display="chip"
+              />
+            </>
+          )}
           <Dropdown
-            value={year}
+            value={selectedYear}
             options={years}
-            onChange={(e) => { checkoutMonthsSelected(e.value); setYear(e.value); }} // Atualiza o estado do year
-            placeholder={year}
+            onChange={(e) => { checkoutMonthsSelected(e.value); setSelectedYear(e.value); }} // Atualiza o estado do year
+            placeholder={selectedYear}
           />
         </div>
 
         {/* Exibe os botões para selecionar os gráficos */}
         <div className="flex flex-wrap gap-6 justify-center">
           {chartsToShow.map(key => {
-            return(
-            <div
-              key={key}
-              className="p-6 bg-white rounded-lg shadow-lg w-72 text-center cursor-pointer hover:shadow-xl"
-              onClick={() => setSelectedChart(key)}
-            >
-              <FaChartColumn className="text-4xl mb-2 text-blue-500" />
-              <div className="text-lg font-semibold">
-                {charts[key as keyof typeof charts].title}
+            return (
+              <div
+                key={key}
+                className="p-6 bg-white rounded-lg shadow-lg w-72 text-center cursor-pointer hover:shadow-xl"
+                onClick={() => setSelectedChart(key)}
+              >
+                <FaChartColumn className="text-4xl mb-2 text-blue-500" />
+                <div className="text-lg font-semibold">
+                  {charts[key as keyof typeof charts].title}
+                </div>
               </div>
-            </div> 
             )
           })}
         </div>
 
         {/* Exibe o gráfico selecionado */}
-        {selectedChart && (
           <div className="mt-8 flex flex-col items-center">
             <div className="bg-white rounded-lg shadow-lg p-6 flex flex-col items-center justify-center w-full max-w-4xl">
               <h2 className="text-xl font-semibold mb-4">
@@ -266,35 +305,7 @@ export default function Home() {
                 style={{ width: "100%", height: "300px" }}
               />
             </div>
-            {/* Botão para voltar e desmarcar o gráfico selecionado */}
-            <button
-              className="bg-blue-500 text-white py-2 px-20 rounded hover:bg-blue-600 mt-4"
-              onClick={() => setSelectedChart(null)} // Desmarca o gráfico
-            >
-              Voltar
-            </button>
           </div>
-        )}
-
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white rounded-lg shadow-lg p-6 flex flex-col items-center">
-            <h2 className="text-xl font-semibold mb-4">{charts.A.title}</h2>
-            <Chart
-              type={charts.A.type}
-              data={mockData.A}
-              options={chartOptions}
-            />
-          </div>
-          <div className="bg-white rounded-lg shadow-lg p-6 flex flex-col items-center">
-            <h2 className="text-xl font-semibold mb-4">{charts.B.title}</h2>
-            <Chart
-              type={charts.B.type}
-              data={mockData.B}
-              options={chartOptions}
-              style={{ width: "100%", maxWidth: "550px", height: "300px" }}
-            />
-          </div>
-        </div>
       </div>
     </div>
   );
