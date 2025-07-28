@@ -5,24 +5,26 @@ import Sidebar from '@/components/Sidebar';
 import { Chart } from 'primereact/chart';
 //import { redirect } from 'next/navigation';
 //import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { FaChartColumn } from "react-icons/fa6"; // Importa o ícone de gráfico de barras
-import { MultiSelect } from "primereact/multiselect"; // Importa o componente MultiSelect para seleções múltiplas
+import { FaBars, FaTimes } from "react-icons/fa"; // MUDANÇA: Mantido para ícones da v5
+import { FaChartColumn } from "react-icons/fa6"; // MUDANÇA: Ícone específico da v6
+import { MultiSelect } from "primereact/multiselect";
 import { getSession } from 'next-auth/react';
 import { Loading } from '@/components/Loading';
 import { Dropdown } from 'primereact/dropdown';
 
 export default function Home() {
   // const session = await getServerSession(authOptions);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Adicionado para o menu
   const [selectedChart, setSelectedChart] = useState<string | null>('A');
   const [selectedYear, setSelectedYear] = useState<any>();
   const [selectedMonths, setMonths] = useState([]);
   const [selectedStates, setStates] = useState([]);
   const [session, setSession] = useState<any>(null);
-  const [loading, setLoading] = useState(true); // Inicia como true
-  const [dataTime, setDataTime] = useState<any>(null); // Inicia como null
+  const [loading, setLoading] = useState(true);
+  const [dataTime, setDataTime] = useState<any>(null);
   const [providersData, setProvidersData] = useState<any>(null);
 
-  // Funções de busca de dados
+  // Funções de busca de dados (sem alterações)
   const fetchSession = async () => {
     try {
       const sessionData = await getSession();
@@ -49,8 +51,6 @@ export default function Home() {
         "Outubro": { "AC": { orders: 220, revenue: 440 }, "AL": { orders: 275, revenue: 550 }, "AP": { orders: 185, revenue: 370 }, "AM": { orders: 330, revenue: 660 }, "BA": { orders: 970, revenue: 1940 }, "CE": { orders: 890, revenue: 1780 }, "DF": { orders: 540, revenue: 1080 }, "ES": { orders: 640, revenue: 1280 }, "GO": { orders: 910, revenue: 1820 }, "MA": { orders: 420, revenue: 840 }, "MT": { orders: 440, revenue: 880 }, "MS": { orders: 435, revenue: 870 }, "MG": { orders: 1170, revenue: 2340 }, "PA": { orders: 480, revenue: 960 }, "PB": { orders: 320, revenue: 640 }, "PR": { orders: 1040, revenue: 2080 }, "PE": { orders: 850, revenue: 1700 }, "PI": { orders: 295, revenue: 590 }, "RJ": { orders: 1370, revenue: 2740 }, "RN": { orders: 280, revenue: 560 }, "RS": { orders: 1000, revenue: 2000 }, "RO": { orders: 225, revenue: 450 }, "RR": { orders: 165, revenue: 330 }, "SC": { orders: 970, revenue: 1940 }, "SP": { orders: 1580, revenue: 3160 }, "SE": { orders: 250, revenue: 500 }, "TO": { orders: 205, revenue: 410 } },
         "Novembro": { "AC": { orders: 230, revenue: 460 }, "AL": { orders: 280, revenue: 560 }, "AP": { orders: 190, revenue: 380 }, "AM": { orders: 340, revenue: 680 }, "BA": { orders: 990, revenue: 1980 }, "CE": { orders: 910, revenue: 1820 }, "DF": { orders: 550, revenue: 1100 }, "ES": { orders: 650, revenue: 1300 }, "GO": { orders: 930, revenue: 1860 }, "MA": { orders: 430, revenue: 860 }, "MT": { orders: 450, revenue: 900 }, "MS": { orders: 440, revenue: 880 }, "MG": { orders: 1200, revenue: 2400 }, "PA": { orders: 490, revenue: 980 }, "PB": { orders: 330, revenue: 660 }, "PR": { orders: 1060, revenue: 2120 }, "PE": { orders: 870, revenue: 1740 }, "PI": { orders: 300, revenue: 600 }, "RJ": { orders: 1400, revenue: 2800 }, "RN": { orders: 290, revenue: 580 }, "RS": { orders: 1020, revenue: 2040 }, "RO": { orders: 230, revenue: 460 }, "RR": { orders: 170, revenue: 340 }, "SC": { orders: 990, revenue: 1980 }, "SP": { orders: 1600, revenue: 3200 }, "SE": { orders: 260, revenue: 520 }, "TO": { orders: 210, revenue: 420 } },
         "Dezembro": { "AC": { orders: 240, revenue: 480 }, "AL": { orders: 290, revenue: 580 }, "AP": { orders: 200, revenue: 400 }, "AM": { orders: 350, revenue: 700 }, "BA": { orders: 1020, revenue: 2040 }, "CE": { orders: 930, revenue: 1860 }, "DF": { orders: 570, revenue: 1140 }, "ES": { orders: 670, revenue: 1340 }, "GO": { orders: 950, revenue: 1900 }, "MA": { orders: 440, revenue: 880 }, "MT": { orders: 460, revenue: 920 }, "MS": { orders: 450, revenue: 900 }, "MG": { orders: 1250, revenue: 2500 }, "PA": { orders: 500, revenue: 1000 }, "PB": { orders: 340, revenue: 680 }, "PR": { orders: 1100, revenue: 2200 }, "PE": { orders: 900, revenue: 1800 }, "PI": { orders: 310, revenue: 620 }, "RJ": { orders: 1450, revenue: 2900 }, "RN": { orders: 300, revenue: 600 }, "RS": { orders: 1050, revenue: 2100 }, "RO": { orders: 240, revenue: 480 }, "RR": { orders: 180, revenue: 360 }, "SC": { orders: 1020, revenue: 2040 }, "SP": { orders: 1650, revenue: 3300 }, "SE": { orders: 270, revenue: 540 }, "TO": { orders: 220, revenue: 440 } },
-
-
       },
       2024: {
         "Janeiro": { "AC": { orders: 400, revenue: 800 }, "AL": { orders: 500, revenue: 1000 }, "AP": { orders: 350, revenue: 700 }, "AM": { orders: 600, revenue: 1200 }, "BA": { orders: 1800, revenue: 3600 }, "CE": { orders: 1700, revenue: 3400 }, "DF": { orders: 1000, revenue: 2000 }, "ES": { orders: 1200, revenue: 2400 }, "GO": { orders: 1740, revenue: 3480 }, "MA": { orders: 800, revenue: 1600 }, "MT": { orders: 840, revenue: 1680 }, "MS": { orders: 820, revenue: 1640 }, "MG": { orders: 2200, revenue: 4400 }, "PA": { orders: 900, revenue: 1800 }, "PB": { orders: 600, revenue: 1200 }, "PR": { orders: 2000, revenue: 4000 }, "PE": { orders: 1600, revenue: 3200 }, "PI": { orders: 560, revenue: 1120 }, "RJ": { orders: 2600, revenue: 5200 }, "RN": { orders: 520, revenue: 1040 }, "RS": { orders: 1900, revenue: 3800 }, "RO": { orders: 420, revenue: 840 }, "RR": { orders: 300, revenue: 600 }, "SC": { orders: 1840, revenue: 3680 }, "SP": { orders: 3000, revenue: 6000 }, "SE": { orders: 460, revenue: 920 }, "TO": { orders: 380, revenue: 760 } },
@@ -68,7 +68,7 @@ export default function Home() {
       }
     };
     setDataTime(data);
-    setSelectedYear(Math.max(...Object.keys(data).map(Number))); // Define o ano padrão
+    setSelectedYear(Math.max(...Object.keys(data).map(Number)));
     const providers = { 2023: { "Gabriel Faria": 20, "Guilherme Kaneda": 17, "Giovani Rodrigues": 15 }, 2024: { "Guilherme Kaneda": 17, "Gabriel Faria": 20, "Giovani Rodrigues": 15, "Gabriel Alvim": 10 } }
     setProvidersData(providers)
   };
@@ -84,231 +84,171 @@ export default function Home() {
         setLoading(false);
       }
     };
-
     initializeApp();
   }, []);
 
-  if (loading) {
+  if (loading || !dataTime) {
     return <Loading />;
   }
 
   function checkoutMonthsSelected(year: any) {
     const avaliableMonthsInYear = Object.keys(dataTime[year])
-    selectedMonths.forEach((month) => {
+    selectedMonths.forEach((month: string) => {
       if (!avaliableMonthsInYear.includes(month)) {
-        // Remove os meses não disponíveis no ano selecionado
         setMonths((prevMonths) => prevMonths.filter((m) => m !== month));
       }
     });
   }
 
   function getOrdersValue() {
-    const arr: number[] = []
-    let months: string[] = []
-
-    // Determina qual coleção de meses usar
-    if (sortedMonths.length == 0) {
-      months = availableMonths
-    }
-    else {
-      months = sortedMonths
-    }
-
+    const arr: number[] = [];
+    let months: string[] = sortedMonths.length === 0 ? availableMonths : sortedMonths;
     months.forEach((month) => {
-      let result: number = 0
-      if (selectedStates.length == 0) {
-        availableStates.forEach((state) => {
-          result += dataTime[selectedYear][month][state]["orders"]
-        })
-      }
-      else {
-        selectedStates.forEach((state) => {
-          result += dataTime[selectedYear][month][state]["orders"]
-        })
-      }
-      arr.push(result)
-    })
-    return arr
+      let result: number = 0;
+      let statesToIterate = selectedStates.length === 0 ? availableStates : selectedStates;
+      statesToIterate.forEach((state: string) => {
+        result += dataTime[selectedYear]?.[month]?.[state]?.["orders"] || 0;
+      });
+      arr.push(result);
+    });
+    return arr;
   }
 
   function getRevenue() {
-    const arr: number[] = []
-    let states: string[] = []
-
-    // Determina qual coleção de meses usar
-    if (selectedStates.length == 0) {
-      states = availableStates
-    }
-    else {
-      states = selectedStates
-    }
-
+    const arr: number[] = [];
+    let states: string[] = selectedStates.length === 0 ? availableStates : selectedStates;
     states.forEach((state) => {
-      let result: number = 0
-      if (selectedMonths.length == 0) {
-        availableMonths.forEach((month) => {
-          result += dataTime[selectedYear][month][state]["revenue"]
-        })
-      }
-      else {
-        selectedMonths.forEach((month) => {
-          result += dataTime[selectedYear][month][state]["revenue"]
-        })
-      }
-      arr.push(result)
-    })
-    return arr
+      let result: number = 0;
+      let monthsToIterate = selectedMonths.length === 0 ? availableMonths : selectedMonths;
+      monthsToIterate.forEach((month: string) => {
+        result += dataTime[selectedYear]?.[month]?.[state]?.["revenue"] || 0;
+      });
+      arr.push(result);
+    });
+    return arr;
   }
 
-  function getProvidersData() {
-    providersData.forEach((provider: string) => {
-      provider
-    })
-  }
-  // CRIAR FUNÇÂO PARA SOMAR VALORES DOS MESES SELECIONADOS (todos os estados)
-  // REFATORAR PARA SORTEDMONTHS SER APENAS SELECTEDMONTHS
-  // CRIAR FUNÇÂO PARA SOMAR VALORES DOS ESTADOS SELECIONADOS (para os meses selecionados)  
-  const years = Object.keys(dataTime); // histórico de anos
-  const availableStates = ["AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO"]; // ISSO VEM DA API TBM (Quais UFs estão presentes)
-  const availableMonths = Object.keys(dataTime[selectedYear]); // meses disponiveis do ano selecionado
-  const sortMonths = { // ordenação dos meses apenas
-    'Janeiro': 1,
-    'Fevereiro': 2,
-    'Março': 3,
-    'Abril': 4,
-    'Maio': 5,
-    'Junho': 6,
-    'Julho': 7,
-    'Agosto': 8,
-    'Setembro': 9,
-    'Outubro': 10,
-    'Novembro': 11,
-    'Dezembro': 12
-  };
+  const years = Object.keys(dataTime);
+  const availableStates = ["AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO"];
+  const availableMonths = Object.keys(dataTime[selectedYear] || {});
+  const sortMonths: { [key: string]: number } = { 'Janeiro': 1, 'Fevereiro': 2, 'Março': 3, 'Abril': 4, 'Maio': 5, 'Junho': 6, 'Julho': 7, 'Agosto': 8, 'Setembro': 9, 'Outubro': 10, 'Novembro': 11, 'Dezembro': 12 };
+  const sortedMonths = [...selectedMonths].sort((a: string, b: string) => sortMonths[a] - sortMonths[b]);
+  const chartOptions = { responsive: true, maintainAspectRatio: false };
+  const colors = ["#FF6384", "#36A2EB", "#FFCE56", "#238080", "#0000CD", "#008080", "#32CD32", "#D2691E", "#7B68EE", "#DC143C"];
 
-  // Ordena os meses de acordo com a ordem definida
-  const sortedMonths = [...selectedMonths].sort((a, b) => sortMonths[a] - sortMonths[b]);
-
-  // Opções de configurações do gráfico
-  const chartOptions = { responsive: true, maintainAspectRatio: false, };
-
-  // cores para o dashboard
-  const colors = ["#FF6384", "#36A2EB", "#FFCE56", "#238080", "#0000CD", "#008080", "#32CD32", "#D2691E", "#7B68EE", "#DC143C"]
-  // Dados mockados para os gráficos
   const mockData = {
-    A: {
-      // Gráfico de pizza
-      labels: selectedStates.length == 0 ? availableStates : selectedStates,
-      datasets: [
-        {
-          data: getRevenue(),
-          backgroundColor: colors,
-        },
-      ],
-    },
-    B: {
-      // Gráfico de barras
-      labels: selectedMonths.length == 0 ? availableMonths : sortedMonths,
-      datasets: [
-        {
-          label: `Pedidos - ${selectedYear}`,
-          backgroundColor: "#36A2EB",
-          data: getOrdersValue(),
-
-        },
-      ],
-    },
-    C: {
-      // Gráfico de donut
-      labels: Object.keys(providersData[selectedYear]),
-      datasets: [
-        {
-          label: "Projetos Realizados",
-          data: Object.values(providersData[selectedYear]),
-          backgroundColor: colors,
-        },
-      ],
-    },
+    A: { labels: selectedStates.length === 0 ? availableStates : selectedStates, datasets: [{ data: getRevenue(), backgroundColor: colors }] },
+    B: { labels: selectedMonths.length === 0 ? availableMonths : sortedMonths, datasets: [{ label: `Pedidos - ${selectedYear}`, backgroundColor: "#36A2EB", data: getOrdersValue() }] },
+    C: { labels: Object.keys(providersData[selectedYear] || {}), datasets: [{ label: "Projetos Realizados", data: Object.values(providersData[selectedYear] || {}), backgroundColor: colors }] },
   };
 
-  // Tipos e títulos dos gráficos
-  const charts = {
-    A: { type: "pie", title: "Faturamento" },
-    B: { type: "bar", title: "Pedidos" },
-    C: { type: "doughnut", title: "Prestador" },
-  }
+  const charts: { [key: string]: { type: 'pie' | 'bar' | 'doughnut', title: string } } = { A: { type: "pie", title: "Faturamento" }, B: { type: "bar", title: "Pedidos" }, C: { type: "doughnut", title: "Prestador" } };
   const chartsToShow = ['A', 'B', 'C'];
 
-  // Verifica se a sessão está carregando
-
   return (
-    <div className="flex h-screen bg-gray-100 overflow-hidden">
-      {/* Componente Sidebar que exibe o menu lateral */}
-      <Sidebar title="Bem-vindo" username="Usuário" />
+    <div className="flex h-screen bg-gray-100">
+      {/* --- Lógica do Menu Responsivo --- */}
+      <button
+        aria-label="Abrir menu"
+        onClick={() => setIsSidebarOpen(true)}
+        className="lg:hidden fixed top-3 left-3 z-30 p-2 text-gray-600 bg-white/70 backdrop-blur-sm rounded-full shadow-md"
+      >
+        <FaBars size={20} />
+      </button>
 
-      <div className="flex-1 p-6 flex flex-col">
-        {/* Filtros de seleção (meses, estados e ano) */}
-        <div className="flex flex-wrap gap-4 mb-6 justify-center">
-          {selectedChart != "C" && (
+      {isSidebarOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/40 z-10"
+          onClick={() => setIsSidebarOpen(false)}
+          aria-hidden="true"
+        ></div>
+      )}
+
+      {/* --- Container da Sidebar --- */}
+      <div
+        className={`
+          bg-white shadow-lg
+          fixed top-0 left-0 h-full w-64 z-20 
+          transform transition-transform duration-300 ease-in-out
+          lg:static lg:translate-x-0 lg:shrink-0
+          ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
+        `}
+      >
+        <button
+          aria-label="Fechar menu"
+          onClick={() => setIsSidebarOpen(false)}
+          className="lg:hidden absolute top-3 right-3 p-2 text-gray-500 hover:text-gray-800"
+        >
+          <FaTimes size={20} />
+        </button>
+        <Sidebar title="Bem-vindo" username="Usuário" />
+      </div>
+
+      {/* --- Conteúdo Principal --- */}
+      <main className="w-full lg:w-auto flex-1 p-4 lg:p-6 flex flex-col overflow-y-auto">
+        <div className="flex flex-col md:flex-row flex-wrap items-center gap-4 mb-6 justify-center">
+          {selectedChart !== "C" && (
             <>
               <MultiSelect
                 value={sortedMonths}
                 options={availableMonths}
                 onChange={(e) => setMonths(e.value)}
                 placeholder="Selecione os meses"
-                className="w-72"
+                className="w-full md:w-72"
               />
               <MultiSelect
                 value={selectedStates}
                 options={availableStates}
-                onChange={(e) => setStates(e.value)} // Atualiza o estado de estados
+                onChange={(e) => setStates(e.value)}
                 placeholder="Selecione os estados"
-                className='w-72'
+                className='w-full md:w-72'
               />
             </>
           )}
           <Dropdown
             value={selectedYear}
             options={years}
-            onChange={(e) => { checkoutMonthsSelected(e.value); setSelectedYear(e.value); }} // Atualiza o estado do year
-            placeholder={selectedYear}
+            onChange={(e) => { checkoutMonthsSelected(e.value); setSelectedYear(e.value); }}
+            placeholder={selectedYear?.toString()}
+            className="w-full md:w-auto"
           />
         </div>
 
-        {/* Exibe os botões para selecionar os gráficos */}
-        <div className="flex flex-wrap gap-6 justify-center">
-          {chartsToShow.map(key => {
-            return (
-              <div
-                key={key}
-                className="p-6 bg-white rounded-lg shadow-lg w-72 text-center cursor-pointer hover:shadow-xl"
-                onClick={() => setSelectedChart(key)}
-              >
-                <FaChartColumn className="text-4xl mb-2 text-blue-500" />
-                <div className="text-lg font-semibold">
-                  {charts[key as keyof typeof charts].title}
-                </div>
+        <div className="flex flex-col md:flex-row flex-wrap gap-6 justify-center items-center">
+          {chartsToShow.map(key => (
+            <div
+              key={key}
+              className="p-6 bg-white rounded-lg shadow-lg w-full md:w-72 text-center cursor-pointer hover:shadow-xl"
+              onClick={() => setSelectedChart(key)}
+            >
+              <FaChartColumn className="text-4xl mx-auto mb-2 text-blue-500" />
+              <div className="text-lg font-semibold">
+                {charts[key]?.title}
               </div>
-            )
-          })}
+            </div>
+          ))}
         </div>
-
-        {/* Exibe o gráfico selecionado */}
+        
         <div className="mt-8 flex flex-col items-center">
-          <div className="bg-white rounded-lg shadow-lg p-6 flex flex-col items-center justify-center w-full max-w-4xl">
-            <h2 className="text-xl font-semibold mb-4">
-              {charts[selectedChart as keyof typeof charts].title}
-            </h2>
-            {/* Exibe o gráfico de acordo com o type e dados selecionados */}
-            <Chart
-              type={charts[selectedChart as keyof typeof charts].type}
-              data={mockData[selectedChart as keyof typeof charts]}
-              options={chartOptions}
-              style={{ width: "100%", height: "300px" }}
-            />
+          <div className="bg-white rounded-lg shadow-lg p-4 md:p-6 flex flex-col items-center justify-center w-full max-w-4xl">
+            {selectedChart && charts[selectedChart] && (
+              <>
+                <h2 className="text-xl font-semibold mb-4 text-center">
+                  {charts[selectedChart].title}
+                </h2>
+                <div className="relative w-full h-[300px] md:h-[400px]">
+                  <Chart
+                    type={charts[selectedChart].type}
+                    data={mockData[selectedChart as keyof typeof mockData]}
+                    options={chartOptions}
+                    className="w-full h-full"
+                  />
+                </div>
+              </>
+            )}
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

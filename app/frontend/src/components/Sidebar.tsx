@@ -15,12 +15,11 @@ interface SidebarProps {
 
 export default function Sidebar({ username }: SidebarProps) {
   const router = useRouter();
-  const [isMobile, setIsMobile] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [session, setSession] = useState<any>(null);
 
-  // Busca a sessão do usuário
+  // Busca a sessão do usuário
   const fetchSession = async () => {
     try {
       const sessionData = await getSession();
@@ -96,23 +95,14 @@ export default function Sidebar({ username }: SidebarProps) {
   const handleLogout = () => {
     signOut();
   };
-
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
+  
   if (loading) {
     fetchSession();
   }
 
   return (
     <div
-      className={`flex ${
-        isMobile ? "w-20" : "w-64"
-      } h-full bg-gradient-to-b from-blue-900 to-blue-600 shadow-xl transition-all duration-300`}
+      className="flex w-64 h-full bg-gradient-to-b from-blue-900 to-blue-600 shadow-xl transition-all duration-300"
     >
       {/* Sidebar */}
       <div className="flex flex-col items-center p-4 space-y-6 w-full">
@@ -128,11 +118,9 @@ export default function Sidebar({ username }: SidebarProps) {
                 className="rounded-full"
               />
             </div>
-            {!isMobile && (
-              <span className="text-white text-sm font-semibold">
-                Bem-vindo, {userName || "Usuário"}
-              </span>
-            )}
+            <span className="text-white text-sm font-semibold">
+              Bem-vindo, {userName || "Usuário"}
+            </span>
           </div>
         )}
 
@@ -145,9 +133,7 @@ export default function Sidebar({ username }: SidebarProps) {
               className="flex items-center w-full p-3 space-x-3 hover:bg-blue-500/30 text-white hover:text-blue-200 rounded-md transition-all duration-200"
             >
               <i className={`${item.icon} text-lg`}></i>
-              {!isMobile && (
-                <span className="text-md font-medium">{item.label}</span>
-              )}
+              <span className="text-md font-medium">{item.label}</span>
             </button>
           ))}
         </nav>
@@ -158,7 +144,7 @@ export default function Sidebar({ username }: SidebarProps) {
           className="flex items-center w-full p-3 space-x-3 bg-blue-300/80 hover:bg-blue-500 text-white rounded-md transition-all duration-200"
         >
           <i className="pi pi-sign-out text-lg"></i>
-          {!isMobile && <span className="text-md font-medium">Sair</span>}
+          <span className="text-md font-medium">Sair</span>
         </button>
       </div>
     </div>
