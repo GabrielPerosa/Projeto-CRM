@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Sidebar from "@/components/Sidebar";
 import StatesForm from "@/components/form/StatesForm";
 import { Button } from "primereact/button";
+import Layout from "@/components/Layout";
 
 interface Estado {
   id: number;
@@ -176,17 +177,12 @@ export default function Settings() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100 relative">
+    <Layout screenTitle="Configurações">
       {saveSuccess && (
         <div className="fixed top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded shadow-md z-50">
           Configurações salvas com sucesso!
         </div>
       )}
-
-      <div className="hidden md:block w-64 bg-gray-100 shadow-md">
-        <Sidebar title="Configurações" username="Usuário" />
-      </div>
-
       <div className="flex-1 overflow-auto p-6 custom-scrollbar">
         <form
           onSubmit={handleSubmit}
@@ -367,6 +363,6 @@ export default function Settings() {
           </div>
         </form>
       </div>
-    </div>
+    </Layout>
   );
 }

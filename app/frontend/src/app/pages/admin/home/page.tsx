@@ -244,7 +244,7 @@ export default function Home() {
   return (
     <div className="flex h-screen bg-gray-100 overflow-hidden">
       {/* Componente Sidebar que exibe o menu lateral */}
-      <Sidebar title="Bem-vindo" username="Usuário" />
+      <Sidebar/>
 
       <div className="flex-1 p-6 flex flex-col">
         {/* Filtros de seleção (meses, estados e ano) */}

@@ -4,6 +4,8 @@ import React, { useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
 import '@/style/styles.css';
 import ClientTable from '@/components/ClientTable';
+import Layout from '@/components/Layout';
+import { title } from 'process';
 
 export default function Proposal() {
   useEffect(() => {
@@ -11,10 +13,7 @@ export default function Proposal() {
   }, []);
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      <div className="w-64 bg-gray-100 shadow-md">
-        <Sidebar title="Meus serviços" username="Usuário" />
-      </div>
+    <Layout screenTitle='Propostas'>
 
       {/* MAIN CONTENT */}
       <div className="flex-1 p-6">
@@ -22,6 +21,6 @@ export default function Proposal() {
           <ClientTable />
         </div>
       </div>
-    </div>
+    </Layout>
   );
 }

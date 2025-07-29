@@ -7,6 +7,7 @@ import { MultiSelect } from 'primereact/multiselect';
 import { getSession } from 'next-auth/react';
 import { Loading } from '@/components/Loading';
 import { Dropdown } from 'primereact/dropdown';
+import Layout from '@/components/Layout';
 
 export default function Home() {
   const [selectedYear, setSelectedYear] = useState<any>();
@@ -122,12 +123,7 @@ export default function Home() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-100">
-      {/* Sidebar fixa */}
-      <div className="w-64 bg-gray-100 shadow-md">
-        <Sidebar title="Olá Amigão" username="Usuário" />
-      </div>
-
+  <Layout screenTitle='Dashboard'>
       {/* Conteúdo principal */}
       <div className="flex-1 overflow-y-auto p-6 mt-20">
         {/* Filtros */}
@@ -165,6 +161,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-    </div>
+  </Layout>
   );
 }

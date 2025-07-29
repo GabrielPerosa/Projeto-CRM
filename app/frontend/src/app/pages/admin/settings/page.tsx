@@ -101,7 +101,7 @@ export default function Settings() {
       )}
 
       <div className="w-64 bg-gray-100 shadow-md">
-        <Sidebar title="Configurações" username="Usuário" />
+        <Sidebar/>
       </div>
 
       <div className="flex-1 p-4 mt-20">
