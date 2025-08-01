@@ -20,35 +20,36 @@ const authOptions: AuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const email = credentials?.email;
+        /*const email = credentials?.email;
         const password = credentials?.password;
 
         if (!email || !password) {
           throw new Error("Credenciais inválidas");
         }
-        /*try {
-          const user_token: any = await axios.post(`${process.env.BACKEND_URL}/login`, {
-            "Email": email,
-            "Password": password
+        try {
+          const user_token: any = await axios.post(`http://127.0.0.1:5555/login`, {
+            "email": email,
+            "senha": password
           });
           if (!user_token) {
             throw new Error("Não foi possível autenticar o usuário.");
           }
+          console.log(user_token)
           return {
             id: '10',  
             email: user_token.data.email,
-            name: user_token.data.name,
-            role: user_token.data.role,
+            name: "Gilberto",
+            role: user_token.data.tipo,
           };
         } catch (error) {
           console.error("Erro na autenticação:", error);
           throw new Error("Erro na autenticação");
-        }*/
-          return{
+        }
+         */ return{
           id: '10',  
           email: "josmar@gmail.com",
           name: "Josmar",
-          role: "provider",
+          role: "client",
           }
       },
     }),

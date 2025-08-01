@@ -8,6 +8,7 @@ import { getSession } from 'next-auth/react';
 import { Loading } from '@/components/Loading';
 import { Dropdown } from 'primereact/dropdown';
 import Layout from '@/components/Layout';
+import axios from "axios";
 
 export default function Home() {
   const [selectedYear, setSelectedYear] = useState<any>();
@@ -29,7 +30,9 @@ export default function Home() {
   };
 
   const fetchData = async () => {
-    const data = {
+    const data = await await axios.get(`http://localhost:5555/projetos?stats=true`, {
+    });
+   /* const data = {
       2023: {
         'Jan': { "done": 2, "revenue": 3000 },
         'Fev': { "done": 1, "revenue": 3000 },
@@ -57,9 +60,10 @@ export default function Home() {
         'Nov': { "done": 1, "revenue": 7100 },
         'Dez': { "done": 1, "revenue": 7400 }
       }
-    }
-    setProviderData(data)
-    setSelectedYear(Math.max(...Object.keys(data).map(Number)))
+    }*/
+    console.log(data)
+    setProviderData(data.data)
+    setSelectedYear(Math.max(...Object.keys(data.data).map(Number)))
   };
     useEffect(() => {
     const initializeApp = async () => {

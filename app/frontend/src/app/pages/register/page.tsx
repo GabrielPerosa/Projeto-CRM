@@ -107,19 +107,32 @@ export default function Register() {
       return;
     }
 
-    const userDto = {
-      name,
-      lastName,
-      email,
-      phone: formattedPhone,
-      password,
-      addedStates,
-      type: isClient ? "Cliente" : isProvider ? "Prestador" : null,
+    let userDto = {}
+
+    if (isClient){
+      userDto = {
+      "nome": name,
+      "sobrenome": lastName,
+      "email": email,
+      "telefone": formattedPhone,
+      "senha": password,
+      "tipo": "client"
     };
+    } else if (isProvider) {
+      userDto = {
+      "nome": name,
+      "sobrenome": lastName,
+      "email": email,
+      "telefone": formattedPhone,
+      "senha": password,
+      "estados": addedStates,
+      "tipo": "provider"
+      };
+    }
 
     try {
       const response = await axios.post(
-        "http://localhost/api/usuario",
+        "http://localhost:5555/user",
         userDto
       );
       setShowSuccessPopup(true);
@@ -147,7 +160,7 @@ export default function Register() {
       setWarningMessage("Este estado já foi adicionado!");
       return;
     }
-
+    console.log(addedStates)
     const newState = { state: selectedState, value: stateValue };
     setAddedStates([...addedStates, newState]);
     setSelectedState("");
