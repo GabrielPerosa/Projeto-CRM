@@ -102,27 +102,22 @@ const initialDataClient: ServiceClient[] = [
 ];
 export default function ServiceTable() {
   const router = useRouter();
-  // Modal de orçamento
   const [showBudget, setShowBudget] = useState<boolean>(false);
 
   const hasKeyWord = (keyWord: string) => {
-    if (typeof window === "undefined") return false; // Evita o erro no ambiente de servidor
+    if (typeof window === "undefined") return false;
     return window.location.pathname.includes(keyWord);
   };
 
-  const isProvider = hasKeyWord("provider"); // Retorna true se "provider" estiver na URL
-
-  // Inicializa o estado de forma condicional
+  const isProvider = hasKeyWord("provider");
   const [services, setServices] = useState(
     isProvider ? initialDataProvider : initialDataClient
   );
   const [search, setSearch] = useState("");
 
-  // Filtragem dinâmica com base no tipo de usuário
   const filteredServices = services.filter((service) =>
     isProvider
-      ? // Filtragem para prestadores
-        (service as ServiceProvider).name
+      ? (service as ServiceProvider).name
           .toLowerCase()
           .includes(search.toLowerCase()) ||
         (service as ServiceProvider).cityState
@@ -131,8 +126,7 @@ export default function ServiceTable() {
         (service as ServiceProvider).status
           .toLowerCase()
           .includes(search.toLowerCase())
-      : // Filtragem para clientes
-        (service as ServiceClient).provider
+      : (service as ServiceClient).provider
           .toLowerCase()
           .includes(search.toLowerCase()) ||
         (service as ServiceClient).cityState
@@ -142,6 +136,47 @@ export default function ServiceTable() {
           .toLowerCase()
           .includes(search.toLowerCase())
   );
+
+  // Componente reutilizável para o Status, para evitar repetição de código
+  const StatusDisplay = ({ status }: { status: string }) => {
+    switch (status) {
+      case "Finalizado":
+        return (
+          <div className="flex items-center">
+            <CheckCircleIcon className="h-5 w-5 text-green-500 mr-1" />
+            <span className="text-green-500 font-medium">{status}</span>
+          </div>
+        );
+      case "Em andamento":
+        return (
+          <div className="flex items-center">
+            <ArrowPathIcon className="h-5 w-5 text-blue-400 mr-1" />
+            <span className="text-blue-400 font-medium">{status}</span>
+          </div>
+        );
+      case "Aguardando prestador":
+        return (
+          <div className="flex items-center">
+            <ClockIcon className="h-5 w-5 text-yellow-500 mr-1" />
+            <span className="text-yellow-500 font-medium">{status}</span>
+          </div>
+        );
+      case "Em aprovação":
+        return (
+          <div className="flex items-center">
+            <DocumentCheckIcon className="h-5 w-5 text-purple-500 mr-1" />
+            <span className="text-purple-500 font-medium">{status}</span>
+          </div>
+        );
+      default:
+        return (
+          <div className="flex items-center">
+            <QuestionMarkCircleIcon className="h-5 w-5 text-gray-400 mr-1" />
+            <span className="text-gray-400 font-medium">Desconhecido</span>
+          </div>
+        );
+    }
+  };
 
   return (
     <div className="p-4">
@@ -154,7 +189,8 @@ export default function ServiceTable() {
         onChange={(e) => setSearch(e.target.value)}
       />
 
-      <table className="min-w-full bg-white border border-gray-200 shadow-md rounded">
+      {/* Tabela para DESKTOP (md e acima) */}
+      <table className="min-w-full bg-white border border-gray-200 shadow-md rounded hidden md:table">
         <thead className="bg-gray-100">
           <tr>
             {isProvider ? (
@@ -163,7 +199,7 @@ export default function ServiceTable() {
                 <th className="p-3 text-left">Cidade-Estado</th>
                 <th className="p-3 text-left">Placas</th>
                 <th className="p-3 text-left">Data de Início</th>
-                <th className="p-3 text-left">Duração de Dias</th>
+                <th className="p-3 text-left">Duração</th>
                 <th className="p-3 text-left">Data de entrega</th>
                 <th className="p-3 text-left">Recebível (R$)</th>
                 <th className="p-3 text-left">Status</th>
@@ -174,7 +210,7 @@ export default function ServiceTable() {
                 <th className="p-3 text-left">Cidade-Estado</th>
                 <th className="p-3 text-left">Placas</th>
                 <th className="p-3 text-left">Data de Início</th>
-                <th className="p-3 text-left">Duração de Dias</th>
+                <th className="p-3 text-left">Duração</th>
                 <th className="p-3 text-left">Data de entrega</th>
                 <th className="p-3 text-left">Orçamento (R$)</th>
                 <th className="p-3 text-left">Status</th>
@@ -191,7 +227,7 @@ export default function ServiceTable() {
                   <td className="p-3">{service.cityState}</td>
                   <td className="p-3">{service.quantity}</td>
                   <td className="p-3">{service.startDate}</td>
-                  <td className="p-3">{service.duration}</td>
+                  <td className="p-3">{service.duration} dias</td>
                   <td className="p-3">{service.deadline}</td>
                   <td className="p-3">
                     <NumericFormat
@@ -203,21 +239,7 @@ export default function ServiceTable() {
                     />
                   </td>
                   <td className="p-3">
-                    {service.status === "Finalizado" ? (
-                      <div className="flex">
-                        <CheckCircleIcon className="h-5 w-5 text-green-500 mr-1" />
-                        <span className="text-green-500 font-medium">
-                          {service.status}
-                        </span>
-                      </div>
-                    ) : (
-                      <div className="flex">
-                        <ArrowPathIcon className="h-5 w-5 text-blue-400 mr-1" />
-                        <span className="text-blue-400 font-medium">
-                          {service.status}
-                        </span>
-                      </div>
-                    )}
+                    <StatusDisplay status={service.status} />
                   </td>
                 </>
               ) : (
@@ -226,7 +248,7 @@ export default function ServiceTable() {
                   <td className="p-3">{service.cityState}</td>
                   <td className="p-3">{service.quantity}</td>
                   <td className="p-3">{service.startDate}</td>
-                  <td className="p-3">{service.duration}</td>
+                  <td className="p-3">{service.duration} dias</td>
                   <td className="p-3">{service.deadline}</td>
                   <td className="p-3">
                     <NumericFormat
@@ -238,57 +260,7 @@ export default function ServiceTable() {
                     />
                   </td>
                   <td className="p-3">
-                    <>
-                      {(() => {
-                        switch (service.status) {
-                          case "Finalizado":
-                            return (
-                              <div className="flex">
-                                <CheckCircleIcon className="h-5 w-5 text-green-500 mr-1" />
-                                <span className="text-green-500 font-medium">
-                                  {service.status}
-                                </span>
-                              </div>
-                            );
-                          case "Em andamento":
-                            return (
-                              <div className="flex">
-                                <ArrowPathIcon className="h-5 w-5 text-blue-400 mr-1" />
-                                <span className="text-blue-400 font-medium">
-                                  {service.status}
-                                </span>
-                              </div>
-                            );
-                          case "Aguardando prestador":
-                            return (
-                              <div className="flex">
-                                <ClockIcon className="h-5 w-5 text-yellow-500 mr-1" />
-                                <span className="text-yellow-500 font-medium">
-                                  {service.status}
-                                </span>
-                              </div>
-                            );
-                          case "Em aprovação":
-                            return (
-                              <div className="flex">
-                                <DocumentCheckIcon className="h-5 w-5 text-purple-500 mr-1" />
-                                <span className="text-purple-500 font-medium">
-                                  {service.status}
-                                </span>
-                              </div>
-                            );
-                          default:
-                            return (
-                              <div>
-                                <QuestionMarkCircleIcon className="h-5 w-5 text-gray-400" />
-                                <span className="text-gray-400 font-medium">
-                                  Desconhecido
-                                </span>
-                              </div>
-                            );
-                        }
-                      })()}
-                    </>
+                    <StatusDisplay status={service.status} />
                   </td>
                 </>
               )}
@@ -297,22 +269,76 @@ export default function ServiceTable() {
         </tbody>
       </table>
 
-      {/* Novo serviço */}
-      {!isProvider ? (
-        <div className="flex justify-end mt-3 mr-2">
-          <div>
-            <button
-              onClick={() => setShowBudget(true)}
-              className="bg-blue-500 text-white p-2 rounded"
-            >
-              Novo serviço
-            </button>
-
-            {showBudget && <Budget setShowModal={setShowBudget} />}
+      {/* Layout de Cards para MOBILE (abaixo de md) */}
+      <div className="md:hidden space-y-4">
+        {filteredServices.map((service) => (
+          <div key={service.id} className="bg-white p-4 rounded-lg shadow-md border border-gray-200">
+            {isProvider ? (
+              // Card para a visão do Prestador
+              <div className="space-y-2">
+                <div>
+                  <span className="font-bold text-gray-600">Cliente: </span>
+                  {(service as ServiceProvider).name}
+                </div>
+                <div>
+                  <span className="font-bold text-gray-600">Cidade-Estado: </span>
+                  {service.cityState}
+                </div>
+                 <div>
+                  <span className="font-bold text-gray-600">Recebível: </span>
+                  <NumericFormat
+                    value={(service as ServiceProvider).cost}
+                    displayType="text"
+                    thousandSeparator="."
+                    decimalSeparator=","
+                    prefix="R$ "
+                  />
+                </div>
+                <div className="pt-2">
+                  <StatusDisplay status={service.status} />
+                </div>
+              </div>
+            ) : (
+              // Card para a visão do Cliente
+              <div className="space-y-2">
+                 <div>
+                  <span className="font-bold text-gray-600">Prestador: </span>
+                  {(service as ServiceClient).provider}
+                </div>
+                <div>
+                  <span className="font-bold text-gray-600">Cidade-Estado: </span>
+                  {service.cityState}
+                </div>
+                <div>
+                  <span className="font-bold text-gray-600">Orçamento: </span>
+                  <NumericFormat
+                    value={(service as ServiceClient).budget}
+                    displayType="text"
+                    thousandSeparator="."
+                    decimalSeparator=","
+                    prefix="R$ "
+                  />
+                </div>
+                 <div className="pt-2">
+                  <StatusDisplay status={service.status} />
+                </div>
+              </div>
+            )}
           </div>
+        ))}
+      </div>
+
+
+      {!isProvider && (
+        <div className="flex justify-end mt-4">
+          <button
+            onClick={() => setShowBudget(true)}
+            className="bg-blue-500 text-white py-2 px-4 rounded-lg shadow hover:bg-blue-600 transition-colors"
+          >
+            Novo serviço
+          </button>
+          {showBudget && <Budget setShowModal={setShowBudget} />}
         </div>
-      ) : (
-        <></>
       )}
     </div>
   );

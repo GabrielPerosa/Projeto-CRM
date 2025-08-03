@@ -130,7 +130,7 @@ export default function ClientTable() {
         </div>
       )}
 
-      <table className="min-w-full bg-white border border-gray-200 shadow-md rounded">
+      <table className="min-w-full bg-white border border-gray-200 shadow-md rounded ">
         <thead className="bg-gray-100">
           <tr>
             <th className="p-3 text-left">Cliente</th>
