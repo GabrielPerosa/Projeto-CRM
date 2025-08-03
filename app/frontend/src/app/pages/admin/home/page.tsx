@@ -1,7 +1,7 @@
 'use client'
 //import { getServerSession } from 'next-auth';
 import React, { useState, useEffect } from 'react';
-import Sidebar from '@/components/Sidebar';
+import Layout from '@/components/Layout';
 import { Chart } from 'primereact/chart';
 //import { redirect } from 'next/navigation';
 //import { authOptions } from '@/app/api/auth/[...nextauth]/route';
@@ -146,46 +146,10 @@ export default function Home() {
   const chartsToShow = ['A', 'B', 'C'];
 
   return (
+    <Layout screenTitle='Início'>
     <div className="flex h-screen bg-gray-100">
-      {/* --- Lógica do Menu Responsivo --- */}
-      <button
-        aria-label="Abrir menu"
-        onClick={() => setIsSidebarOpen(true)}
-        className="lg:hidden fixed top-3 left-3 z-30 p-2 text-gray-600 bg-white/70 backdrop-blur-sm rounded-full shadow-md"
-      >
-        <FaBars size={20} />
-      </button>
-
-      {isSidebarOpen && (
-        <div
-          className="lg:hidden fixed inset-0 bg-black/40 z-10"
-          onClick={() => setIsSidebarOpen(false)}
-          aria-hidden="true"
-        ></div>
-      )}
-
-      {/* --- Container da Sidebar --- */}
-      <div
-        className={`
-          bg-white shadow-lg
-          fixed top-0 left-0 h-full w-64 z-20 
-          transform transition-transform duration-300 ease-in-out
-          lg:static lg:translate-x-0 lg:shrink-0
-          ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
-        `}
-      >
-        <button
-          aria-label="Fechar menu"
-          onClick={() => setIsSidebarOpen(false)}
-          className="lg:hidden absolute top-3 right-3 p-2 text-gray-500 hover:text-gray-800"
-        >
-          <FaTimes size={20} />
-        </button>
-        <Sidebar title="Bem-vindo" username="Usuário" />
-      </div>
-
       {/* --- Conteúdo Principal --- */}
-      <main className="w-full lg:w-auto flex-1 p-4 lg:p-6 flex flex-col overflow-y-auto">
+      <main className="w-full lg:w-auto flex-1 p-4 lg:p-6 flex flex-col ">
         <div className="flex flex-col md:flex-row flex-wrap items-center gap-4 mb-6 justify-center">
           {selectedChart !== "C" && (
             <>
@@ -250,5 +214,6 @@ export default function Home() {
         </div>
       </main>
     </div>
+    </Layout>
   );
 }

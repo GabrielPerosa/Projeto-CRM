@@ -54,13 +54,13 @@ const prestadoresMock: Prestador[] = [
 ];
 
 const clientesMock: Cliente[] = [
-    { id: 1, cliente: "Carlos Silva", prestador: "", estado: "SP", data: "", valor: "R$ 5.000", status: "Aprovação de Crédito", dataInicio: null, dataEntrega: null, email: "carlos@email.com", telefone: "(11) 99999-9999", cep: "18072-000", numeroComplemento: "20", cidade: "Guarulhos", rua: "Alameda Amélia" },
-    { id: 2, cliente: "Ana Souza", prestador: "", estado: "MG", data: "", valor: "R$ 10.000", status: "Aguardando Orçamento", dataInicio: null, dataEntrega: null, email: "ana@email.com", telefone: "(31) 98888-8888", cep: "18050-001", numeroComplemento: "20", cidade: "Abaeté", rua: "Antônio Jacinto Lasma" },
-    { id: 3, cliente: "João Pereira", prestador: "", estado: "BA", data: "", valor: "R$ 7.000", status: "Em Andamento", dataInicio: null, dataEntrega: null, email: "joao@email.com", telefone: "(71) 97777-7777", cep: "18040-020", numeroComplemento: "20", cidade: "Candeias", rua: "Loteamento Cruz" },
-    { id: 4, cliente: "Maria Oliveira", prestador: "", estado: "AL", data: "", valor: "R$ 15.000", status: "Concluído", dataInicio: null, dataEntrega: null, email: "maria@email.com", telefone: "(82) 96666-6666", cep: "18051-030", numeroComplemento: "20", cidade: "Anadia", rua: "Doutor Fernandes Lima" },
-    { id: 5, cliente: "Pedro Costa", prestador: "", estado: "RJ", data: "", valor: "R$ 12.000", status: "Aguardando Orçamento", dataInicio: null, dataEntrega: null, email: "pedro@email.com", telefone: "(21) 95555-5555", cep: "20000-000", numeroComplemento: "100", cidade: "Rio de Janeiro", rua: "Avenida Principal" },
-    { id: 6, cliente: "Juliana Santos", prestador: "", estado: "RS", data: "", valor: "R$ 8.500", status: "Em Andamento", dataInicio: null, dataEntrega: null, email: "juliana@email.com", telefone: "(51) 94444-4444", cep: "90000-000", numeroComplemento: "50B", cidade: "Porto Alegre", rua: "Rua dos Gaúchos" },
-    { id: 7, cliente: "Lucas Martins", prestador: "", estado: "PE", data: "", valor: "R$ 20.000", status: "Concluído", dataInicio: null, dataEntrega: null, email: "lucas@email.com", telefone: "(81) 93333-3333", cep: "50000-000", numeroComplemento: "Ap 301", cidade: "Recife", rua: "Rua da Praia" },
+  { id: 1, cliente: "Carlos Silva", prestador: "", estado: "SP", data: "", valor: "R$ 5.000", status: "Aprovação de Crédito", dataInicio: null, dataEntrega: null, email: "carlos@email.com", telefone: "(11) 99999-9999", cep: "18072-000", numeroComplemento: "20", cidade: "Guarulhos", rua: "Alameda Amélia" },
+  { id: 2, cliente: "Ana Souza", prestador: "", estado: "MG", data: "", valor: "R$ 10.000", status: "Aguardando Orçamento", dataInicio: null, dataEntrega: null, email: "ana@email.com", telefone: "(31) 98888-8888", cep: "18050-001", numeroComplemento: "20", cidade: "Abaeté", rua: "Antônio Jacinto Lasma" },
+  { id: 3, cliente: "João Pereira", prestador: "", estado: "BA", data: "", valor: "R$ 7.000", status: "Em Andamento", dataInicio: null, dataEntrega: null, email: "joao@email.com", telefone: "(71) 97777-7777", cep: "18040-020", numeroComplemento: "20", cidade: "Candeias", rua: "Loteamento Cruz" },
+  { id: 4, cliente: "Maria Oliveira", prestador: "", estado: "AL", data: "", valor: "R$ 15.000", status: "Concluído", dataInicio: null, dataEntrega: null, email: "maria@email.com", telefone: "(82) 96666-6666", cep: "18051-030", numeroComplemento: "20", cidade: "Anadia", rua: "Doutor Fernandes Lima" },
+  { id: 5, cliente: "Pedro Costa", prestador: "", estado: "RJ", data: "", valor: "R$ 12.000", status: "Aguardando Orçamento", dataInicio: null, dataEntrega: null, email: "pedro@email.com", telefone: "(21) 95555-5555", cep: "20000-000", numeroComplemento: "100", cidade: "Rio de Janeiro", rua: "Avenida Principal" },
+  { id: 6, cliente: "Juliana Santos", prestador: "", estado: "RS", data: "", valor: "R$ 8.500", status: "Em Andamento", dataInicio: null, dataEntrega: null, email: "juliana@email.com", telefone: "(51) 94444-4444", cep: "90000-000", numeroComplemento: "50B", cidade: "Porto Alegre", rua: "Rua dos Gaúchos" },
+  { id: 7, cliente: "Lucas Martins", prestador: "", estado: "PE", data: "", valor: "R$ 20.000", status: "Concluído", dataInicio: null, dataEntrega: null, email: "lucas@email.com", telefone: "(81) 93333-3333", cep: "50000-000", numeroComplemento: "Ap 301", cidade: "Recife", rua: "Rua da Praia" },
 ];
 
 export default function Filter() {
@@ -202,9 +202,7 @@ export default function Filter() {
           Configurações salvas com sucesso!
         </div>
       )}
-      
-      {/* MUDANÇA: 'responsiveLayout' e 'breakpoint' foram removidos.
-          'scrollable' e 'scrollDirection' foram adicionados para a rolagem horizontal. */}
+
       <DataTable
         value={clientes}
         paginator
@@ -221,7 +219,7 @@ export default function Filter() {
           filter
           showFilterMatchModes={false}
           showClearButton
-          style={{ minWidth: '200px' }} // Adicionado para garantir largura mínima
+          style={{ minWidth: '200px' }}
           filterElement={(options) => (
             <div style={{ position: "relative" }}>
               <FaUser style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "#6c757d" }} />
@@ -234,21 +232,21 @@ export default function Filter() {
         />
         <Column field="prestador" header="Prestador" style={{ minWidth: '150px' }} body={(row: Cliente) => (<Button label={row.prestador || "Selecionar"} onClick={() => abrirPopupPrestador(row)} className="p-button-outlined p-button-sm" />)} />
         <Column field="estado" header="Estado" filter showFilterMatchModes={false} showClearButton style={{ minWidth: '150px' }} filterElement={(options) => (
-            <div style={{ position: "relative" }}>
-              <FaMapMarkerAlt style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "#6c757d" }} />
-              <InputText value={options.value || ""} onChange={(e) => options.filterCallback(e.target.value)} placeholder="Digite o estado" className="w-full" style={{ paddingLeft: "2.5rem" }} />
-            </div>
-          )}
+          <div style={{ position: "relative" }}>
+            <FaMapMarkerAlt style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "#6c757d" }} />
+            <InputText value={options.value || ""} onChange={(e) => options.filterCallback(e.target.value)} placeholder="Digite o estado" className="w-full" style={{ paddingLeft: "2.5rem" }} />
+          </div>
+        )}
         />
         <Column field="dataInicio" header="Data de Início" style={{ minWidth: '200px' }} body={(row) => (<Calendar value={row.dataInicio ? new Date(row.dataInicio) : null} onChange={(e) => { const novos = clientes.map((c) => c.id === row.id ? { ...c, dataInicio: e.value ? e.value.toISOString() : null } : c); setClientes(novos); }} dateFormat="dd/mm/yy" placeholder="Selecionar data" />)} />
         <Column field="dataEntrega" header="Data de Entrega" style={{ minWidth: '200px' }} body={(row) => (<Calendar value={row.dataEntrega ? new Date(row.dataEntrega) : null} onChange={(e) => { const novos = clientes.map((c) => c.id === row.id ? { ...c, dataEntrega: e.value ? e.value.toISOString() : null } : c); setClientes(novos); }} dateFormat="dd/mm/yy" placeholder="Selecionar data" />)} />
         <Column field="valor" header="Valor (R$)" style={{ minWidth: '150px' }} body={valorTemplate} />
         <Column field="status" header="Status" body={statusTemplate} filter showFilterMatchModes={false} showClearButton style={{ minWidth: '200px' }} filterElement={(options) => (
-            <div style={{ position: "relative" }}>
-              <FaClockRotateLeft style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "#6c757d" }} />
-              <InputText value={options.value || ""} onChange={(e) => options.filterCallback(e.target.value)} placeholder="Digite o status" className="w-full" style={{ paddingLeft: "2.5rem" }} />
-            </div>
-          )}
+          <div style={{ position: "relative" }}>
+            <FaClockRotateLeft style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "#6c757d" }} />
+            <InputText value={options.value || ""} onChange={(e) => options.filterCallback(e.target.value)} placeholder="Digite o status" className="w-full" style={{ paddingLeft: "2.5rem" }} />
+          </div>
+        )}
         />
       </DataTable>
 
@@ -259,15 +257,45 @@ export default function Filter() {
         className="w-[95vw] md:w-[70vw] lg:w-[50vw]"
         maximizable
       >
+
         {dialogType === "prestador" ? (
-          <DataTable value={prestadoresMock} responsiveLayout="stack" breakpoint="768px">
-            <Column field="nome" header="Nome" />
-            <Column field="duracao" header="Duração (dias)" />
-            <Column field="dataDisponivel" header="Data Disponível" />
-            <Column field="valor" header="Valor Cobrado" />
-            <Column header="Ação" body={(row: Prestador) => (<Button label="Selecionar" onClick={() => selecionarPrestador(row)} className="p-button-sm" />)} />
-          </DataTable>
+          <div className="p-1 md:p-2 space-y-4 bg-gray-50 rounded-lg">
+            {prestadoresMock.map((prestador) => (
+              <div key={prestador.nome} className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
+                {/* Cabeçalho do Card */}
+                <div className="bg-gray-100 p-4">
+                  <h3 className="font-bold text-lg text-gray-800">{prestador.nome}</h3>
+                </div>
+
+                {/* Corpo do Card com os detalhes */}
+                <div className="p-4 space-y-3">
+                  <div className="flex justify-between items-center border-b border-gray-200 pb-3">
+                    <span className="text-sm text-gray-600">Duração (dias)</span>
+                    <span className="text-sm font-medium text-gray-900">{prestador.duracao}</span>
+                  </div>
+                  <div className="flex justify-between items-center border-b border-gray-200 pb-3">
+                    <span className="text-sm text-gray-600">Data Disponível</span>
+                    <span className="text-sm font-medium text-gray-900">{prestador.dataDisponivel}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Valor Cobrado</span>
+                    <span className="text-sm font-bold text-blue-600">{prestador.valor}</span>
+                  </div>
+                </div>
+
+                {/* Rodapé do Card com o botão de ação */}
+                <div className="bg-gray-50 p-3 text-right">
+                  <Button
+                    label="Selecionar"
+                    onClick={() => selecionarPrestador(prestador)}
+                    className="p-button-sm p-button-info"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
         ) : (
+
           selectedRow && (
             <div className="relative pb-20 overflow-x-auto">
               <table className="min-w-full text-left text-sm border border-gray-200 rounded-lg">

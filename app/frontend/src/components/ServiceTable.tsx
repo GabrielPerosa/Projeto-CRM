@@ -137,7 +137,6 @@ export default function ServiceTable() {
           .includes(search.toLowerCase())
   );
 
-  // Componente reutilizável para o Status, para evitar repetição de código
   const StatusDisplay = ({ status }: { status: string }) => {
     switch (status) {
       case "Finalizado":
