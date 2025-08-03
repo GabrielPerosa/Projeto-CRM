@@ -1,12 +1,13 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Sidebar from '@/components/Sidebar';
+
 import { Chart } from 'primereact/chart';
 import { MultiSelect } from 'primereact/multiselect';
 import { getSession } from 'next-auth/react';
 import { Loading } from '@/components/Loading';
 import { Dropdown } from 'primereact/dropdown';
+import Layout from '@/components/Layout';
 
 export default function Home() {
   const [selectedYear, setSelectedYear] = useState<any>();
@@ -122,14 +123,10 @@ export default function Home() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-100">
-      {/* Sidebar fixa */}
-      <div className="w-64 bg-gray-100 shadow-md">
-        <Sidebar title="Olá Amigão" username="Usuário" />
-      </div>
-
+    <Layout screenTitle="Início">
+    <div className="flex h-screen bg-gray-100">
       {/* Conteúdo principal */}
-      <div className="flex-1 overflow-y-auto p-6 mt-20">
+      <div className="flex-1 p-6 mt-20">
         {/* Filtros */}
         <div className="bg-white p-4 mb-6 rounded-lg shadow flex flex-wrap gap-4">
           {/* Filtro de Ano */}
@@ -166,5 +163,6 @@ export default function Home() {
         </div>
       </div>
     </div>
+    </Layout>
   );
 }

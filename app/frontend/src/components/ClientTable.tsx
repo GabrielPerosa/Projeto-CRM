@@ -1,6 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
-import { CheckCircleIcon, ExclamationCircleIcon } from "@heroicons/react/24/solid";
+import {
+  CheckCircleIcon,
+  ExclamationCircleIcon,
+} from "@heroicons/react/24/solid";
 import { Calendar } from "primereact/calendar";
 import { NumericFormat } from "react-number-format";
 
@@ -21,36 +24,7 @@ type StoredClient = Omit<Client, "startDate" | "deliveryDate"> & {
 };
 
 const initialData: Client[] = [
-  {
-    id: 1,
-    name: "João Silva",
-    cityState: "São Paulo-SP",
-    quantity: 10,
-    startDate: null,
-    deliveryDate: null,
-    value: null,
-    status: "Pendente",
-  },
-  {
-    id: 2,
-    name: "Maria Oliveira",
-    cityState: "Rio de Janeiro-RJ",
-    quantity: 20,
-    startDate: null,
-    deliveryDate: null,
-    value: null,
-    status: "Pendente",
-  },
-  {
-    id: 3,
-    name: "Carlos Souza",
-    cityState: "Belo Horizonte-MG",
-    quantity: 15,
-    startDate: null,
-    deliveryDate: null,
-    value: null,
-    status: "Pendente",
-  },
+  // ... (seus dados iniciais aqui) ...
 ];
 
 export default function ClientTable() {
@@ -100,7 +74,6 @@ export default function ClientTable() {
         return client;
       })
     );
-
     setShowPopup(true);
     setTimeout(() => setShowPopup(false), 3000);
   };
@@ -111,6 +84,15 @@ export default function ClientTable() {
       client.cityState.toLowerCase().includes(search.toLowerCase()) ||
       client.status.toLowerCase().includes(search.toLowerCase())
   );
+
+  const isButtonDisabled = (client: Client) => {
+    return (
+      client.status === "Enviado" ||
+      !client.startDate ||
+      !client.deliveryDate ||
+      client.value === null
+    );
+  };
 
   return (
     <div className="p-4">
@@ -125,115 +107,176 @@ export default function ClientTable() {
       />
 
       {showPopup && (
-        <div className="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-md">
+        <div className="fixed top-4 right-4 z-50 bg-green-500 text-white px-4 py-2 rounded shadow-lg">
           Proposta enviada com sucesso!
         </div>
       )}
 
-      <table className="min-w-full bg-white border border-gray-200 shadow-md rounded ">
-        <thead className="bg-gray-100">
-          <tr>
-            <th className="p-3 text-left">Cliente</th>
-            <th className="p-3 text-left">Cidade-Estado</th>
-            <th className="p-3 text-left">Placas</th>
-            <th className="p-3 text-left">Data de Início</th>
-            <th className="p-3 text-left">Data de Entrega</th>
-            <th className="p-3 text-left">Valor (R$)</th>
-            <th className="p-3 text-left">Status</th>
-            <th className="p-3 text-left">Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredClients.map((client) => (
-            <tr key={client.id} className="border-b">
-              <td className="p-3">{client.name}</td>
-              <td className="p-3">{client.cityState}</td>
-              <td className="p-3">{client.quantity}</td>
+      {/* Tabela para DESKTOP (md e acima) */}
+      <div className="overflow-x-auto">
+        <table className="min-w-full bg-white border border-gray-200 shadow-md rounded hidden md:table">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="p-3 text-left">Cliente</th>
+              <th className="p-3 text-left">Cidade-Estado</th>
+              <th className="p-3 text-left">Placas</th>
+              <th className="p-3 text-left">Data de Início</th>
+              <th className="p-3 text-left">Data de Entrega</th>
+              <th className="p-3 text-left">Valor (R$)</th>
+              <th className="p-3 text-left">Status</th>
+              <th className="p-3 text-left">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredClients.map((client) => (
+              <tr key={client.id} className="border-b">
+                <td className="p-3">{client.name}</td>
+                <td className="p-3">{client.cityState}</td>
+                <td className="p-3">{client.quantity}</td>
+                <td className="p-3">
+                  <Calendar
+                    value={client.startDate}
+                    onChange={(e) => handleUpdate(client.id, "startDate", e.value ?? null)}
+                    dateFormat="dd/mm/yy"
+                    placeholder="Selecionar"
+                    className="border border-gray-300 rounded p-1 w-full"
+                  />
+                </td>
+                <td className="p-3">
+                  <Calendar
+                    value={client.deliveryDate}
+                    onChange={(e) => handleUpdate(client.id, "deliveryDate", e.value ?? null)}
+                    dateFormat="dd/mm/yy"
+                    placeholder="Selecionar"
+                    className="border border-gray-300 rounded p-1 w-full"
+                  />
+                </td>
+                <td className="p-3">
+                  <NumericFormat
+                    value={client.value ?? ""}
+                    thousandSeparator="."
+                    decimalSeparator=","
+                    prefix="R$ "
+                    decimalScale={2}
+                    fixedDecimalScale
+                    className="border border-gray-300 rounded p-2 w-full"
+                    onValueChange={(values) => handleUpdate(client.id, "value", values.floatValue ?? null)}
+                  />
+                </td>
+                <td className="p-3">
+                  {client.status === "Enviado" ? (
+                    <div className="flex items-center">
+                      <CheckCircleIcon className="h-5 w-5 text-green-500 mr-1" />
+                      <span className="text-green-500 font-medium">Enviado</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center">
+                      <ExclamationCircleIcon className="h-5 w-5 text-orange-500 mr-1" />
+                      <span className="text-orange-500 font-medium">Pendente</span>
+                    </div>
+                  )}
+                </td>
+                <td className="p-3">
+                  <button
+                    type="button"
+                    className={`px-4 py-2 rounded text-white font-semibold transition-colors ${
+                      isButtonDisabled(client)
+                        ? "bg-gray-300 cursor-not-allowed"
+                        : "bg-blue-500 hover:bg-blue-600"
+                    }`}
+                    onClick={() => handleSendProposal(client.id)}
+                    disabled={isButtonDisabled(client)}
+                  >
+                    Enviar
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-              {/*  data de início */}
-              <td className="p-3">
+      {/* Layout de Cards para MOBILE (abaixo de md) */}
+      <div className="md:hidden space-y-4">
+        {filteredClients.map((client) => (
+          <div key={client.id} className="bg-white p-4 rounded-lg shadow-md border border-gray-200 space-y-4">
+            {/* Informações do Cliente */}
+            <div>
+              <h3 className="font-bold text-lg">{client.name}</h3>
+              <p className="text-sm text-gray-600">{client.cityState}</p>
+              <p className="text-sm text-gray-600">Placas: {client.quantity}</p>
+            </div>
+
+            {/* Campos de Formulário */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Data de Início</label>
                 <Calendar
                   value={client.startDate}
-                  onChange={(e) =>
-                    handleUpdate(client.id, "startDate", e.value ?? null)
-                  }
+                  onChange={(e) => handleUpdate(client.id, "startDate", e.value ?? null)}
                   dateFormat="dd/mm/yy"
                   placeholder="Selecionar data"
-                  className="border border-gray-300 rounded p-1 w-full"
+                  className="w-full"
+                  inputClassName="border border-gray-300 rounded p-2 w-full"
                 />
-              </td>
-
-              {/* data de entrega */}
-              <td className="p-3">
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Data de Entrega</label>
                 <Calendar
                   value={client.deliveryDate}
-                  onChange={(e) =>
-                    handleUpdate(client.id, "deliveryDate", e.value ?? null)
-                  }
+                  onChange={(e) => handleUpdate(client.id, "deliveryDate", e.value ?? null)}
                   dateFormat="dd/mm/yy"
                   placeholder="Selecionar data"
-                  className="border border-gray-300 rounded p-1 w-full"
+                  className="w-full"
+                  inputClassName="border border-gray-300 rounded p-2 w-full"
                 />
-              </td>
+              </div>
+            </div>
 
-              <td className="p-3">
-                <NumericFormat
-                  value={client.value ?? ""}
-                  thousandSeparator="."
-                  decimalSeparator=","
-                  prefix="R$ "
-                  decimalScale={2}
-                  fixedDecimalScale
-                  allowNegative={false}
-                  className="border border-gray-300 rounded p-1 w-full"
-                  onValueChange={(values) =>
-                    handleUpdate(client.id, "value", values.floatValue ?? null)
-                  }
-                />
-              </td>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Valor (R$)</label>
+              <NumericFormat
+                value={client.value ?? ""}
+                thousandSeparator="."
+                decimalSeparator=","
+                prefix="R$ "
+                decimalScale={2}
+                fixedDecimalScale
+                className="border border-gray-300 rounded p-2 w-full"
+                onValueChange={(values) => handleUpdate(client.id, "value", values.floatValue ?? null)}
+              />
+            </div>
+            
+            {/* Status e Ação */}
+            <div className="pt-2 border-t flex items-center justify-between">
+              {client.status === "Enviado" ? (
+                <div className="flex items-center">
+                  <CheckCircleIcon className="h-5 w-5 text-green-500 mr-1" />
+                  <span className="text-green-500 font-medium">Enviado</span>
+                </div>
+              ) : (
+                <div className="flex items-center">
+                  <ExclamationCircleIcon className="h-5 w-5 text-orange-500 mr-1" />
+                  <span className="text-orange-500 font-medium">Pendente</span>
+                </div>
+              )}
 
-              <td className="p-3 flex items-center space-x-2">
-                {client.status === "Enviado" ? (
-                  <>
-                    <CheckCircleIcon className="h-5 w-5 text-green-500" />
-                    <span className="text-green-500 font-medium">Enviado</span>
-                  </>
-                ) : (
-                  <>
-                    <ExclamationCircleIcon className="h-5 w-5 text-orange-500" />
-                    <span className="text-orange-500 font-medium">
-                      Pendente
-                    </span>
-                  </>
-                )}
-              </td>
-
-              <td className="p-3">
-                <button
-                  type="button"
-                  className={`px-4 py-2 rounded text-white ${
-                    client.status === "Enviado" ||
-                    !client.startDate ||
-                    !client.deliveryDate ||
-                    client.value === null
-                      ? "bg-gray-300 cursor-not-allowed"
-                      : "bg-blue-500 hover:bg-blue-600"
-                  }`}
-                  onClick={() => handleSendProposal(client.id)}
-                  disabled={
-                    client.status === "Enviado" ||
-                    !client.startDate ||
-                    !client.deliveryDate ||
-                    client.value === null
-                  }
-                >
-                  Enviar
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              <button
+                type="button"
+                className={`px-4 py-2 rounded text-white font-semibold transition-colors ${
+                  isButtonDisabled(client)
+                    ? "bg-gray-300 cursor-not-allowed"
+                    : "bg-blue-500 hover:bg-blue-600"
+                }`}
+                onClick={() => handleSendProposal(client.id)}
+                disabled={isButtonDisabled(client)}
+              >
+                Enviar
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

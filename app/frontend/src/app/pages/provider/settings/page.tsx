@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Sidebar from "@/components/Sidebar";
+import Layout from "@/components/Layout";
 import StatesForm from "@/components/form/StatesForm";
 import { Button } from "primereact/button";
 
@@ -176,197 +176,197 @@ export default function Settings() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100 relative">
-      {saveSuccess && (
-        <div className="fixed top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded shadow-md z-50">
-          Configurações salvas com sucesso!
+    <Layout screenTitle="Configurações">
+      <div className="flex h-screen bg-gray-100 relative">
+        {saveSuccess && (
+          <div className="fixed top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded shadow-md z-50">
+            Configurações salvas com sucesso!
+          </div>
+        )}
+
+        <div className="flex-1 overflow-auto p-6 custom-scrollbar">
+          <form
+            onSubmit={handleSubmit}
+            className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+          >
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <h2 className="text-xl font-semibold mb-4 text-gray-800">
+                Editar Perfil
+              </h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-gray-700 mb-1">Nome</label>
+                  <input
+                    type="text"
+                    name="nome"
+                    value={formData.nome}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border rounded-lg"
+                  />
+                  {errors.nome && (
+                    <p className="text-red-500 text-sm mt-1">{errors.nome}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-gray-700 mb-1">Sobrenome</label>
+                  <input
+                    type="text"
+                    name="sobrenome"
+                    value={formData.sobrenome}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border rounded-lg"
+                  />
+                  {errors.sobrenome && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.sobrenome}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div>
+                  <label className="block text-gray-700 mb-1">CEP</label>
+                  <input
+                    type="text"
+                    name="cep"
+                    value={address.cep}
+                    onChange={handleAddressChange}
+                    onBlur={(e) => fetchAddressByZip(e.target.value)}
+                    className="w-full px-3 py-2 border rounded-lg"
+                  />
+                  {errors.cep && (
+                    <p className="text-red-500 text-sm mt-1">{errors.cep}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-gray-700 mb-1">Rua</label>
+                  <input
+                    type="text"
+                    id="rua"
+                    name="rua"
+                    value={address.rua}
+                    onChange={handleAddressChange}
+                    placeholder="Rua"
+                    className="w-full px-3 py-2 border rounded-lg"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                <div>
+                  <label className="block text-gray-700 mb-1">
+                    Número/Complemento
+                  </label>
+                  <input
+                    type="text"
+                    name="numero"
+                    value={address.numero}
+                    onChange={handleAddressChange}
+                    className="w-full px-3 py-2 border rounded-lg"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-gray-700 mb-1">Cidade</label>
+                  <input
+                    type="text"
+                    name="cidade"
+                    value={address.cidade}
+                    className="w-full px-3 py-2 border rounded-lg bg-gray-200"
+                    disabled
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-gray-700 mb-1">Estado</label>
+                  <input
+                    type="text"
+                    name="estado"
+                    value={address.estado}
+                    className="w-full px-3 py-2 border rounded-lg bg-gray-200"
+                    disabled
+                  />
+                </div>
+              </div>
+
+              <div className="mt-4">
+                <label className="block text-gray-700 mb-1">E-mail</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border rounded-lg"
+                />
+                {errors.email && (
+                  <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                )}
+              </div>
+
+              <div className="mt-4">
+                <label className="block text-gray-700 mb-1">Telefone</label>
+                <input
+                  type="tel"
+                  name="telefone"
+                  value={formData.telefone}
+                  onChange={handleTelefoneChange}
+                  className="w-full px-3 py-2 border rounded-lg"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div>
+                  <label className="block text-gray-700 mb-1">Nova Senha</label>
+                  <input
+                    type="password"
+                    name="senha"
+                    value={formData.senha}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border rounded-lg"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-gray-700 mb-1">
+                    Confirmar Senha
+                  </label>
+                  <input
+                    type="password"
+                    name="confirmarSenha"
+                    value={formData.confirmarSenha}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border rounded-lg"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-lg shadow-md flex flex-col h-full">
+              <h2 className="text-xl font-semibold mb-4 text-gray-800">
+                Estados e Valores Médios
+              </h2>
+              <StatesForm
+                estadosAdicionados={estadosAtendidos ?? []}
+                setEstadosAdicionados={setEstadosAtendidos}
+                className="bg-white p-4 rounded-md shadow-sm space-y-3"
+
+              />
+            </div>
+
+            <div className="col-span-1 lg:col-span-2 text-right mt-4">
+              <Button
+                label="Salvar Alterações"
+                icon="pi pi-save"
+                className="bg-blue-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </form>
         </div>
-      )}
-
-      <div className="hidden md:block w-64 bg-gray-100 shadow-md">
-        <Sidebar title="Configurações" username="Usuário" />
       </div>
-
-      <div className="flex-1 overflow-auto p-6 custom-scrollbar">
-        <form
-          onSubmit={handleSubmit}
-          className="grid grid-cols-1 lg:grid-cols-2 gap-6"
-        >
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold mb-4 text-gray-800">
-              Editar Perfil
-            </h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-gray-700 mb-1">Nome</label>
-                <input
-                  type="text"
-                  name="nome"
-                  value={formData.nome}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border rounded-lg"
-                />
-                {errors.nome && (
-                  <p className="text-red-500 text-sm mt-1">{errors.nome}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-gray-700 mb-1">Sobrenome</label>
-                <input
-                  type="text"
-                  name="sobrenome"
-                  value={formData.sobrenome}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border rounded-lg"
-                />
-                {errors.sobrenome && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.sobrenome}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-              <div>
-                <label className="block text-gray-700 mb-1">CEP</label>
-                <input
-                  type="text"
-                  name="cep"
-                  value={address.cep}
-                  onChange={handleAddressChange}
-                  onBlur={(e) => fetchAddressByZip(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg"
-                />
-                {errors.cep && (
-                  <p className="text-red-500 text-sm mt-1">{errors.cep}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-gray-700 mb-1">Rua</label>
-                <input
-                  type="text"
-                  name="rua"
-                  value={address.rua}
-                  className="w-full px-3 py-2 border rounded-lg bg-gray-200"
-                  disabled
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-              <div>
-                <label className="block text-gray-700 mb-1">
-                  Número/Complemento
-                </label>
-                <input
-                  type="text"
-                  name="numero"
-                  value={address.numero}
-                  onChange={handleAddressChange}
-                  className="w-full px-3 py-2 border rounded-lg"
-                />
-              </div>
-
-              <div>
-                <label className="block text-gray-700 mb-1">Cidade</label>
-                <input
-                  type="text"
-                  name="cidade"
-                  value={address.cidade}
-                  className="w-full px-3 py-2 border rounded-lg bg-gray-200"
-                  disabled
-                />
-              </div>
-
-              <div>
-                <label className="block text-gray-700 mb-1">Estado</label>
-                <input
-                  type="text"
-                  name="estado"
-                  value={address.estado}
-                  className="w-full px-3 py-2 border rounded-lg bg-gray-200"
-                  disabled
-                />
-              </div>
-            </div>
-
-            <div className="mt-4">
-              <label className="block text-gray-700 mb-1">E-mail</label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border rounded-lg"
-              />
-              {errors.email && (
-                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-              )}
-            </div>
-
-            <div className="mt-4">
-              <label className="block text-gray-700 mb-1">Telefone</label>
-              <input
-                type="tel"
-                name="telefone"
-                value={formData.telefone}
-                onChange={handleTelefoneChange}
-                className="w-full px-3 py-2 border rounded-lg"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-              <div>
-                <label className="block text-gray-700 mb-1">Nova Senha</label>
-                <input
-                  type="password"
-                  name="senha"
-                  value={formData.senha}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border rounded-lg"
-                />
-              </div>
-
-              <div>
-                <label className="block text-gray-700 mb-1">
-                  Confirmar Senha
-                </label>
-                <input
-                  type="password"
-                  name="confirmarSenha"
-                  value={formData.confirmarSenha}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border rounded-lg"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-lg shadow-md flex flex-col h-full">
-            <h2 className="text-xl font-semibold mb-4 text-gray-800">
-              Estados e Valores Médios
-            </h2>
-            <StatesForm
-              estadosAdicionados={estadosAtendidos ?? []}
-              setEstadosAdicionados={setEstadosAtendidos}
-              className="bg-white p-4 rounded-md shadow-sm space-y-3"
-
-            />
-          </div>
-
-          <div className="col-span-1 lg:col-span-2 text-right mt-4">
-            <Button
-                  label="Salvar Alterações"
-                  icon="pi pi-save"
-                  className="bg-blue-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-          </div>
-        </form>
-      </div>
-    </div>
+    </Layout>
   );
 }

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect } from 'react';
-import Sidebar from '@/components/Sidebar';
+import Layout from '@/components/Layout';
 import '@/style/styles.css';
 import ClientTable from '@/components/ClientTable';
 
@@ -11,11 +11,8 @@ export default function Proposal() {
   }, []);
 
   return (
+    <Layout screenTitle="Propostas">
     <div className="flex h-screen bg-gray-100">
-      <div className="w-64 bg-gray-100 shadow-md">
-        <Sidebar title="Meus serviços" username="Usuário" />
-      </div>
-
       {/* MAIN CONTENT */}
       <div className="flex-1 p-6">
         <div className="text-black">
@@ -23,5 +20,6 @@ export default function Proposal() {
         </div>
       </div>
     </div>
+    </Layout>
   );
 }
