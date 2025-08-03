@@ -7,40 +7,49 @@ import Counter from "@/components/Counter";
 import Budget from "@/components/Budget";
 import "@/style/styles.css";
 import "@/style/globals.css";
+// Importando os ícones para o menu hambúrguer
+import { FaBars, FaTimes } from "react-icons/fa";
 
 const SolarLandingPage = () => {
-  // Controle para mostrar ou ocultar o modal
+  // Controle para mostrar ou ocultar o modal de orçamento
   const [showModal, setShowModal] = useState(false);
+  // Estado para controlar a visibilidade do menu mobile
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <div className="bg-gradient-to-b from-blue-50 to-blue-100 text-gray-800 min-h-screen">
-      {/* Cabeçalho */}
+      {/* Cabeçalho Modificado */}
       <header className="bg-blue-500 text-white py-4 sticky top-0 z-50 shadow-md">
         <nav className="max-w-7xl mx-auto flex justify-between items-center px-4">
           <h1 className="text-2xl font-bold">Painéis Solares</h1>
-          <ul className="flex space-x-6">
-            <li>
-              <a href="#home" className="hover:underline">
-                HOME
-              </a>
-            </li>
-            <li>
-              <a href="#about" className="hover:underline">
-                SOBRE NÓS
-              </a>
-            </li>
-            <li>
-              <a href="#services" className="hover:underline">
-                SERVIÇOS
-              </a>
-            </li>
-            <li>
-              <a href="/pages/login" className="hover:underline">
-                ENTRAR
-              </a>
-            </li>
+
+          {/* Menu para Desktop (escondido em telas pequenas) */}
+          <ul className="hidden md:flex space-x-6">
+            <li><a href="#home" className="hover:underline">HOME</a></li>
+            <li><a href="#about" className="hover:underline">SOBRE NÓS</a></li>
+            <li><a href="#services" className="hover:underline">SERVIÇOS</a></li>
+            <li><a href="/pages/login" className="hover:underline">ENTRAR</a></li>
           </ul>
+
+          {/* Botão Hambúrguer (visível apenas em telas pequenas) */}
+          <div className="md:hidden">
+            <button onClick={() => setIsMenuOpen(!isMenuOpen)}>
+              {isMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+            </button>
+          </div>
         </nav>
+
+        {/* Menu Mobile (aparece quando o botão é clicado) */}
+        {isMenuOpen && (
+          <div className="md:hidden bg-blue-500">
+            <ul className="flex flex-col items-center space-y-4 py-4">
+              <li><a href="#home" onClick={() => setIsMenuOpen(false)} className="hover:underline">HOME</a></li>
+              <li><a href="#about" onClick={() => setIsMenuOpen(false)} className="hover:underline">SOBRE NÓS</a></li>
+              <li><a href="#services" onClick={() => setIsMenuOpen(false)} className="hover:underline">SERVIÇOS</a></li>
+              <li><a href="/pages/login" onClick={() => setIsMenuOpen(false)} className="hover:underline">ENTRAR</a></li>
+            </ul>
+          </div>
+        )}
       </header>
 
       {/* Seção Inicial */}
@@ -52,7 +61,8 @@ const SolarLandingPage = () => {
         transition={{ duration: 0.8 }}
       >
         <div className="max-w-3xl">
-          <h2 className="text-5xl font-extrabold text-blue-800 mb-6 leading-tight">
+          {/* Tamanho da fonte ajustado para telas menores */}
+          <h2 className="text-4xl md:text-5xl font-extrabold text-blue-800 mb-6 leading-tight">
             Economize com Energia Solar. Invista em Sustentabilidade e Retorno
             Garantido.
           </h2>
