@@ -2,13 +2,16 @@
 
 import React, { useState, useEffect } from "react";
 import Sidebar from "@/components/Sidebar";
+import StatesForm from "@/components/form/StatesForm";
 import { Button } from "primereact/button";
 
-export default function Settings() {
-  const [emailError, setEmailError] = useState<string | null>(null);
-  const [nameError, setNameError] = useState<string | null>(null);
-  const [saveSuccess, setSaveSuccess] = useState(false);
+interface Estado {
+  id: number;
+  estado: string;
+  valor: string;
+}
 
+export default function Settings() {
   const [formData, setFormData] = useState({
     nome: "",
     sobrenome: "",
@@ -19,13 +22,20 @@ export default function Settings() {
     valorMaterial: "",
   });
 
-  // Validação de e-mail
-  const validateEmail = (email: string) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(email);
-  };
+  const [errors, setErrors] = useState<Record<string, string | null>>({});
+  const [estadosAtendidos, setEstadosAtendidos] = useState<Estado[]>([]);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
-  // Formata o número para moeda
+  useEffect(() => {
+    const dadosSalvos = localStorage.getItem("configuracoes_prestador");
+    if (dadosSalvos) {
+      const dados = JSON.parse(dadosSalvos);
+      setFormData(dados.formData || {});
+      setEstadosAtendidos(dados.estadosAtendidos || []);
+    }
+  }, []);
+
+  // 👉 Formata número para moeda BRL
   const formatCurrencyLive = (value: string) => {
     const onlyDigits = value.replace(/\D/g, "");
     const numericValue = parseFloat(onlyDigits) / 100;
@@ -38,27 +48,10 @@ export default function Settings() {
     });
   };
 
-  // Handle de mudança dos campos
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
-    if (name === "nome" || name === "sobrenome") {
-      if (/\d/.test(value)) {
-        setNameError("Nome e sobrenome não podem conter números.");
-        return;
-      } else {
-        setNameError(null);
-      }
-    }
-
-    if (name === "email") {
-      if (value && !validateEmail(value)) {
-        setEmailError("Por favor, insira um e-mail válido.");
-      } else {
-        setEmailError(null);
-      }
-    }
-
+    // 👉 Campos monetários
     if (name === "valorAssinatura" || name === "valorMaterial") {
       const formatted = formatCurrencyLive(value);
       setFormData({ ...formData, [name]: formatted });
@@ -68,204 +61,197 @@ export default function Settings() {
     setFormData({ ...formData, [name]: value });
   };
 
+  const validateEmail = (email: string) => {
+    if (/\s/.test(email) || /\.{2,}/.test(email)) return false;
+    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return regex.test(email);
+  };
+
+  const validateForm = () => {
+    const newErrors: Record<string, string | null> = {};
+    if (formData.nome && /\d/.test(formData.nome)) {
+      newErrors.nome = "Nome não pode conter números.";
+    }
+    if (formData.sobrenome && /\d/.test(formData.sobrenome)) {
+      newErrors.sobrenome = "Sobrenome não pode conter números.";
+    }
+    if (formData.email && !validateEmail(formData.email)) {
+      newErrors.email = "Por favor, insira um e-mail válido.";
+    }
+    return newErrors;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!validateEmail(formData.email)) {
-      setEmailError("Por favor, insira um e-mail válido.");
+    const newErrors = validateForm();
+    if (Object.values(newErrors).some((error) => error !== null)) {
+      setErrors(newErrors);
+      setSaveSuccess(false);
       return;
     }
 
+    const dadosParaSalvar = {
+      formData,
+      estadosAtendidos,
+    };
+
     localStorage.setItem(
-      "configuracoes_admin",
-      JSON.stringify({ formData })
+      "configuracoes_prestador",
+      JSON.stringify(dadosParaSalvar)
     );
+
+    setErrors({});
     setSaveSuccess(true);
-    setTimeout(() => setSaveSuccess(false), 3000);
+    setTimeout(() => setSaveSuccess(false), 4000);
   };
 
-  useEffect(() => {
-    const dadosSalvos = localStorage.getItem("configuracoes_admin");
-    if (dadosSalvos) {
-      const dados = JSON.parse(dadosSalvos);
-      setFormData(dados.formData || {});
-    }
-  }, []);
-
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-100 relative">
       {saveSuccess && (
         <div className="fixed top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded shadow-md z-50">
           Configurações salvas com sucesso!
         </div>
       )}
 
-      <div className="w-64 bg-gray-100 shadow-md">
+      <div className="hidden md:block w-64 bg-gray-100 shadow-md">
         <Sidebar title="Configurações" username="Usuário" />
       </div>
 
-      <div className="flex-1 p-4 mt-20">
-        <div className="bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto">
-          <h2 className="text-xl font-semibold mb-4 text-gray-800">
-            Editar Perfil
-          </h2>
+      <div className="flex-1 overflow-auto p-6 custom-scrollbar mt-10">
+        <form
+          onSubmit={handleSubmit}
+          className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+        >
+          {/* COLUNA ESQUERDA */}
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold mb-4 text-gray-800">
+              Editar Perfil
+            </h2>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
             {/* Nome e Sobrenome */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label
-                  htmlFor="nome"
-                  className="block text-gray-700 font-medium mb-2"
-                >
-                  Nome
-                </label>
+                <label className="block text-gray-700 mb-1">Nome</label>
                 <input
                   type="text"
-                  id="nome"
                   name="nome"
                   value={formData.nome}
                   onChange={handleChange}
-                  placeholder="Digite seu nome"
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border rounded-lg"
                 />
+                {errors.nome && (
+                  <p className="text-red-500 text-sm mt-1">{errors.nome}</p>
+                )}
               </div>
-
               <div>
-                <label
-                  htmlFor="sobrenome"
-                  className="block text-gray-700 font-medium mb-2"
-                >
-                  Sobrenome
-                </label>
+                <label className="block text-gray-700 mb-1">Sobrenome</label>
                 <input
                   type="text"
-                  id="sobrenome"
                   name="sobrenome"
                   value={formData.sobrenome}
                   onChange={handleChange}
-                  placeholder="Digite seu sobrenome"
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border rounded-lg"
                 />
+                {errors.sobrenome && (
+                  <p className="text-red-500 text-sm mt-1">{errors.sobrenome}</p>
+                )}
               </div>
             </div>
-            {nameError && (
-              <p className="text-red-500 text-sm mt-1">{nameError}</p>
-            )}
 
-            {/* E-mail */}
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-gray-700 font-medium mb-2"
-              >
-                E-mail
-              </label>
+            {/* Email */}
+            <div className="mt-4">
+              <label className="block text-gray-700 mb-1">E-mail</label>
               <input
                 type="email"
-                id="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                onBlur={handleChange}
-                required
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Digite seu email"
+                className="w-full px-3 py-2 border rounded-lg"
               />
-              {emailError && (
-                <p className="text-red-500 text-sm mt-1">{emailError}</p>
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
               )}
             </div>
 
             {/* Senha e Confirmar Senha */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <div>
-                <label
-                  htmlFor="senha"
-                  className="block text-gray-700 font-medium mb-2"
-                >
-                  Nova Senha
-                </label>
+                <label className="block text-gray-700 mb-1">Nova Senha</label>
                 <input
                   type="password"
-                  id="senha"
                   name="senha"
                   value={formData.senha}
                   onChange={handleChange}
-                  placeholder="Digite sua nova senha"
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border rounded-lg"
                 />
               </div>
-
               <div>
-                <label
-                  htmlFor="confirmarSenha"
-                  className="block text-gray-700 font-medium mb-2"
-                >
+                <label className="block text-gray-700 mb-1">
                   Confirmar Senha
                 </label>
                 <input
                   type="password"
-                  id="confirmarSenha"
                   name="confirmarSenha"
                   value={formData.confirmarSenha}
                   onChange={handleChange}
-                  placeholder="Confirme sua nova senha"
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border rounded-lg"
                 />
               </div>
             </div>
 
-            {/* Valor Assinatura e Valor Material */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Valores */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <div>
-                <label
-                  htmlFor="valorAssinatura"
-                  className="block text-gray-700 font-medium mb-2"
-                >
-                  Valor da Assinatura (R$)
+                <label className="block text-gray-700 mb-1">
+                  Valor da Assinatura
                 </label>
                 <input
                   type="text"
-                  id="valorAssinatura"
                   name="valorAssinatura"
                   value={formData.valorAssinatura}
                   onChange={handleChange}
-                  placeholder="Ex: 29,90"
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border rounded-lg"
+                  placeholder="Ex: 90,00"
                 />
               </div>
-
               <div>
-                <label
-                  htmlFor="valorMaterial"
-                  className="block text-gray-700 font-medium mb-2"
-                >
-                  Valor do Material (R$)
+                <label className="block text-gray-700 mb-1">
+                  Valor do Material
                 </label>
                 <input
                   type="text"
-                  id="valorMaterial"
                   name="valorMaterial"
                   value={formData.valorMaterial}
                   onChange={handleChange}
-                  placeholder="Ex: 29,90"
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border rounded-lg"
+                  placeholder="Ex: 100,50"
                 />
               </div>
             </div>
+          </div>
 
-            {/* Botão Salvar */}
-            <div className="text-right">
-              <Button
-                label="Salvar Alterações"
-                icon="pi pi-save"
-                className="bg-blue-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                type="submit"
-              />
-            </div>
-          </form>
-        </div>
+          {/* COLUNA DIREITA */}
+          <div className="bg-white p-6 rounded-lg shadow-md flex flex-col h-full">
+            <h2 className="text-xl font-semibold mb-4 text-gray-800">
+              Estados e Valor das Placas Solares
+            </h2>
+            <StatesForm
+              estadosAdicionados={estadosAtendidos ?? []}
+              setEstadosAdicionados={setEstadosAtendidos}
+              className="bg-white p-4 rounded-md shadow-sm space-y-3"
+            />
+          </div>
+
+          {/* BOTÃO ÚNICO */}
+          <div className="col-span-1 lg:col-span-2 text-right mt-4">
+            <Button
+              type="submit"
+              label="Salvar Alterações"
+              icon="pi pi-save"
+              className="bg-blue-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        </form>
       </div>
     </div>
   );
